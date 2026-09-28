@@ -22,10 +22,11 @@ from core_engine import (
 
 if getattr(sys, 'frozen', False):
     template_folder = os.path.join(sys._MEIPASS, 'templates')
-    app = Flask(__name__, template_folder=template_folder)
+    static_folder = os.path.join(sys._MEIPASS, 'static')
+    app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
     BASE_DIR = os.path.dirname(sys.executable)
 else:
-    app = Flask(__name__, template_folder='templates')
+    app = Flask(__name__, template_folder='templates', static_folder='static')
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app.config['MAX_CONTENT_LENGTH'] = 64 * 1024 * 1024  # 64 MB - siparis dosyasi yukleme siniri
