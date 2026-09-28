@@ -624,7 +624,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     font_code = Font(name='Segoe UI', size=10, bold=True, color='1E293B')
 
     fill_header = PatternFill(start_color='1E293B', end_color='1E293B', fill_type='solid')
-    fill_zebra = PatternFill(start_color='F8FAFC', end_color='F8FAFC', fill_type='solid')
+    fill_zebra = PatternFill(start_color='F1F5F9', end_color='F1F5F9', fill_type='solid')
 
     border_thin = Side(border_style='thin', color='94A3B8')
     cell_border = Border(top=border_thin, left=border_thin, right=border_thin, bottom=border_thin)
@@ -705,9 +705,20 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
         if has_page_break:
             ws.row_breaks.append(Break(id=page_break_after_idx + 1))
 
-        ws.column_dimensions['A'].width = 10 if is_dense else 12
-        ws.column_dimensions['B'].width = 60 if is_dense else 56
-        ws.column_dimensions['C'].width = 16 if is_dense else 18
+        # Tablo sütun genişliklerini içerik uzunluğuna göre dinamik ayarla
+        max_q_len = max([len('Miktar')] + [len(str(itm.get('qty', ''))) for itm in rows_data]) if rows_data else 6
+        max_s_len = max([len('Stok Kodu')] + [len(str(itm.get('stok', ''))) for itm in rows_data]) if rows_data else 9
+
+        col_a_w = max(8, min(max_q_len + 4, 12))
+        col_c_w = max(14, min(max_s_len + 4, 22))
+
+        # A4 dikey toplam genişliği (~84-86 pt) içinde kalan genişliği Ürün Adı'na ver
+        target_total_w = 84 if is_dense else 86
+        col_b_w = max(50, target_total_w - col_a_w - col_c_w)
+
+        ws.column_dimensions['A'].width = col_a_w
+        ws.column_dimensions['B'].width = col_b_w
+        ws.column_dimensions['C'].width = col_c_w
 
     # 1. Main Workbook (Non-Beko or All)
     wb_main = openpyxl.Workbook()
