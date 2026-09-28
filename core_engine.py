@@ -505,6 +505,19 @@ def pick_best_name(names, brand=None):
     return cleaned_names[0]
 
 
+def get_signature_image_path():
+    """İmza görseli dosya yolunu farklı çalıştırma ortamlarına göre (kaynak kod, PyInstaller, çalışma dizini) bulur."""
+    candidates = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'signature.png'),
+        os.path.join(getattr(sys, '_MEIPASS', ''), 'static', 'signature.png'),
+        os.path.join(os.getcwd(), 'static', 'signature.png'),
+    ]
+    for p in candidates:
+        if p and os.path.isfile(p):
+            return p
+    return None
+
+
 def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     """
     Mükerrer ürünleri konsolide eder ve A4 formatlı Excel dosyalarını BELLEKTE üretir.
@@ -721,6 +734,25 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
         ws.column_dimensions['A'].width = col_a_w
         ws.column_dimensions['B'].width = col_b_w
         ws.column_dimensions['C'].width = col_c_w
+
+        # Her A4 sayfasının sağ alt köşesinde Saygılarımla imza çıktısı
+        ws.oddFooter.right.text = '&I&10Saygılarımla,\nGökhan B.'
+
+        # Çalışma sayfası sonuna imza görseli ve Saygılarımla metni
+        sig_path = get_signature_image_path()
+        if sig_path and os.path.isfile(sig_path):
+            try:
+                from openpyxl.drawing.image import Image as XlsxImage
+                sig_img = XlsxImage(sig_path)
+                sig_img.width = 85
+                sig_img.height = int(212 * (85 / 305))
+                last_r = len(rows_data) + 1
+                c_sig = ws.cell(row=last_r + 2, column=3, value='Saygılarımla,')
+                c_sig.font = Font(name='Segoe UI', size=9.5, italic=True, color='334155')
+                c_sig.alignment = Alignment(horizontal='right')
+                ws.add_image(sig_img, f'C{last_r + 3}')
+            except Exception:
+                pass
 
     # 1. Main Workbook (Non-Beko or All)
     wb_main = openpyxl.Workbook()
