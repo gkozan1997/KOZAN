@@ -140,7 +140,9 @@ def is_major_appliance_or_warranty(name):
 
     return False
 
-def is_excluded_product(name):
+def is_excluded_product(name, brand=''):
+    if brand and brand != 'BEKO' and 'BEKO' not in canonical_key(name):
+        return False
     return is_major_appliance_or_warranty(name)
 
 def find_column_index(headers, possible_names):
@@ -468,25 +470,30 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     brand_consolidated = defaultdict(lambda: defaultdict(lambda: {'name': '', 'stok': '', 'qty': 0, 'brand': ''}))
     beko_consolidated = defaultdict(lambda: {'name': '', 'stok': '', 'qty': 0, 'brand': 'BEKO'})
 
-    # Büyük beyaz eşya içeren sipariş/müşteri kümesi
-    # Kural: Ankastre Ocak ve Aspiratör (Beko P 38 vb.) aynı müşteri tek başına satın aldıysa listeye ekle,
-    # Çamaşır, Kurutma, Bulaşık, Buzdolabı, Fırın, Davlumbaz, TV, Derin Dondurucu veya Klima ile aldıysa listeye ekleme.
-    orders_with_major = set()
+    # Büyük beyaz eşya içeren sipariş/müşteri kümesi (SADECE BEKO İÇİN)
+    # Kural: Bu filtreleme sadece Beko markası için uygulanır. Geriye kalan tüm markalar (Tefal, Philips, Teka vb.) doğrudan listelenir.
+    orders_with_beko_major = set()
     for item in all_raw_rows:
-        if is_major_appliance_or_warranty(item['name']):
+        is_beko = (item['brand'] == 'BEKO' or 'BEKO' in canonical_key(item['name']))
+        if is_beko and is_major_appliance_or_warranty(item['name']):
             if item.get('order_no'):
-                orders_with_major.add(item['order_no'])
+                orders_with_beko_major.add(item['order_no'])
             if item.get('customer'):
-                orders_with_major.add(canonical_key(item['customer']))
+                orders_with_beko_major.add(canonical_key(item['customer']))
 
     def is_item_excluded(item):
+        is_beko = (item['brand'] == 'BEKO' or 'BEKO' in canonical_key(item['name']))
+        # Sadece BEKO markasına uygulanır, diğer markalar asla elenmez
+        if not is_beko:
+            return False
+
         name = item['name']
         if is_major_appliance_or_warranty(name):
             return True
         if is_conditional_appliance(name):
             ord_no = item.get('order_no', '')
             cust = canonical_key(item.get('customer', ''))
-            return bool((ord_no and ord_no in orders_with_major) or (cust and cust in orders_with_major))
+            return bool((ord_no and ord_no in orders_with_beko_major) or (cust and cust in orders_with_beko_major))
         return False
 
     for item in all_raw_rows:

@@ -61,8 +61,8 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * `TEFAL`, `BABYLISS`, `LENOVO`, `GRUNDIG`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ` vb.
   * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
 * **Büyük Beyaz Eşya, TV ve Garanti Filtrelemesi (`is_excluded_product`):**
-  * Sipariş toplama listelerinde yalnızca depodan fiziki toplanacak küçük ev aletleri ve elektronik ürünler yer alır.
-  * **Filtrelenen Ürünler (Listeden Hariç Tutulanlar):**
+  * Bu filtreleme **YALNIZCA BEKO markalı ürünlere** uygulanır. Diğer tüm markalar (Tefal, Babyliss, Philips, Braun, Lenovo, Teka, Bissell, Laurastar, WMF, Kenwood vb.) doğrudan listelenir.
+  * **Beko İçin Filtrelenen Ürünler (Listeden Hariç Tutulanlar):**
     - Çamaşır Kurutma Makinesi, Kurutma Makinesi
     - Bulaşık Makinesi
     - Buzdolabı (Mini Buzdolabı dahil)
