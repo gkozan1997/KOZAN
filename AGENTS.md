@@ -97,15 +97,22 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 
 ## 5. Çıktı Standartları (A4 Dikey)
 
-* **Sayfa Düzeni:** A4 Dikey, `fitToWidth=1`, `fitToHeight=1` (yazdırırken sayfaya tam sığdırma).
+* **Sayfa Düzeni ve A4 Sığdırma Standardı:**
+  * **Genel Liste (1. Sekme):** Toplam **tam 2 sayfa A4**. `fitToWidth=1`, `fitToHeight=2` ve aradaki `Break` sayesinde:
+    - **1. Sayfa:** Diğer tüm markalar tam 1 sayfaya sığar.
+    - **2. Sayfa:** Beko & Grundig ürünleri tam 2. sayfaya sığar.
+    - `ws.print_title_rows = '1:1'` ile her sayfada başlık satırı tekrarlanır.
+  * **Tek Sayfalık Sekmeler (2+ Sekmeler ve Beko Dosyası):** `fitToWidth=1`, `fitToHeight=1` ile her marka sekmesi tam 1 sayfaya sığdırılır.
+  * **Dinamik Satır ve Font Optimizasyonu:** Sayfa başına düşen kalem > 35 ise satır yüksekliği 20pt, Segoe UI 9.5pt font ve kompakt kenar boşlukları (0.35/0.4 inç) kullanılır; <= 35 kalem için 24pt satır yüksekliği ve 10pt font kullanılır.
+  * **Web A4 Yazdır Standardı (`@media print`):** `@page { size: A4 portrait; margin: 8mm 10mm; }`, `thead { display: table-header-group; }` ve `tr.print-page-break { break-before: page; }` kuralları ile tarayıcıdan A4 yazdırıldığında da 1. sayfa diğer markaları, 2. sayfa Beko & Grundig ürünlerini tam 2 A4 sayfasına sığdırır.
 * **3 Sütun Yapısı:**
-  1. `Miktar` (Genişlik 12, ortalı, kalın font)
-  2. `Ürün Adı` (Genişlik 56, sola dayalı, kelime kaydırma aktif)
-  3. `Stok Kodu` (Genişlik 18, ortalı, monospace/koyu font)
+  1. `Miktar` (Genişlik 10-12, ortalı, kalın font)
+  2. `Ürün Adı` (Genişlik 56-60, sola dayalı, kelime kaydırma aktif)
+  3. `Stok Kodu` (Genişlik 16-18, ortalı, monospace/koyu font)
 * **Stil:** Koyu başlık satırı (`#1E293B`, beyaz yazı), zebra desenli satırlar (`#F8FAFC`), ince gri kenarlıklar.
 * **Dosyalar:**
   1. `Urun_Toplama_Listesi_A4_Cikti.xlsx` (Ana Liste + her marka için ayrı sekme).
-  2. `Beko_Urun_Toplama_Listesi_A4.xlsx` (Beko ürünleri toplama listesi).
+  2. `Beko_Urun_Toplama_Listesi_A4.xlsx` (Beko & Grundig ürünleri toplama listesi).
 * **Kayıt Konumları:**
   * `projem/YYYY-AA-GG/`
   * `Desktop/Siparis/YYYY-AA-GG/`

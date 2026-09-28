@@ -706,53 +706,113 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Print View styles */
+        /* Print View styles - A4 Portrait Optimized */
         @media print {
-            body {
+            @page {
+                size: A4 portrait;
+                margin: 8mm 10mm;
+            }
+            html, body {
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
                 background: #ffffff !important;
                 color: #000000 !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
             }
-            header, .rules-bar, .action-grid, .action-toolbar, .search-input, .brand-tabs, #toast-container, .card, .kpi-grid {
+            header, .rules-bar, .action-grid, .action-toolbar, .search-input, .brand-tabs, #toast-container, .card, .kpi-grid, #source-files-badge, footer {
                 display: none !important;
+            }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
             .results-section {
                 border: none !important;
                 padding: 0 !important;
                 margin: 0 !important;
             }
+            .results-header {
+                display: none !important;
+            }
             .table-responsive {
                 border: none !important;
                 overflow: visible !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             table {
                 width: 100% !important;
-                font-size: 10pt !important;
+                border-collapse: collapse !important;
                 border: 1px solid #94a3b8 !important;
+                font-size: 8.5pt !important;
+                line-height: 1.15 !important;
             }
             thead {
+                display: table-header-group !important;
                 background: #1e293b !important;
-                -webkit-print-color-adjust: exact;
-                color-adjust: exact;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             th {
                 color: #ffffff !important;
-                border: 1px solid #94a3b8 !important;
-                padding: 8px !important;
+                background: #1e293b !important;
+                border: 1px solid #475569 !important;
+                padding: 4px 6px !important;
+                font-size: 8.5pt !important;
+                font-weight: 700 !important;
+                text-align: center !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            th:nth-child(2) {
+                text-align: left !important;
+            }
+            tr {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            tr.print-page-break {
+                break-before: page !important;
+                page-break-before: always !important;
             }
             td {
                 border: 1px solid #cbd5e1 !important;
-                padding: 6px 8px !important;
+                padding: 2.2px 5px !important;
                 color: #000000 !important;
+                font-size: 8.5pt !important;
+                vertical-align: middle !important;
+            }
+            td.col-qty {
+                width: 45px !important;
+                text-align: center !important;
+                font-weight: 700 !important;
+            }
+            td.col-name {
+                text-align: left !important;
+            }
+            td.col-code {
+                width: 120px !important;
+                text-align: center !important;
+                font-family: 'JetBrains Mono', monospace !important;
+                font-size: 8pt !important;
+                font-weight: 600 !important;
             }
             .qty-badge {
                 border: none !important;
                 background: transparent !important;
                 color: #000000 !important;
-                font-weight: bold !important;
+                font-weight: 700 !important;
+                font-size: 8.5pt !important;
+                padding: 0 !important;
             }
             tbody tr:nth-child(even) {
                 background: #f8fafc !important;
-                -webkit-print-color-adjust: exact;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
         }
     </style>
@@ -1209,8 +1269,14 @@
             return;
         }
 
-        items.forEach(itm => {
+        const isAllTab = (activeTabKey === 'all');
+        const splitIdx = currentResultData.other_items_count || 0;
+
+        items.forEach((itm, idx) => {
             const tr = document.createElement('tr');
+            if (isAllTab && splitIdx > 0 && idx === splitIdx) {
+                tr.classList.add('print-page-break');
+            }
             tr.innerHTML = `
                 <td class="col-qty"><span class="qty-badge">${itm.qty}</span></td>
                 <td class="col-name">${itm.name}</td>

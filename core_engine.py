@@ -560,50 +560,66 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
         ws.page_setup.orientation = ws.ORIENTATION_PORTRAIT
         ws.sheet_properties.pageSetUpPr.fitToPage = True
         ws.page_setup.fitToWidth = 1
-        if page_break_after_idx is not None and 0 < page_break_after_idx < len(rows_data):
-            # Cok sayfali dikey yazdirma icin fitToHeight 0 (sinirsiz) yapilir;
-            # boylece Excel sayfa kirilimini (page break) korur ve tek sayfaya sikistirmaz.
-            ws.page_setup.fitToHeight = 0
-            # 2. sayfada da basliklarin ("Miktar", "Urun Adi", "Stok Kodu") gorunmesi icin:
+
+        has_page_break = (page_break_after_idx is not None and 0 < page_break_after_idx < len(rows_data))
+        if has_page_break:
+            # 2 sayfa A4: 1. sayfa diger markalar, 2. sayfa Beko & Grundig
+            ws.page_setup.fitToHeight = 2
             ws.print_title_rows = '1:1'
         else:
+            # Tek sayfa A4
             ws.page_setup.fitToHeight = 1
 
-        ws.page_margins.left = 0.5
-        ws.page_margins.right = 0.5
-        ws.page_margins.top = 0.6
-        ws.page_margins.bottom = 0.6
-        ws.page_margins.header = 0.3
-        ws.page_margins.footer = 0.3
+        # Sayfa basina dusen maksimum satir sayisina gore dinamik optimizasyon
+        if has_page_break:
+            max_page_rows = max(page_break_after_idx, len(rows_data) - page_break_after_idx)
+        else:
+            max_page_rows = len(rows_data)
+
+        is_dense = (max_page_rows > 35)
+
+        ws.page_margins.left = 0.35 if is_dense else 0.4
+        ws.page_margins.right = 0.35 if is_dense else 0.4
+        ws.page_margins.top = 0.4 if is_dense else 0.5
+        ws.page_margins.bottom = 0.4 if is_dense else 0.5
+        ws.page_margins.header = 0.2 if is_dense else 0.25
+        ws.page_margins.footer = 0.2 if is_dense else 0.25
 
         ws.print_options.horizontalCentered = True
         ws.print_options.gridLines = True
 
+        f_header = Font(name='Segoe UI', size=10 if is_dense else 11, bold=True, color='FFFFFF')
+        f_regular = Font(name='Segoe UI', size=9.5 if is_dense else 10)
+        f_qty = Font(name='Segoe UI', size=10.5 if is_dense else 11, bold=True)
+        f_code = Font(name='Segoe UI', size=9.5 if is_dense else 10, bold=True, color='1E293B')
+
         headers = ['Miktar', 'Ürün Adı', 'Stok Kodu']
         for col_idx, h in enumerate(headers, 1):
             c = ws.cell(row=1, column=col_idx, value=h)
-            c.font = font_header
+            c.font = f_header
             c.fill = fill_header
             c.alignment = Alignment(horizontal='center', vertical='center')
             c.border = cell_border
-        ws.row_dimensions[1].height = 30
+        ws.row_dimensions[1].height = 24 if is_dense else 28
+
+        row_h = 20 if is_dense else 24
 
         for idx, itm in enumerate(rows_data, 1):
             row_num = idx + 1
 
             c_q = ws.cell(row=row_num, column=1, value=itm['qty'])
             c_q.alignment = Alignment(horizontal='center', vertical='center')
-            c_q.font = font_qty
+            c_q.font = f_qty
 
             c_n = ws.cell(row=row_num, column=2, value=itm['name'])
             c_n.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
-            c_n.font = font_regular
+            c_n.font = f_regular
 
             c_s = ws.cell(row=row_num, column=3, value=itm['stok'])
             c_s.alignment = Alignment(horizontal='center', vertical='center')
-            c_s.font = font_code
+            c_s.font = f_code
 
-            ws.row_dimensions[row_num].height = 26
+            ws.row_dimensions[row_num].height = row_h
 
             for c in range(1, 4):
                 cell = ws.cell(row=row_num, column=c)
@@ -611,12 +627,12 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
                 if idx % 2 == 0:
                     cell.fill = fill_zebra
 
-        if page_break_after_idx is not None and 0 < page_break_after_idx < len(rows_data):
+        if has_page_break:
             ws.row_breaks.append(Break(id=page_break_after_idx + 1))
 
-        ws.column_dimensions['A'].width = 12
-        ws.column_dimensions['B'].width = 56
-        ws.column_dimensions['C'].width = 18
+        ws.column_dimensions['A'].width = 10 if is_dense else 12
+        ws.column_dimensions['B'].width = 60 if is_dense else 56
+        ws.column_dimensions['C'].width = 16 if is_dense else 18
 
     # 1. Main Workbook (Non-Beko or All)
     wb_main = openpyxl.Workbook()
@@ -666,10 +682,11 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
         'source_files': source_filenames,
         'total_files': len(source_filenames),
         'total_orders': len(all_raw_rows),
-        'excluded_orders': len(excluded_rows),
+        'excluded_rows': len(excluded_rows),
         'excluded_qty': sum(x['qty'] for x in excluded_rows),
         'non_beko_count': len(grouped_items),
         'non_beko_qty': sum(x['qty'] for x in grouped_items),
+        'other_items_count': other_items_count,
         'beko_count': len(beko_orders),
         'beko_qty': sum(x['qty'] for x in beko_orders),
         'filter_beko': filter_beko,
