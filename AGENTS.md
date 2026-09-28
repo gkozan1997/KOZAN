@@ -129,3 +129,17 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 * Flask varsayılan olarak `127.0.0.1:5000` portunu kullanır.
 * Olası donma veya eski açık kalmış `SiparisToplama.exe` süreçlerinin portu kilitlemesini önlemek için:
   * Tüm `.bat` başlatıcıları açılışta 5000 portunu dinleyen süreçleri otomatik temizler (`taskkill /F /PID %%a`).
+
+---
+
+## 7. Sayfa İmzası (Gökhan B. & Saygılarımla Standardı)
+
+* **Web Arayüzü & A4 Baskı Önizlemesi (`@media print`):**
+  * Kullanıcının mavi mürekkepli **Gökhan B.** imzası saydamlaştırılarak (transparan arka plan) sisteme entegre edilmiştir.
+  * Ağ gecikmesi, 404 önbellek veya offline durumlardan etkilenmemesi için imza doğrudan **Inline Base64 Data URI** olarak HTML içine gömülüdür.
+  * CSS Paged Media `position: fixed; bottom: 3.5mm; right: 10mm;` kuralı sayesinde tarayıcıdan A4 yazdırıldığında (`printA4Document()`), imza ve üstündeki **"Saygılarımla,"** yazısı **HER SAYFANIN** (1. sayfa, 2. sayfa vb.) sağ alt köşesinde otomatik basılır.
+  * Tarayıcının "Arka plan grafikleri" seçeneğine bakılmaksızın imza mürekkebinin tam çıkması için `-webkit-print-color-adjust: exact !important` ve `print-color-adjust: exact !important` kuralları aktiftir.
+  * Web ekranında da tablonun hemen altında sağa dayalı imza alanı yer alır.
+* **Excel Çalışma Kitabı Çıktısı (`core_engine.py`):**
+  * Excel sayfa yapısında her sayfada çıkacak şekilde alt bilgi (`ws.oddFooter.right.text = '&ISaygılarımla,\nGökhan B.'`) tanımlıdır.
+  * Ayrıca çalışma sayfasında listenin sağ altına `openpyxl.drawing.image.Image` ve `Pillow` ile transparan imza görseli ve "Saygılarımla," hücresi eklenir.
