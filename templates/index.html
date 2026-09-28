@@ -864,7 +864,7 @@
                         <input type="checkbox" id="toggle-beko">
                         <span class="slider"></span>
                     </div>
-                    <span>Beko siparişlerini ana listeden ayır (Ayrı dosya yap)</span>
+                    <span>Beko & Grundig siparişlerini ana listeden ayır (Ayrı dosya yap)</span>
                 </label>
             </div>
         </div>
@@ -881,7 +881,7 @@
             <div class="kpi-value" id="kpi-non-beko">0 <span class="kpi-unit">Adet</span></div>
         </div>
         <div class="kpi-card kpi-accent-amber">
-            <div class="kpi-label" id="kpi-beko-label">Beko Siparişleri</div>
+            <div class="kpi-label" id="kpi-beko-label">Beko & Grundig</div>
             <div class="kpi-value" id="kpi-beko">0 <span class="kpi-unit">Adet</span></div>
         </div>
         <div class="kpi-card kpi-accent-indigo">
@@ -903,7 +903,7 @@
             </button>
             <button class="btn-action" id="btn-open-beko" onclick="openBekoExcel()">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                📦 Beko Listesini Aç (Excel)
+                📦 Beko & Grundig Listesini Aç (Excel)
             </button>
         </div>
 
@@ -1108,7 +1108,7 @@
 
         const bekoLabel = document.getElementById('kpi-beko-label');
         if (bekoLabel) {
-            bekoLabel.innerText = result.filter_beko ? 'Ayrıştırılan Beko' : 'Beko Siparişleri';
+            bekoLabel.innerText = result.filter_beko ? 'Ayrıştırılan Beko & Grundig' : 'Beko & Grundig Siparişleri';
         }
 
         // Files Badge
@@ -1152,23 +1152,23 @@
         allTab.onclick = () => switchTab('all', allTab);
         tabsContainer.appendChild(allTab);
 
-        const bekoInBrands = result.brands.some(b => b.brand === 'BEKO');
+        const bekoInBrands = result.brands.some(b => b.brand === 'BEKO & GRUNDIG' || b.brand === 'BEKO');
 
         result.brands.forEach(b => {
             const btn = document.createElement('button');
-            const isBeko = (b.brand === 'BEKO');
+            const isBeko = (b.brand === 'BEKO & GRUNDIG' || b.brand === 'BEKO');
             btn.className = 'tab-btn' + (isBeko ? ' tab-beko' : '');
-            btn.innerText = isBeko ? `🛡️ BEKO (${b.qty} Adet)` : `${b.brand} (${b.qty})`;
+            btn.innerText = isBeko ? `🛡️ ${b.brand} (${b.qty} Adet)` : `${b.brand} (${b.qty})`;
             btn.onclick = () => switchTab(b.brand, btn);
             tabsContainer.appendChild(btn);
         });
 
-        // Eger filter_beko=True ise BEKO result.brands icinde yer almaz; ayri sekme olarak ekle
+        // Eger filter_beko=True ise BEKO & GRUNDIG result.brands icinde yer almaz; ayri sekme olarak ekle
         if (!bekoInBrands && result.beko_count > 0) {
             const bekoTab = document.createElement('button');
             bekoTab.className = 'tab-btn tab-beko';
-            bekoTab.innerText = `🛡️ Beko (${result.beko_qty} Adet)`;
-            bekoTab.onclick = () => switchTab('BEKO', bekoTab);
+            bekoTab.innerText = `🛡️ Beko & Grundig (${result.beko_qty} Adet)`;
+            bekoTab.onclick = () => switchTab('BEKO & GRUNDIG', bekoTab);
             tabsContainer.appendChild(bekoTab);
         }
 
@@ -1191,10 +1191,10 @@
         let items = [];
         if (activeTabKey === 'all') {
             items = currentResultData.grouped_items;
-        } else if (activeTabKey === 'BEKO') {
+        } else if (activeTabKey === 'BEKO & GRUNDIG' || activeTabKey === 'BEKO') {
             items = (currentResultData.beko_items && currentResultData.beko_items.length > 0)
                     ? currentResultData.beko_items
-                    : currentResultData.grouped_items.filter(x => x.brand === 'BEKO');
+                    : currentResultData.grouped_items.filter(x => x.brand === 'BEKO' || x.brand === 'GRUNDIG');
         } else {
             items = currentResultData.grouped_items.filter(x => x.brand === activeTabKey);
         }
@@ -1262,7 +1262,7 @@
         if (!currentResultData) return;
         if (IS_CLOUD) {
             const id = currentResultData.beko_download_id;
-            if (!id) return showToast("Beko listesi bulunamadı.");
+            if (!id) return showToast("Beko & Grundig listesi bulunamadı.");
             triggerDownload(id);
             return;
         }
@@ -1273,7 +1273,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ file_path: currentResultData.beko_excel_path })
             });
-            showToast("📦 Beko Listesi Excel'de açıldı.");
+            showToast("📦 Beko & Grundig Listesi Excel'de açıldı.");
         } catch(e) {
             showToast("Hata: " + e);
         }

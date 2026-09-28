@@ -54,11 +54,23 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * Ürün adı veya ilk kelimesi `BEKO` içeriyorsa,
   * Mağaza adı `beko` içeriyorsa (`Bingöl Ticaret - Beko`),
   * Veya ürün Beko model kodlarıyla başlıyorsa (`KMX`, `7053MB`, `CM`, `CMX`, `B 600`, `B 710`, `BKK`, `BFC`, `BDE`, `TKM`, `BEU`, `KMB`, `9704`, `9705`, `31825`, `74826`, `FR 8374` vb.) otomatik olarak **BEKO** markası olarak tanımlanır.
-* **Beko Listeleme Davranışı:**
-  * **Varsayılan (`filter_beko=False`):** Beko ürünleri **Ana Toplama Listesi**ne (Tümü) dahil edilir. `Urun_Toplama_Listesi_A4_Cikti.xlsx` içinde hem 1. sayfadaki genel toplama listesinde hem de özel **BEKO** sekmesinde yer alır. Aynı zamanda bağımsız `Beko_Urun_Toplama_Listesi_A4.xlsx` dosyası da eş zamanlı üretilerek istendiğinde tek tıkla açılabilir.
-  * **Seçenekli Ayrıştırma (`filter_beko=True`):** Kullanıcı arayüzdeki "Beko siparişlerini ana listeden ayır" onay kutusunu işaretlerse, Beko ürünleri ana listeden çıkarılır ve yalnızca bağımsız Beko listesinde yer alır.
+* **Beko ve Grundig Listeleme Davranışı (2. Sayfa ve 2. Sekme Standardı):**
+  * **Genel Liste (1. Sekme - `Ürün Toplama Listesi`):**
+    - İlk olarak diğer tüm markalar (Tefal, Babyliss, Philips, Lenovo vb.) listelenir.
+    - Diğer markaların bittiği satıra dikey sayfa sonu (`Break(id=other_items_count + 1)`) eklenir; böylece **BEKO ve GRUNDIG markalı ürünler doğrudan 2. Sayfaya** basılır.
+    - 2. sayfada da `Miktar`, `Ürün Adı`, `Stok Kodu` başlıklarının en üstte tekrarlanması için `ws.print_title_rows = '1:1'` ve `fitToHeight = 0` (sıkıştırmadan çok sayfalı dikey yazdırma) kullanılır.
+  * **Excel Çalışma Kitabı Sekmeleri:**
+    - 1. Sekme: `Ürün Toplama Listesi` (Sayfa 1: Diğer Markalar, Sayfa 2: Beko & Grundig).
+    - 2. Sekme: Özel **`BEKO & GRUNDIG`** sekmesi (tüm Beko ve Grundig siparişleri burada toplanır).
+    - 3+ Sekmeler: Diğer markaların alfabetik/adet sıralı özel sekmeleri (`TEFAL`, `BABYLISS`, `PHILIPS`, `LENOVO` vb.).
+  * **Web Arayüzü Sekmeleri:**
+    - 1. Sekme: `Tümü (Ana Liste)`
+    - 2. Sekme: `🛡️ BEKO & GRUNDIG (X Adet)`
+    - 3+ Sekmeler: `TEFAL`, `BABYLISS`, vb.
+  * **Bağımsız Dosya:** `Beko_Urun_Toplama_Listesi_A4.xlsx` eş zamanlı olarak tüm Beko & Grundig siparişlerini bağımsız A4 listesi olarak üretir.
+  * **Seçenekli Ayrıştırma (`filter_beko=True`):** Kullanıcı arayüzdeki "Beko & Grundig siparişlerini ana listeden ayır" onay kutusunu işaretlerse, Beko ve Grundig ürünleri ana listeden çıkarılır ve yalnızca bağımsız listede yer alır.
 * **Diğer Markalar:**
-  * `TEFAL`, `BABYLISS`, `LENOVO`, `GRUNDIG`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ` vb.
+  * `TEFAL`, `BABYLISS`, `LENOVO`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ` vb.
   * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
 * **Büyük Beyaz Eşya, TV ve Garanti Filtrelemesi (`is_excluded_product`):**
   * Bu filtreleme **YALNIZCA BEKO markalı ürünlere** uygulanır. Diğer tüm markalar (Tefal, Babyliss, Philips, Braun, Lenovo, Teka, Bissell, Laurastar, WMF, Kenwood vb.) doğrudan listelenir.

@@ -1,6 +1,7 @@
 import xlrd
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.worksheet.pagebreak import Break
 from collections import defaultdict
 import datetime
 import io
@@ -506,11 +507,11 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
         if is_beko:
             brand = 'BEKO'
 
-        if filter_beko and is_beko:
+        if filter_beko and (is_beko or brand == 'GRUNDIG'):
             beko_consolidated[key]['name'] = item['name']
             beko_consolidated[key]['stok'] = item['stok']
             beko_consolidated[key]['qty'] += item['qty']
-            beko_consolidated[key]['brand'] = 'BEKO'
+            beko_consolidated[key]['brand'] = brand
         else:
             brand_consolidated[brand][key]['name'] = item['name']
             brand_consolidated[brand][key]['stok'] = item['stok']
@@ -521,16 +522,26 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     for brand, items_dict in brand_consolidated.items():
         brand_orders[brand] = sorted(items_dict.values(), key=lambda x: x['qty'], reverse=True)
 
+    beko_list = list(brand_orders.get('BEKO', []))
+    grundig_list = list(brand_orders.get('GRUNDIG', []))
+    beko_grundig_orders = sorted(beko_list + grundig_list, key=lambda x: x['qty'], reverse=True)
+
     if filter_beko:
         beko_orders = sorted(beko_consolidated.values(), key=lambda x: x['qty'], reverse=True)
+        beko_grundig_orders = beko_orders
     else:
-        beko_orders = list(brand_orders.get('BEKO', []))
+        beko_orders = beko_grundig_orders
 
-    sorted_brand_keys = sorted(brand_orders.keys(), key=lambda b: sum(x['qty'] for x in brand_orders[b]), reverse=True)
+    other_brand_keys = [b for b in brand_orders.keys() if b not in ('BEKO', 'GRUNDIG')]
+    sorted_other_keys = sorted(other_brand_keys, key=lambda b: sum(x['qty'] for x in brand_orders[b]), reverse=True)
 
     grouped_items = []
-    for brand in sorted_brand_keys:
+    for brand in sorted_other_keys:
         grouped_items.extend(brand_orders[brand])
+    other_items_count = len(grouped_items)
+
+    if not filter_beko:
+        grouped_items.extend(beko_grundig_orders)
 
     font_header = Font(name='Segoe UI', size=11, bold=True, color='FFFFFF')
     font_regular = Font(name='Segoe UI', size=10)
@@ -543,13 +554,20 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     border_thin = Side(border_style='thin', color='94A3B8')
     cell_border = Border(top=border_thin, left=border_thin, right=border_thin, bottom=border_thin)
 
-    def setup_a4_sheet(ws, title, rows_data):
+    def setup_a4_sheet(ws, title, rows_data, page_break_after_idx=None):
         ws.title = title
         ws.page_setup.paperSize = ws.PAPERSIZE_A4
         ws.page_setup.orientation = ws.ORIENTATION_PORTRAIT
         ws.sheet_properties.pageSetUpPr.fitToPage = True
         ws.page_setup.fitToWidth = 1
-        ws.page_setup.fitToHeight = 1
+        if page_break_after_idx is not None and 0 < page_break_after_idx < len(rows_data):
+            # Cok sayfali dikey yazdirma icin fitToHeight 0 (sinirsiz) yapilir;
+            # boylece Excel sayfa kirilimini (page break) korur ve tek sayfaya sikistirmaz.
+            ws.page_setup.fitToHeight = 0
+            # 2. sayfada da basliklarin ("Miktar", "Urun Adi", "Stok Kodu") gorunmesi icin:
+            ws.print_title_rows = '1:1'
+        else:
+            ws.page_setup.fitToHeight = 1
 
         ws.page_margins.left = 0.5
         ws.page_margins.right = 0.5
@@ -593,6 +611,9 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
                 if idx % 2 == 0:
                     cell.fill = fill_zebra
 
+        if page_break_after_idx is not None and 0 < page_break_after_idx < len(rows_data):
+            ws.row_breaks.append(Break(id=page_break_after_idx + 1))
+
         ws.column_dimensions['A'].width = 12
         ws.column_dimensions['B'].width = 56
         ws.column_dimensions['C'].width = 18
@@ -600,22 +621,36 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     # 1. Main Workbook (Non-Beko or All)
     wb_main = openpyxl.Workbook()
     ws1 = wb_main.active
-    setup_a4_sheet(ws1, "Ürün Toplama Listesi", grouped_items)
+    # Sheet 1: Genel Toplama Listesi (Sayfa 1: Diger Markalar, Sayfa 2: Beko & Grundig)
+    page_break_idx = other_items_count if (other_items_count > 0 and len(beko_grundig_orders) > 0 and not filter_beko) else None
+    setup_a4_sheet(ws1, "Ürün Toplama Listesi", grouped_items, page_break_after_idx=page_break_idx)
 
-    for brand in sorted_brand_keys:
+    # Sheet 2: BEKO & GRUNDIG Sekmesi (Eger Beko & Grundig siparisi varsa)
+    if beko_grundig_orders and not filter_beko:
+        ws_bg = wb_main.create_sheet(title="BEKO & GRUNDIG")
+        setup_a4_sheet(ws_bg, "BEKO & GRUNDIG", beko_grundig_orders)
+
+    # Sheet 3+: Diger Marka Sekmeleri (Tefal, Babyliss, Philips vb.)
+    for brand in sorted_other_keys:
         sheet_title = brand[:30]
-        ws_b = wb_main.create_sheet()
+        ws_b = wb_main.create_sheet(title=sheet_title)
         setup_a4_sheet(ws_b, sheet_title, brand_orders[brand])
 
-    # 2. Beko Workbook
+    # 2. Beko & Grundig Workbook (Ayri dosya)
     wb_beko = None
     if beko_orders:
         wb_beko = openpyxl.Workbook()
         ws_beko = wb_beko.active
-        setup_a4_sheet(ws_beko, "Beko Toplama Listesi", beko_orders)
+        setup_a4_sheet(ws_beko, "Beko & Grundig Toplama Listesi", beko_orders)
 
     brand_stats = []
-    for b in sorted_brand_keys:
+    if beko_grundig_orders and not filter_beko:
+        brand_stats.append({
+            'brand': 'BEKO & GRUNDIG',
+            'count': len(beko_grundig_orders),
+            'qty': sum(x['qty'] for x in beko_grundig_orders)
+        })
+    for b in sorted_other_keys:
         brand_stats.append({
             'brand': b,
             'count': len(brand_orders[b]),
