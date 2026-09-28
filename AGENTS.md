@@ -23,9 +23,11 @@ Bu doküman, projenin mimari yapısını, pazaryeri sipariş formatlarını, iş
   * Kullanıcı tek seferde birden fazla `.xls` veya `.xlsx` dosyasını sürükleyip bırakabilir veya seçebilir (`<input type="file" multiple>`).
   * Backend (`/api/upload`) tüm dosyaları tek seferde alır ve `parse_and_process_multiple_files` fonksiyonuna iletir.
   * İndirilenler klasöründeki güncel sipariş dosyaları tek tıkla `/api/process-all-recent` ile birleştirilebilir.
-* **Mükerrer Birleştirme (Konsolidasyon):**
-  * Birden fazla dosyadan gelen aynı ürünler `(Ürün Adı, Stok Kodu)` anahtarına göre gruplanır.
-  * Miktarlar (`qty`) toplanır; böylece depodaki personel aynı ürünü tek bir satırda toplam adet olarak görür.
+* **Mükerrer Birleştirme (Akıllı Konsolidasyon):**
+  * **Stok Kodu (SKU) Öncelikli Eşleştirme:** Pazaryerleri aynı ürüne farklı ekler eklese dahi (örn. Hepsiburada'nın `[SSD Kapasitesi:..., Ram (...):...]` veya Trendyol'un `[Renk:Beyaz]`, `, one size` gibi etiketleri), aynı marka ve geçerli bir Stok Kodu taşıyan tüm siparişler otomatik olarak **tek bir satırda toplanır ve adetleri birleştirilir**.
+  * **Akıllı İsim Temizleme (`clean_product_name`):** Köşeli parantezli pazar yeri varyant etiketleri temizlenir.
+  * **En Uygun Başlık Seçimi (`pick_best_name`):** Farklı platformlardan gelen varyasyonlar arasından marka adını içeren, anlamsız sistem kodları taşımayan en temiz ve okunaklı ürün başlığı seçilir.
+  * **Stok Kodu Olmayanlar:** Temizlenmiş ve normalize edilmiş ürün adı üzerinden birleştirilir.
 
 ---
 

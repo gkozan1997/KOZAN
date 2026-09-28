@@ -462,14 +462,47 @@ def read_rows_from_files(files_or_paths, temp_dir=None):
     return all_raw_rows, source_filenames
 
 
+def clean_product_name(s):
+    """
+    Ürün adındaki pazaryeri varyant/özellik kalıntılarını ve köşeli parantezli ekleri temizler.
+    Örn: "[SSD Kapasitesi:512 GB, Ram (Sistem Belleği):8 GB]", "[Renk:Beyaz]", ", one size" vb.
+    """
+    if not s:
+        return ""
+    # 1. Parantez içi pazaryeri eklerini temizle: [Renk:Beyaz], [SSD Kapasitesi:...], [Beden:...] vb.
+    s = re.sub(r'\s*\[[^\]]+\]', '', s)
+    # 2. ", one size" veya ", standart" gibi pazaryeri kalıntılarını temizle
+    s = re.sub(r',\s*(one size|standart|tek ebat)\b', '', s, flags=re.IGNORECASE)
+    # 3. Fazla boşlukları temizle
+    s = re.sub(r'\s+', ' ', s).strip()
+    return s
+
+
+def pick_best_name(names, brand=None):
+    """
+    Aynı ürün için gelen farklı ad varyasyonları arasından en temiz ve açıklayıcı olanı seçer.
+    Marka adını içeren ve gereksiz sistem kodları taşımayan başlığa öncelik verir.
+    """
+    cleaned_names = [clean_product_name(n) for n in names if n]
+    if not cleaned_names:
+        return ""
+    b_upper = (brand or "").upper()
+    def score(n):
+        has_brand = 1 if b_upper and b_upper in n.upper() else 0
+        has_garbage = -1 if re.search(r'TYC[A-Z0-9]{15,}', n) else 0
+        return (has_brand, has_garbage, len(n))
+    cleaned_names.sort(key=score, reverse=True)
+    return cleaned_names[0]
+
+
 def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     """
     Mükerrer ürünleri konsolide eder ve A4 formatlı Excel dosyalarını BELLEKTE üretir.
     Bu fonksiyon hiçbir disk yazma işlemi yapmaz; hem masaüstü hem bulut yolu bunu kullanır.
     """
-    # Group by brand & CONSOLIDATE duplicate products across ALL files (name + stok)
-    brand_consolidated = defaultdict(lambda: defaultdict(lambda: {'name': '', 'stok': '', 'qty': 0, 'brand': ''}))
-    beko_consolidated = defaultdict(lambda: {'name': '', 'stok': '', 'qty': 0, 'brand': 'BEKO'})
+    # Group by brand & CONSOLIDATE duplicate products across ALL files
+    brand_consolidated = defaultdict(dict)
+    beko_consolidated = dict()
 
     # Büyük beyaz eşya içeren sipariş/müşteri kümesi (SADECE BEKO İÇİN)
     # Kural: Bu filtreleme sadece Beko markası için uygulanır. Geriye kalan tüm markalar (Tefal, Philips, Teka vb.) doğrudan listelenir.
@@ -502,32 +535,64 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
             continue
 
         brand = item['brand']
-        key = (item['name'], item['stok'])
+        stok = (item.get('stok') or '').strip().upper()
+        if stok.endswith('.0'):
+            stok = stok[:-2]
+
         is_beko = (brand == 'BEKO' or 'BEKO' in canonical_key(item['name']))
         if is_beko:
             brand = 'BEKO'
 
-        if filter_beko and (is_beko or brand == 'GRUNDIG'):
-            beko_consolidated[key]['name'] = item['name']
-            beko_consolidated[key]['stok'] = item['stok']
-            beko_consolidated[key]['qty'] += item['qty']
-            beko_consolidated[key]['brand'] = brand
+        clean_name = clean_product_name(item['name'])
+        is_valid_stok = bool(stok and len(stok) >= 3 and stok.lower() not in ('-', 'yok', '0', 'none', 'null'))
+
+        if is_valid_stok:
+            merge_key = ('STOK', brand, stok)
         else:
-            brand_consolidated[brand][key]['name'] = item['name']
-            brand_consolidated[brand][key]['stok'] = item['stok']
-            brand_consolidated[brand][key]['qty'] += item['qty']
-            brand_consolidated[brand][key]['brand'] = brand
+            merge_key = ('NAME', brand, canonical_key(clean_name))
+
+        target_dict = beko_consolidated if (filter_beko and (is_beko or brand == 'GRUNDIG')) else brand_consolidated[brand]
+
+        if merge_key not in target_dict:
+            target_dict[merge_key] = {
+                'names': [],
+                'stok': stok,
+                'qty': 0,
+                'brand': brand
+            }
+        target_dict[merge_key]['names'].append(item['name'])
+        if not target_dict[merge_key]['stok'] and stok:
+            target_dict[merge_key]['stok'] = stok
+        target_dict[merge_key]['qty'] += item['qty']
 
     brand_orders = {}
     for brand, items_dict in brand_consolidated.items():
-        brand_orders[brand] = sorted(items_dict.values(), key=lambda x: x['qty'], reverse=True)
+        processed_list = []
+        for merge_key, data in items_dict.items():
+            best_name = pick_best_name(data['names'], brand=brand)
+            processed_list.append({
+                'name': best_name,
+                'stok': data['stok'],
+                'qty': data['qty'],
+                'brand': data['brand']
+            })
+        brand_orders[brand] = sorted(processed_list, key=lambda x: x['qty'], reverse=True)
 
     beko_list = list(brand_orders.get('BEKO', []))
     grundig_list = list(brand_orders.get('GRUNDIG', []))
     beko_grundig_orders = sorted(beko_list + grundig_list, key=lambda x: x['qty'], reverse=True)
 
     if filter_beko:
-        beko_orders = sorted(beko_consolidated.values(), key=lambda x: x['qty'], reverse=True)
+        processed_beko = []
+        for merge_key, data in beko_consolidated.items():
+            best_name = pick_best_name(data['names'], brand=data['brand'])
+            processed_beko.append({
+                'name': best_name,
+                'stok': data['stok'],
+                'qty': data['qty'],
+                'brand': data['brand']
+            })
+        beko_orders = sorted(processed_beko, key=lambda x: x['qty'], reverse=True)
         beko_grundig_orders = beko_orders
     else:
         beko_orders = beko_grundig_orders
