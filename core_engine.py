@@ -100,6 +100,10 @@ EXCLUDE_PRODUCT_KEYWORDS = [
     'ek garanti',
     'garanti uzatma',
     'garanti paketi',
+    'yazarkasa',
+    'yazar kasa',
+    'pos cihazi',
+    'odeme kaydedici',
 ]
 
 def is_conditional_appliance(name):
@@ -134,7 +138,13 @@ def is_major_appliance_or_warranty(name):
     if 'ankastre firin' in norm or 'mini firin' in norm or 'buhar destekli firin' in norm or 'solo firin' in norm or ' firin' in norm or norm.endswith('firin'):
         return True
 
-    # 5. Diğer beyaz eşya & garanti listesi
+    # 5. Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS vb.)
+    if 'yazarkasa' in norm or 'yazar kasa' in norm or 'pos cihazi' in norm or 'odeme kaydedici' in norm or 'okc' in cleaned_words:
+        return True
+    if 'pos' in cleaned_words and ('yazar' in norm or 'kasa' in norm or 'x30' in norm or '300 tr' in norm or '220' in norm or '400' in norm or 'mobil' in norm or 'cihaz' in norm or 'eft' in norm):
+        return True
+
+    # 6. Diğer beyaz eşya & garanti listesi
     for kw in EXCLUDE_PRODUCT_KEYWORDS:
         if kw in norm:
             return True

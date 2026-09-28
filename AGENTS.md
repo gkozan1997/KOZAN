@@ -87,6 +87,7 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - TV / Televizyon (QLED, OLED, Smart LED vb.)
     - Derin Dondurucu (Çekmeceli, Sandık tipi vb.)
     - Klima (Split, Inverter, Salon tipi vb.)
+    - Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS, 300 TR vb. mali cihazlar)
   * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
     - Lenovo Garanti (Lenovo 1 Yıl Garanti Uzatma Paketi vb.)
     - Mikrodalga Fırın (Beko BMD vb.)
