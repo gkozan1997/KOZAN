@@ -1,0 +1,38 @@
+# Vercel'e GONDERILMEYECEK dosyalar.
+# Bu liste, gercek siparis/musteri verisinin public URL'ye yuklenmesini engeller.
+# vercel.json icindeki excludeFiles ile birlikte ikinci guvenlik katmanidir.
+
+# --- GERCEK SIPARIS VE MUSTERI VERISI (ASLA GONDERME) ---
+2026-*/
+2025-*/
+2024-*/
+Siparis/
+Downloads/
+*.xls
+*.xlsx
+!templates/**
+
+# --- DERLEME CIKTILARI ---
+dist/
+build/
+__pycache__/
+*.pyc
+*.pyo
+*.spec
+*.zip
+*.exe
+
+# --- YEREL ARACLAR ---
+.agents/
+.claude/
+_tasarim_yedek/
+_regression_test.py
+baslat.bat
+notes/
+*.md
+!AGENTS.md
+
+# --- GIZLI AYARLAR ---
+.env
+.env.*
+.vercel/
