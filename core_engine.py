@@ -383,7 +383,7 @@ def read_rows_from_files(files_or_paths, temp_dir=None):
     return all_raw_rows, source_filenames
 
 
-def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=True):
+def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     """
     Mükerrer ürünleri konsolide eder ve A4 formatlı Excel dosyalarını BELLEKTE üretir.
     Bu fonksiyon hiçbir disk yazma işlemi yapmaz; hem masaüstü hem bulut yolu bunu kullanır.
@@ -396,6 +396,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=True):
         brand = item['brand']
         key = (item['name'], item['stok'])
         is_beko = (brand == 'BEKO' or 'BEKO' in canonical_key(item['name']))
+        if is_beko:
+            brand = 'BEKO'
 
         if filter_beko and is_beko:
             beko_consolidated[key]['name'] = item['name']
@@ -412,7 +414,10 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=True):
     for brand, items_dict in brand_consolidated.items():
         brand_orders[brand] = sorted(items_dict.values(), key=lambda x: x['qty'], reverse=True)
 
-    beko_orders = sorted(beko_consolidated.values(), key=lambda x: x['qty'], reverse=True)
+    if filter_beko:
+        beko_orders = sorted(beko_consolidated.values(), key=lambda x: x['qty'], reverse=True)
+    else:
+        beko_orders = list(brand_orders.get('BEKO', []))
 
     sorted_brand_keys = sorted(brand_orders.keys(), key=lambda b: sum(x['qty'] for x in brand_orders[b]), reverse=True)
 
@@ -521,6 +526,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=True):
         'non_beko_qty': sum(x['qty'] for x in grouped_items),
         'beko_count': len(beko_orders),
         'beko_qty': sum(x['qty'] for x in beko_orders),
+        'filter_beko': filter_beko,
         'brands': brand_stats,
         'grouped_items': grouped_items,
         'beko_items': beko_orders,
@@ -541,7 +547,7 @@ def workbooks_to_bytes(wb_main, wb_beko=None):
     return main_buf.getvalue(), (beko_buf.getvalue() if beko_buf else None)
 
 
-def parse_and_process_multiple_files(files_or_paths, filter_beko=True, target_date=None):
+def parse_and_process_multiple_files(files_or_paths, filter_beko=False, target_date=None):
     """
     MASAÜSTÜ YOLU: dosyaları işler, konsolide eder ve A4 Excel çıktılarını
     tarih klasörlerine diske yazar. Davranış eskisiyle birebir aynıdır.
@@ -598,7 +604,7 @@ def parse_and_process_multiple_files(files_or_paths, filter_beko=True, target_da
     return result
 
 
-def process_in_memory(files_or_paths, filter_beko=True):
+def process_in_memory(files_or_paths, filter_beko=False):
     """
     BULUT YOLU: hiçbir disk yazma işlemi yapmaz. Excel çıktıları bellekte üretilir
     ve byte olarak döner. Vercel gibi kalıcı diski olmayan ortamlar içindir.
@@ -623,7 +629,7 @@ def process_in_memory(files_or_paths, filter_beko=True):
     })
     return result
 
-def parse_and_process_file(file_path_or_bytes, custom_filename=None, filter_beko=True, target_date=None):
+def parse_and_process_file(file_path_or_bytes, custom_filename=None, filter_beko=False, target_date=None):
     """
     Backward-compatible wrapper for single file or list of files.
     """

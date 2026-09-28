@@ -14,7 +14,7 @@ def process_excel_orders(source_file_path, base_output_dirs=None):
     Sipariş Excel dosyasını (.xls veya .xlsx) okur, pazaryeri ve Beko ayrımını yapar,
     A4 formatında yazdırılabilir toplama listelerini oluşturur.
     """
-    return parse_and_process_file(source_file_path, filter_beko=True)
+    return parse_and_process_file(source_file_path, filter_beko=False)
 
 if __name__ == '__main__':
     source = get_latest_download_file()

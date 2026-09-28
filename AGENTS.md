@@ -45,18 +45,21 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 
 ---
 
-## 4. Marka Tespiti ve Beko Ayrıştırması
+## 4. Marka Tespiti ve Beko Entegrasyonu
 
 * **Mağazalar:**
   * `Ahidenal`: Küçük ev aletleri, elektronik (Tefal, Babyliss, Philips, Braun, Lenovo, Bissell, Teka, Laurastar, Ariete, iPhone vb.).
   * `Bingöl Ticaret - Beko` & `Bingöl Ticaret`: Beko bayisi siparişleri.
-* **Beko Ayrıştırma Kriterleri (`filter_beko=True`):**
+* **Beko Tanıma Kriterleri:**
   * Ürün adı veya ilk kelimesi `BEKO` içeriyorsa,
   * Mağaza adı `beko` içeriyorsa (`Bingöl Ticaret - Beko`),
-  * Veya ürün Beko model kodlarıyla başlıyorsa (`KMX`, `7053MB`, `CM`, `CMX`, `B 600`, `B 710`, `BKK`, `BFC`, `BDE`, `TKM`, `BEU`, `KMB`, `9704`, `9705`, `31825`, `74826`, `FR 8374` vb.) otomatik olarak **Beko Toplama Listesi**ne aktarılır.
+  * Veya ürün Beko model kodlarıyla başlıyorsa (`KMX`, `7053MB`, `CM`, `CMX`, `B 600`, `B 710`, `BKK`, `BFC`, `BDE`, `TKM`, `BEU`, `KMB`, `9704`, `9705`, `31825`, `74826`, `FR 8374` vb.) otomatik olarak **BEKO** markası olarak tanımlanır.
+* **Beko Listeleme Davranışı:**
+  * **Varsayılan (`filter_beko=False`):** Beko ürünleri **Ana Toplama Listesi**ne (Tümü) dahil edilir. `Urun_Toplama_Listesi_A4_Cikti.xlsx` içinde hem 1. sayfadaki genel toplama listesinde hem de özel **BEKO** sekmesinde yer alır. Aynı zamanda bağımsız `Beko_Urun_Toplama_Listesi_A4.xlsx` dosyası da eş zamanlı üretilerek istendiğinde tek tıkla açılabilir.
+  * **Seçenekli Ayrıştırma (`filter_beko=True`):** Kullanıcı arayüzdeki "Beko siparişlerini ana listeden ayır" onay kutusunu işaretlerse, Beko ürünleri ana listeden çıkarılır ve yalnızca bağımsız Beko listesinde yer alır.
 * **Diğer Markalar:**
   * `TEFAL`, `BABYLISS`, `LENOVO`, `GRUNDIG`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ` vb.
-  * Beko dışındaki tüm ürünler **Ana Toplama Listesi**ne ve her marka için oluşturulan özel sekmelere eklenir.
+  * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
 
 ---
 

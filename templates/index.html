@@ -799,7 +799,7 @@
             </div>
         </div>
         <div class="rule-tag" style="color: var(--accent-amber);">
-            <span>🛡️ Beko Ürünleri Ana Listeden Ayrıştırılır</span>
+            <span>🛡️ Beko Markası Ana Listeye Dahil ve Özel Sekmeli</span>
         </div>
     </div>
 
@@ -861,10 +861,10 @@
             <div class="options-row">
                 <label class="toggle-label">
                     <div class="toggle-switch">
-                        <input type="checkbox" id="toggle-beko" checked>
+                        <input type="checkbox" id="toggle-beko">
                         <span class="slider"></span>
                     </div>
-                    <span>Beko siparişlerini ana listeden ayır (Ayrı listele)</span>
+                    <span>Beko siparişlerini ana listeden ayır (Ayrı dosya yap)</span>
                 </label>
             </div>
         </div>
@@ -881,7 +881,7 @@
             <div class="kpi-value" id="kpi-non-beko">0 <span class="kpi-unit">Adet</span></div>
         </div>
         <div class="kpi-card kpi-accent-amber">
-            <div class="kpi-label">Ayrıştırılan Beko</div>
+            <div class="kpi-label" id="kpi-beko-label">Beko Siparişleri</div>
             <div class="kpi-value" id="kpi-beko">0 <span class="kpi-unit">Adet</span></div>
         </div>
         <div class="kpi-card kpi-accent-indigo">
@@ -1106,6 +1106,11 @@
         document.getElementById('kpi-beko').innerHTML = `${result.beko_qty} <span class="kpi-unit">Adet (${result.beko_count} Çeşit)</span>`;
         document.getElementById('kpi-brands').innerHTML = `${result.brands.length} <span class="kpi-unit">Marka</span>`;
 
+        const bekoLabel = document.getElementById('kpi-beko-label');
+        if (bekoLabel) {
+            bekoLabel.innerText = result.filter_beko ? 'Ayrıştırılan Beko' : 'Beko Siparişleri';
+        }
+
         // Files Badge
         const filesContainer = document.getElementById('source-files-badge');
         if (filesContainer) {
@@ -1141,15 +1146,19 @@
         allTab.onclick = () => switchTab('all', allTab);
         tabsContainer.appendChild(allTab);
 
+        const bekoInBrands = result.brands.some(b => b.brand === 'BEKO');
+
         result.brands.forEach(b => {
             const btn = document.createElement('button');
-            btn.className = 'tab-btn';
-            btn.innerText = `${b.brand} (${b.qty})`;
+            const isBeko = (b.brand === 'BEKO');
+            btn.className = 'tab-btn' + (isBeko ? ' tab-beko' : '');
+            btn.innerText = isBeko ? `🛡️ BEKO (${b.qty} Adet)` : `${b.brand} (${b.qty})`;
             btn.onclick = () => switchTab(b.brand, btn);
             tabsContainer.appendChild(btn);
         });
 
-        if (result.beko_count > 0) {
+        // Eger filter_beko=True ise BEKO result.brands icinde yer almaz; ayri sekme olarak ekle
+        if (!bekoInBrands && result.beko_count > 0) {
             const bekoTab = document.createElement('button');
             bekoTab.className = 'tab-btn tab-beko';
             bekoTab.innerText = `🛡️ Beko (${result.beko_qty} Adet)`;
@@ -1177,7 +1186,9 @@
         if (activeTabKey === 'all') {
             items = currentResultData.grouped_items;
         } else if (activeTabKey === 'BEKO') {
-            items = currentResultData.beko_items;
+            items = (currentResultData.beko_items && currentResultData.beko_items.length > 0)
+                    ? currentResultData.beko_items
+                    : currentResultData.grouped_items.filter(x => x.brand === 'BEKO');
         } else {
             items = currentResultData.grouped_items.filter(x => x.brand === activeTabKey);
         }

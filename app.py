@@ -137,7 +137,7 @@ def process_latest():
         return jsonify({'success': False, 'error': 'İndirilenler klasöründe uygun sipariş Excel dosyası bulunamadı.'}), 404
 
     data = request.get_json(silent=True) or {}
-    filter_beko = data.get('filter_beko', True)
+    filter_beko = data.get('filter_beko', False)
 
     try:
         result = parse_and_process_file(latest_file, filter_beko=filter_beko)
@@ -159,7 +159,7 @@ def process_all_recent():
         return jsonify({'success': False, 'error': 'İndirilenler klasöründe uygun sipariş Excel dosyası bulunamadı.'}), 404
 
     data = request.get_json(silent=True) or {}
-    filter_beko = data.get('filter_beko', True)
+    filter_beko = data.get('filter_beko', False)
 
     try:
         result = parse_and_process_multiple_files(recent_files, filter_beko=filter_beko)
@@ -175,7 +175,7 @@ def upload_file():
     if not valid_files:
         return jsonify({'success': False, 'error': 'Dosya seçilmedi veya geçerli dosya bulunamadı.'}), 400
 
-    filter_beko = (request.form.get('filter_beko', 'true').lower() == 'true')
+    filter_beko = (request.form.get('filter_beko', 'false').lower() == 'true')
 
     try:
         if IS_CLOUD:
