@@ -60,6 +60,25 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 * **Diğer Markalar:**
   * `TEFAL`, `BABYLISS`, `LENOVO`, `GRUNDIG`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ` vb.
   * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
+* **Büyük Beyaz Eşya, TV ve Garanti Filtrelemesi (`is_excluded_product`):**
+  * Sipariş toplama listelerinde yalnızca depodan fiziki toplanacak küçük ev aletleri ve elektronik ürünler yer alır.
+  * **Filtrelenen Ürünler (Listeden Hariç Tutulanlar):**
+    - Çamaşır Kurutma Makinesi, Kurutma Makinesi
+    - Bulaşık Makinesi
+    - Buzdolabı (Mini Buzdolabı dahil)
+    - Ankastre Fırın, Mini Fırın, Solo Fırın, Buhar Destekli Fırın
+    - Çamaşır Makinesi
+    - Ek Garanti, Garanti Uzatma Paketleri
+    - Davlumbaz
+    - TV / Televizyon (QLED, OLED, Smart LED vb.)
+    - Derin Dondurucu (Çekmeceli, Sandık tipi vb.)
+    - Klima (Split, Inverter, Salon tipi vb.)
+  * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
+    - Mikrodalga Fırın (Beko BMD vb.)
+    - Ankastre Ocak / Ocaklar (Beko BOCD, BOI vb.)
+    - Aspiratör / Ankastre Sürgülü Aspiratör (Beko P 38 vb.)
+    - Saç Kurutma Makinesi (BaByliss, Grundig vb.)
+    - Tüm Küçük Ev Aletleri (Kahve/Çay Makinesi, Blender, Ütü, Fritöz, Süpürge, Tost Makinesi vb.), Telefon ve Bilgisayarlar.
 
 ---
 

@@ -799,7 +799,7 @@
             </div>
         </div>
         <div class="rule-tag" style="color: var(--accent-amber);">
-            <span>🛡️ Beko Markası Ana Listeye Dahil ve Özel Sekmeli</span>
+            <span>🛡️ Beyaz Eşya, TV, Fırın, Kurutma ve Garantiler Otomatik Ayrıştırılır</span>
         </div>
     </div>
 
@@ -1114,13 +1114,19 @@
         // Files Badge
         const filesContainer = document.getElementById('source-files-badge');
         if (filesContainer) {
+            let filesHtml = '';
             if (result.source_files && result.source_files.length > 1) {
-                filesContainer.style.display = 'flex';
-                filesContainer.innerHTML = `<span style="font-weight: 700; color: var(--accent-cyan);">📁 Birleştirilen ${result.total_files} Dosya:</span> ` + 
+                filesHtml = `<span style="font-weight: 700; color: var(--accent-cyan);">📁 Birleştirilen ${result.total_files} Dosya:</span> ` + 
                     result.source_files.map(f => `<span style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); padding: 3px 10px; border-radius: 6px; font-size: 12px; color: #f1f5f9;">${f}</span>`).join(' ');
             } else if (result.source_filename) {
+                filesHtml = `<span style="font-weight: 600; color: var(--text-muted);">📄 Kaynak Dosya:</span> <span style="color: #ffffff; font-weight: 600;">${result.source_filename}</span>`;
+            }
+            if (result.excluded_qty > 0) {
+                filesHtml += ` <span style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); padding: 3px 10px; border-radius: 6px; font-size: 12px; color: #fca5a5; font-weight: 600;">🚫 ${result.excluded_qty} Adet Beyaz Eşya/TV/Garanti Ayrıştırıldı</span>`;
+            }
+            if (filesHtml) {
                 filesContainer.style.display = 'flex';
-                filesContainer.innerHTML = `<span style="font-weight: 600; color: var(--text-muted);">📄 Kaynak Dosya:</span> <span style="color: #ffffff; font-weight: 600;">${result.source_filename}</span>`;
+                filesContainer.innerHTML = filesHtml;
             } else {
                 filesContainer.style.display = 'none';
             }

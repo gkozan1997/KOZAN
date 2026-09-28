@@ -73,6 +73,69 @@ def canonical_key(s):
     """
     return normalize_text(s).upper()
 
+def normalize_tr(s):
+    if not s:
+        return ""
+    tr_map = str.maketrans({
+        'ı': 'i', 'İ': 'i', 'I': 'i', 'i': 'i',
+        'ş': 's', 'Ş': 's',
+        'ğ': 'g', 'Ğ': 'g',
+        'ü': 'u', 'Ü': 'u',
+        'ö': 'o', 'Ö': 'o',
+        'ç': 'c', 'Ç': 'c'
+    })
+    return str(s).translate(tr_map).lower()
+
+EXCLUDE_PRODUCT_KEYWORDS = [
+    'camasir kurutma makinesi',
+    'camasir makinesi',
+    'bulasik makinesi',
+    'buzdolabi',
+    'ankastre firin',
+    'mini firin',
+    'derin dondurucu',
+    'davlumbaz',
+    'klima',
+    'ek garanti',
+    'garanti uzatma',
+    'garanti paketi',
+]
+
+def is_excluded_product(name):
+    norm = normalize_tr(name)
+    if not norm:
+        return False
+
+    # 1. KESİNLİKLE KORUNACAKLAR (Kullanıcı tercihi: Ocak, Aspiratör, Mikrodalga, Saç Kurutma listede kalmalı)
+    if 'sac kurutma' in norm:
+        return False
+    if 'mikrodalga' in norm:
+        return False
+    if 'aspirator' in norm or 'ocak' in norm:
+        return False
+
+    # 2. TV / Televizyon kontrolü
+    if 'televizyon' in norm:
+        return True
+    cleaned_words = norm.replace('"', ' ').replace("'", ' ').replace('-', ' ').replace(',', ' ').replace('.', ' ').split()
+    if 'tv' in cleaned_words or 'qled' in cleaned_words or 'oled' in cleaned_words:
+        return True
+
+    # 3. Kurutma makinesi (çamaşır / büyük)
+    if 'kurutma makinesi' in norm:
+        return True
+
+    # 4. Fırınlar (Mikrodalga yukarıda istisna yapıldığı için diğer ankastre/mini fırınlar elenir)
+    if 'ankastre firin' in norm or 'mini firin' in norm or 'buhar destekli firin' in norm or 'solo firin' in norm or ' firin' in norm or norm.endswith('firin'):
+        return True
+
+    # 5. Diğer beyaz eşya & garanti listesi
+    for kw in EXCLUDE_PRODUCT_KEYWORDS:
+        if kw in norm:
+            return True
+
+    return False
+
 def find_column_index(headers, possible_names):
     norm_headers = [normalize_text(h) for h in headers]
     for name in possible_names:
@@ -393,6 +456,10 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     beko_consolidated = defaultdict(lambda: {'name': '', 'stok': '', 'qty': 0, 'brand': 'BEKO'})
 
     for item in all_raw_rows:
+        # Büyük beyaz eşya, TV, klima, fırın ve ek garanti ürünlerini filtrele
+        if is_excluded_product(item['name']):
+            continue
+
         brand = item['brand']
         key = (item['name'], item['stok'])
         is_beko = (brand == 'BEKO' or 'BEKO' in canonical_key(item['name']))
@@ -515,6 +582,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
             'qty': sum(x['qty'] for x in brand_orders[b])
         })
 
+    excluded_rows = [item for item in all_raw_rows if is_excluded_product(item['name'])]
+
     summary_filename = source_filenames[0] if len(source_filenames) == 1 else f"{len(source_filenames)} Dosya Birleştirildi"
 
     return {
@@ -522,6 +591,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
         'source_files': source_filenames,
         'total_files': len(source_filenames),
         'total_orders': len(all_raw_rows),
+        'excluded_orders': len(excluded_rows),
+        'excluded_qty': sum(x['qty'] for x in excluded_rows),
         'non_beko_count': len(grouped_items),
         'non_beko_qty': sum(x['qty'] for x in grouped_items),
         'beko_count': len(beko_orders),
