@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.spec
+.venv/
+venv/
+
+# PyInstaller ciktilari
+build/
+dist/
+
+# Vercel
+.vercel/
+
+# Gelistirme araclari (public repo'ya girmemeli)
+.agents/
+.claude/
+.vscode/
+_tasarim_yedek/
+
+# Gecici test/deneme betikleri
+_*.py
+
+# Yerel gizli ayarlar
+.env
+.env.*
+
+# Siparis / musteri verisi - ASLA commit edilmemeli
+2026-*/
+2025-*/
+Siparis/
+*.xls
+*.xlsx
