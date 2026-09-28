@@ -106,7 +106,9 @@ def is_excluded_product(name):
     if not norm:
         return False
 
-    # 1. KESİNLİKLE KORUNACAKLAR (Kullanıcı tercihi: Ocak, Aspiratör, Mikrodalga, Saç Kurutma listede kalmalı)
+    # 1. KESİNLİKLE KORUNACAKLAR (Kullanıcı tercihi: Lenovo Garanti, Ocak, Aspiratör, Mikrodalga, Saç Kurutma listede kalmalı)
+    if 'lenovo' in norm and 'garanti' in norm:
+        return False
     if 'sac kurutma' in norm:
         return False
     if 'mikrodalga' in norm:

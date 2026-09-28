@@ -68,12 +68,13 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Buzdolabı (Mini Buzdolabı dahil)
     - Ankastre Fırın, Mini Fırın, Solo Fırın, Buhar Destekli Fırın
     - Çamaşır Makinesi
-    - Ek Garanti, Garanti Uzatma Paketleri
+    - Ek Garanti, Garanti Uzatma Paketleri (Beko vb. ek garantiler - Lenovo Garanti hariç)
     - Davlumbaz
     - TV / Televizyon (QLED, OLED, Smart LED vb.)
     - Derin Dondurucu (Çekmeceli, Sandık tipi vb.)
     - Klima (Split, Inverter, Salon tipi vb.)
   * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
+    - Lenovo Garanti (Lenovo 1 Yıl Garanti Uzatma Paketi vb.)
     - Mikrodalga Fırın (Beko BMD vb.)
     - Ankastre Ocak / Ocaklar (Beko BOCD, BOI vb.)
     - Aspiratör / Ankastre Sürgülü Aspiratör (Beko P 38 vb.)
