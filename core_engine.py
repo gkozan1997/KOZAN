@@ -561,7 +561,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
         else:
             merge_key = ('NAME', brand, canonical_key(clean_name))
 
-        target_dict = beko_consolidated if (filter_beko and (is_beko or brand == 'GRUNDIG')) else brand_consolidated[brand]
+        is_special_brand = (is_beko or brand in ('GRUNDIG', 'LENOVO'))
+        target_dict = beko_consolidated if (filter_beko and is_special_brand) else brand_consolidated[brand]
 
         if merge_key not in target_dict:
             target_dict[merge_key] = {
@@ -590,7 +591,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
 
     beko_list = list(brand_orders.get('BEKO', []))
     grundig_list = list(brand_orders.get('GRUNDIG', []))
-    beko_grundig_orders = sorted(beko_list + grundig_list, key=lambda x: x['qty'], reverse=True)
+    lenovo_list = list(brand_orders.get('LENOVO', []))
+    beko_grundig_orders = sorted(beko_list + grundig_list + lenovo_list, key=lambda x: x['qty'], reverse=True)
 
     if filter_beko:
         processed_beko = []
@@ -607,7 +609,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     else:
         beko_orders = beko_grundig_orders
 
-    other_brand_keys = [b for b in brand_orders.keys() if b not in ('BEKO', 'GRUNDIG')]
+    other_brand_keys = [b for b in brand_orders.keys() if b not in ('BEKO', 'GRUNDIG', 'LENOVO')]
     sorted_other_keys = sorted(other_brand_keys, key=lambda b: sum(x['qty'] for x in brand_orders[b]), reverse=True)
 
     grouped_items = []
@@ -727,10 +729,10 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     page_break_idx = other_items_count if (other_items_count > 0 and len(beko_grundig_orders) > 0 and not filter_beko) else None
     setup_a4_sheet(ws1, "Ürün Toplama Listesi", grouped_items, page_break_after_idx=page_break_idx)
 
-    # Sheet 2: BEKO & GRUNDIG Sekmesi (Eger Beko & Grundig siparisi varsa)
+    # Sheet 2: BEKO, GRUNDIG & LENOVO Sekmesi (Eger Beko, Grundig veya Lenovo siparisi varsa)
     if beko_grundig_orders and not filter_beko:
-        ws_bg = wb_main.create_sheet(title="BEKO & GRUNDIG")
-        setup_a4_sheet(ws_bg, "BEKO & GRUNDIG", beko_grundig_orders)
+        ws_bg = wb_main.create_sheet(title="BEKO, GRUNDIG & LENOVO")
+        setup_a4_sheet(ws_bg, "BEKO, GRUNDIG & LENOVO", beko_grundig_orders)
 
     # Sheet 3+: Diger Marka Sekmeleri (Tefal, Babyliss, Philips vb.)
     for brand in sorted_other_keys:
@@ -738,17 +740,17 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
         ws_b = wb_main.create_sheet(title=sheet_title)
         setup_a4_sheet(ws_b, sheet_title, brand_orders[brand])
 
-    # 2. Beko & Grundig Workbook (Ayri dosya)
+    # 2. Beko, Grundig & Lenovo Workbook (Ayri dosya)
     wb_beko = None
     if beko_orders:
         wb_beko = openpyxl.Workbook()
         ws_beko = wb_beko.active
-        setup_a4_sheet(ws_beko, "Beko & Grundig Toplama Listesi", beko_orders)
+        setup_a4_sheet(ws_beko, "Beko Grundig Lenovo Listesi", beko_orders)
 
     brand_stats = []
     if beko_grundig_orders and not filter_beko:
         brand_stats.append({
-            'brand': 'BEKO & GRUNDIG',
+            'brand': 'BEKO, GRUNDIG & LENOVO',
             'count': len(beko_grundig_orders),
             'qty': sum(x['qty'] for x in beko_grundig_orders)
         })

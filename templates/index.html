@@ -942,7 +942,7 @@
                         <input type="checkbox" id="toggle-beko">
                         <span class="slider"></span>
                     </div>
-                    <span>Beko & Grundig siparişlerini ana listeden ayır (Ayrı dosya yap)</span>
+                    <span>Beko, Grundig & Lenovo siparişlerini ana listeden ayır (Ayrı dosya yap)</span>
                 </label>
             </div>
         </div>
@@ -959,7 +959,7 @@
             <div class="kpi-value" id="kpi-non-beko">0 <span class="kpi-unit">Adet</span></div>
         </div>
         <div class="kpi-card kpi-accent-amber">
-            <div class="kpi-label" id="kpi-beko-label">Beko & Grundig</div>
+            <div class="kpi-label" id="kpi-beko-label">Beko, Grundig & Lenovo</div>
             <div class="kpi-value" id="kpi-beko">0 <span class="kpi-unit">Adet</span></div>
         </div>
         <div class="kpi-card kpi-accent-indigo">
@@ -981,7 +981,7 @@
             </button>
             <button class="btn-action" id="btn-open-beko" onclick="openBekoExcel()">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                📦 Beko & Grundig Listesini Aç (Excel)
+                📦 Beko, Grundig & Lenovo Listesini Aç (Excel)
             </button>
         </div>
 
@@ -1186,7 +1186,7 @@
 
         const bekoLabel = document.getElementById('kpi-beko-label');
         if (bekoLabel) {
-            bekoLabel.innerText = result.filter_beko ? 'Ayrıştırılan Beko & Grundig' : 'Beko & Grundig Siparişleri';
+            bekoLabel.innerText = result.filter_beko ? 'Ayrıştırılan Beko, Grundig & Lenovo' : 'Beko, Grundig & Lenovo Siparişleri';
         }
 
         // Files Badge
@@ -1230,23 +1230,28 @@
         allTab.onclick = () => switchTab('all', allTab);
         tabsContainer.appendChild(allTab);
 
-        const bekoInBrands = result.brands.some(b => b.brand === 'BEKO & GRUNDIG' || b.brand === 'BEKO');
+        const isSpecialBrandName = (name) => {
+            const u = (name || '').toUpperCase();
+            return u.includes('BEKO') || u.includes('GRUNDIG') || u.includes('LENOVO');
+        };
+
+        const bekoInBrands = result.brands.some(b => isSpecialBrandName(b.brand));
 
         result.brands.forEach(b => {
             const btn = document.createElement('button');
-            const isBeko = (b.brand === 'BEKO & GRUNDIG' || b.brand === 'BEKO');
-            btn.className = 'tab-btn' + (isBeko ? ' tab-beko' : '');
-            btn.innerText = isBeko ? `🛡️ ${b.brand} (${b.qty} Adet)` : `${b.brand} (${b.qty})`;
+            const isSpecial = isSpecialBrandName(b.brand);
+            btn.className = 'tab-btn' + (isSpecial ? ' tab-beko' : '');
+            btn.innerText = isSpecial ? `🛡️ ${b.brand} (${b.qty} Adet)` : `${b.brand} (${b.qty})`;
             btn.onclick = () => switchTab(b.brand, btn);
             tabsContainer.appendChild(btn);
         });
 
-        // Eger filter_beko=True ise BEKO & GRUNDIG result.brands icinde yer almaz; ayri sekme olarak ekle
+        // Eger filter_beko=True ise BEKO, GRUNDIG & LENOVO result.brands icinde yer almaz; ayri sekme olarak ekle
         if (!bekoInBrands && result.beko_count > 0) {
             const bekoTab = document.createElement('button');
             bekoTab.className = 'tab-btn tab-beko';
-            bekoTab.innerText = `🛡️ Beko & Grundig (${result.beko_qty} Adet)`;
-            bekoTab.onclick = () => switchTab('BEKO & GRUNDIG', bekoTab);
+            bekoTab.innerText = `🛡️ Beko, Grundig & Lenovo (${result.beko_qty} Adet)`;
+            bekoTab.onclick = () => switchTab('BEKO, GRUNDIG & LENOVO', bekoTab);
             tabsContainer.appendChild(bekoTab);
         }
 
@@ -1266,13 +1271,18 @@
         const tbody = document.getElementById('table-body');
         tbody.innerHTML = '';
 
+        const isSpecialBrandName = (name) => {
+            const u = (name || '').toUpperCase();
+            return u.includes('BEKO') || u.includes('GRUNDIG') || u.includes('LENOVO');
+        };
+
         let items = [];
         if (activeTabKey === 'all') {
             items = currentResultData.grouped_items;
-        } else if (activeTabKey === 'BEKO & GRUNDIG' || activeTabKey === 'BEKO') {
+        } else if (isSpecialBrandName(activeTabKey)) {
             items = (currentResultData.beko_items && currentResultData.beko_items.length > 0)
                     ? currentResultData.beko_items
-                    : currentResultData.grouped_items.filter(x => x.brand === 'BEKO' || x.brand === 'GRUNDIG');
+                    : currentResultData.grouped_items.filter(x => isSpecialBrandName(x.brand));
         } else {
             items = currentResultData.grouped_items.filter(x => x.brand === activeTabKey);
         }

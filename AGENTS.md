@@ -56,26 +56,26 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * Ürün adı veya ilk kelimesi `BEKO` içeriyorsa,
   * Mağaza adı `beko` içeriyorsa (`Bingöl Ticaret - Beko`),
   * Veya ürün Beko model kodlarıyla başlıyorsa (`KMX`, `7053MB`, `CM`, `CMX`, `B 600`, `B 710`, `BKK`, `BFC`, `BDE`, `TKM`, `BEU`, `KMB`, `9704`, `9705`, `31825`, `74826`, `FR 8374` vb.) otomatik olarak **BEKO** markası olarak tanımlanır.
-* **Beko ve Grundig Listeleme Davranışı (2. Sayfa ve 2. Sekme Standardı):**
+* **Beko, Grundig ve Lenovo Listeleme Davranışı (2. Sayfa ve 2. Sekme Standardı):**
   * **Genel Liste (1. Sekme - `Ürün Toplama Listesi`):**
-    - İlk olarak diğer tüm markalar (Tefal, Babyliss, Philips, Lenovo vb.) listelenir.
-    - Diğer markaların bittiği satıra dikey sayfa sonu (`Break(id=other_items_count + 1)`) eklenir; böylece **BEKO ve GRUNDIG markalı ürünler doğrudan 2. Sayfaya** basılır.
-    - 2. sayfada da `Miktar`, `Ürün Adı`, `Stok Kodu` başlıklarının en üstte tekrarlanması için `ws.print_title_rows = '1:1'` ve `fitToHeight = 0` (sıkıştırmadan çok sayfalı dikey yazdırma) kullanılır.
+    - İlk olarak diğer tüm markalar (Tefal, Babyliss, Philips, Braun, Teka, Bissell vb.) listelenir.
+    - Diğer markaların bittiği satıra dikey sayfa sonu (`Break(id=other_items_count + 1)`) eklenir; böylece **BEKO, GRUNDIG ve LENOVO markalı ürünler doğrudan 2. Sayfaya** basılır.
+    - 2. sayfada da `Miktar`, `Ürün Adı`, `Stok Kodu` başlıklarının en üstte tekrarlanması için `ws.print_title_rows = '1:1'` ve `fitToHeight = 2` kullanılır.
   * **Excel Çalışma Kitabı Sekmeleri:**
-    - 1. Sekme: `Ürün Toplama Listesi` (Sayfa 1: Diğer Markalar, Sayfa 2: Beko & Grundig).
-    - 2. Sekme: Özel **`BEKO & GRUNDIG`** sekmesi (tüm Beko ve Grundig siparişleri burada toplanır).
-    - 3+ Sekmeler: Diğer markaların alfabetik/adet sıralı özel sekmeleri (`TEFAL`, `BABYLISS`, `PHILIPS`, `LENOVO` vb.).
+    - 1. Sekme: `Ürün Toplama Listesi` (Sayfa 1: Diğer Markalar, Sayfa 2: Beko, Grundig & Lenovo).
+    - 2. Sekme: Özel **`BEKO, GRUNDIG & LENOVO`** sekmesi (tüm Beko, Grundig ve Lenovo siparişleri burada toplanır).
+    - 3+ Sekmeler: Diğer markaların alfabetik/adet sıralı özel sekmeleri (`TEFAL`, `BABYLISS`, `PHILIPS` vb.).
   * **Web Arayüzü Sekmeleri:**
     - 1. Sekme: `Tümü (Ana Liste)`
-    - 2. Sekme: `🛡️ BEKO & GRUNDIG (X Adet)`
+    - 2. Sekme: `🛡️ BEKO, GRUNDIG & LENOVO (X Adet)`
     - 3+ Sekmeler: `TEFAL`, `BABYLISS`, vb.
-  * **Bağımsız Dosya:** `Beko_Urun_Toplama_Listesi_A4.xlsx` eş zamanlı olarak tüm Beko & Grundig siparişlerini bağımsız A4 listesi olarak üretir.
-  * **Seçenekli Ayrıştırma (`filter_beko=True`):** Kullanıcı arayüzdeki "Beko & Grundig siparişlerini ana listeden ayır" onay kutusunu işaretlerse, Beko ve Grundig ürünleri ana listeden çıkarılır ve yalnızca bağımsız listede yer alır.
+  * **Bağımsız Dosya:** `Beko_Urun_Toplama_Listesi_A4.xlsx` eş zamanlı olarak tüm Beko, Grundig & Lenovo siparişlerini bağımsız A4 listesi olarak üretir.
+  * **Seçenekli Ayrıştırma (`filter_beko=True`):** Kullanıcı arayüzdeki "Beko, Grundig & Lenovo siparişlerini ana listeden ayır" onay kutusunu işaretlerse, bu ürünler ana listeden çıkarılır ve yalnızca bağımsız listede yer alır.
 * **Diğer Markalar:**
-  * `TEFAL`, `BABYLISS`, `LENOVO`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ` vb.
+  * `TEFAL`, `BABYLISS`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ` vb.
   * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
 * **Büyük Beyaz Eşya, TV ve Garanti Filtrelemesi (`is_excluded_product`):**
-  * Bu filtreleme **YALNIZCA BEKO markalı ürünlere** uygulanır. Diğer tüm markalar (Tefal, Babyliss, Philips, Braun, Lenovo, Teka, Bissell, Laurastar, WMF, Kenwood vb.) doğrudan listelenir.
+  * Bu filtreleme **YALNIZCA BEKO markalı ürünlere** uygulanır. Diğer tüm markalar (Lenovo, Tefal, Babyliss, Philips, Braun, Teka, Bissell, Laurastar, WMF, Kenwood vb.) doğrudan listelenir.
   * **Beko İçin Filtrelenen Ürünler (Listeden Hariç Tutulanlar):**
     - Çamaşır Kurutma Makinesi, Kurutma Makinesi
     - Bulaşık Makinesi
@@ -89,7 +89,7 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Klima (Split, Inverter, Salon tipi vb.)
     - Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS, 300 TR vb. mali cihazlar)
   * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
-    - Lenovo Garanti (Lenovo 1 Yıl Garanti Uzatma Paketi vb.)
+    - Lenovo Garanti ve Bilgisayarlar (Lenovo 1 Yıl Garanti Uzatma Paketi, IdeaPad vb.)
     - Mikrodalga Fırın (Beko BMD vb.)
     - Ankastre Ocak / Ocaklar (Beko BOCD, BOI vb. - Tek başına alındıysa toplanır; Çamaşır, Kurutma, Bulaşık, Buzdolabı, Fırın, Davlumbaz, TV, Dondurucu veya Klima ile alındıysa hariç tutulur)
     - Aspiratör / Ankastre Sürgülü Aspiratör (Beko P 38 vb. - Tek başına alındıysa toplanır; büyük beyaz eşyalarla birlikte alındıysa hariç tutulur)
@@ -103,16 +103,16 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 * **Sayfa Düzeni ve A4 Sığdırma Standardı:**
   * **Genel Liste (1. Sekme):** Toplam **tam 2 sayfa A4**. `fitToWidth=1`, `fitToHeight=2` ve aradaki `Break` sayesinde:
     - **1. Sayfa:** Diğer tüm markalar tam 1 sayfaya sığar.
-    - **2. Sayfa:** Beko & Grundig ürünleri tam 2. sayfaya sığar.
+    - **2. Sayfa:** Beko, Grundig & Lenovo ürünleri tam 2. sayfaya sığar.
     - `ws.print_title_rows = '1:1'` ile her sayfada başlık satırı tekrarlanır.
   * **Tek Sayfalık Sekmeler (2+ Sekmeler ve Beko Dosyası):** `fitToWidth=1`, `fitToHeight=1` ile her marka sekmesi tam 1 sayfaya sığdırılır.
   * **Dinamik Satır ve Font Optimizasyonu:** Sayfa başına düşen kalem > 35 ise satır yüksekliği 20pt, Segoe UI 9.5pt font ve kompakt kenar boşlukları (0.35/0.4 inç) kullanılır; <= 35 kalem için 24pt satır yüksekliği ve 10pt font kullanılır.
-  * **Web A4 Yazdır Standardı (`@media print`):** `@page { size: A4 portrait; margin: 8mm 10mm; }`, `thead { display: table-header-group; }` ve `tr.print-page-break { break-before: page; }` kuralları ile tarayıcıdan A4 yazdırıldığında da 1. sayfa diğer markaları, 2. sayfa Beko & Grundig ürünlerini tam 2 A4 sayfasına sığdırır.
-* **3 Sütun Yapısı:**
-  1. `Miktar` (Genişlik 10-12, ortalı, kalın font)
-  2. `Ürün Adı` (Genişlik 56-60, sola dayalı, kelime kaydırma aktif)
-  3. `Stok Kodu` (Genişlik 16-18, ortalı, monospace/koyu font)
-* **Stil:** Koyu başlık satırı (`#1E293B`, beyaz yazı), zebra desenli satırlar (`#F8FAFC`), ince gri kenarlıklar.
+  * **Web A4 Yazdır Standardı (`@media print`):** `@page { size: A4 portrait; margin: 8mm 10mm; }`, `thead { display: table-header-group; }` ve `tr.print-page-break { break-before: page; }` kuralları ile tarayıcıdan A4 yazdırıldığında da 1. sayfa diğer markaları, 2. sayfa Beko, Grundig & Lenovo ürünlerini tam 2 A4 sayfasına sığdırır.
+* **İçeriğe Göre Otomatik Sütun Genişliği & Hafif Gri Zebra:**
+  1. `Miktar` (İçeriğe göre dinamik genişlik, ortalı, kalın font)
+  2. `Ürün Adı` (Kalan genişliğin tamamı, sola dayalı, kelime kaydırma aktif)
+  3. `Stok Kodu` (İçeriğe göre dinamik genişlik, ortalı, monospace/koyu font)
+* **Stil:** Koyu başlık satırı (`#1E293B`, beyaz yazı), satırların biri diğerine göre hafif gri zebra desenli (`#F1F5F9`), ince kenarlıklar.
 * **Dosyalar:**
   1. `Urun_Toplama_Listesi_A4_Cikti.xlsx` (Ana Liste + her marka için ayrı sekme).
   2. `Beko_Urun_Toplama_Listesi_A4.xlsx` (Beko & Grundig ürünleri toplama listesi).
