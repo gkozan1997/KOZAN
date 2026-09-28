@@ -101,19 +101,21 @@ EXCLUDE_PRODUCT_KEYWORDS = [
     'garanti paketi',
 ]
 
-def is_excluded_product(name):
+def is_conditional_appliance(name):
+    norm = normalize_tr(name)
+    return ('aspirator' in norm or 'ocak' in norm)
+
+def is_major_appliance_or_warranty(name):
     norm = normalize_tr(name)
     if not norm:
         return False
 
-    # 1. KESİNLİKLE KORUNACAKLAR (Kullanıcı tercihi: Lenovo Garanti, Ocak, Aspiratör, Mikrodalga, Saç Kurutma listede kalmalı)
+    # 1. KESİNLİKLE KORUNACAKLAR (İstisnalar)
     if 'lenovo' in norm and 'garanti' in norm:
         return False
     if 'sac kurutma' in norm:
         return False
     if 'mikrodalga' in norm:
-        return False
-    if 'aspirator' in norm or 'ocak' in norm:
         return False
 
     # 2. TV / Televizyon kontrolü
@@ -137,6 +139,9 @@ def is_excluded_product(name):
             return True
 
     return False
+
+def is_excluded_product(name):
+    return is_major_appliance_or_warranty(name)
 
 def find_column_index(headers, possible_names):
     norm_headers = [normalize_text(h) for h in headers]
@@ -301,6 +306,7 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
         idx_qty = find_column_index(headers, ['adet', 'miktar', 'miktar (adet)', 'sipariş adedi', 'quantity', 'qty'])
         idx_ord = find_column_index(headers, ['sipariş no', 'sipariş numarası', 'siparis no', 'paket no', 'order no'])
         idx_bar = find_column_index(headers, ['gtin (barkod)', 'barkod', 'gtin', 'barcode', 'ean'])
+        idx_cust = find_column_index(headers, ['üye adı soyadı', 'fatura - müşteri', 'müşteri', 'musteri', 'alıcı', 'alici', 'ad soyad', 'pazaryeri kullanıcı'])
         idx_magaza = find_column_index(headers, ['mağaza', 'magaza', 'satıcı', 'store'])
         idx_marka = find_column_index(headers, ['marka', 'brand'])
         idx_pazar = find_column_index(headers, ['pazaryeri', 'pazar yeri', 'platform'])
@@ -331,6 +337,7 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
             ord_val = str(sh.cell_value(r, idx_ord)).strip() if idx_ord != -1 else ''
             if ord_val.endswith('.0'): ord_val = ord_val[:-2]
 
+            cust_val = str(sh.cell_value(r, idx_cust)).strip() if idx_cust != -1 else ''
             magaza_val = str(sh.cell_value(r, idx_magaza)).strip() if idx_magaza != -1 else ''
             marka_val = str(sh.cell_value(r, idx_marka)).strip() if idx_marka != -1 else ''
             pazar_val = str(sh.cell_value(r, idx_pazar)).strip() if idx_pazar != -1 else ''
@@ -343,6 +350,7 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
                 'barkod': bar_val,
                 'qty': qty_val,
                 'order_no': ord_val,
+                'customer': cust_val,
                 'brand': brand,
                 'magaza': magaza_val,
                 'pazar': pazar_val,
@@ -371,6 +379,7 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
         idx_qty = find_column_index(headers, ['adet', 'miktar', 'miktar (adet)', 'sipariş adedi', 'quantity', 'qty'])
         idx_ord = find_column_index(headers, ['sipariş no', 'sipariş numarası', 'siparis no', 'paket no', 'order no'])
         idx_bar = find_column_index(headers, ['gtin (barkod)', 'barkod', 'gtin', 'barcode', 'ean'])
+        idx_cust = find_column_index(headers, ['fatura - müşteri', 'üye adı soyadı', 'müşteri', 'musteri', 'alıcı', 'alici', 'ad soyad', 'pazaryeri kullanıcı'])
         idx_magaza = find_column_index(headers, ['mağaza', 'magaza', 'satıcı', 'store'])
         idx_marka = find_column_index(headers, ['marka', 'brand'])
         idx_pazar = find_column_index(headers, ['pazaryeri', 'pazar yeri', 'platform'])
@@ -401,6 +410,7 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
             ord_val = str(sh.cell(r, idx_ord + 1).value or '').strip() if idx_ord != -1 else ''
             if ord_val.endswith('.0'): ord_val = ord_val[:-2]
 
+            cust_val = str(sh.cell(r, idx_cust + 1).value or '').strip() if idx_cust != -1 else ''
             magaza_val = str(sh.cell(r, idx_magaza + 1).value or '').strip() if idx_magaza != -1 else ''
             marka_val = str(sh.cell(r, idx_marka + 1).value or '').strip() if idx_marka != -1 else ''
             pazar_val = str(sh.cell(r, idx_pazar + 1).value or '').strip() if idx_pazar != -1 else ''
@@ -413,6 +423,7 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
                 'barkod': bar_val,
                 'qty': qty_val,
                 'order_no': ord_val,
+                'customer': cust_val,
                 'brand': brand,
                 'magaza': magaza_val,
                 'pazar': pazar_val,
@@ -457,9 +468,29 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     brand_consolidated = defaultdict(lambda: defaultdict(lambda: {'name': '', 'stok': '', 'qty': 0, 'brand': ''}))
     beko_consolidated = defaultdict(lambda: {'name': '', 'stok': '', 'qty': 0, 'brand': 'BEKO'})
 
+    # Büyük beyaz eşya içeren sipariş/müşteri kümesi
+    # Kural: Ankastre Ocak ve Aspiratör (Beko P 38 vb.) aynı müşteri tek başına satın aldıysa listeye ekle,
+    # Çamaşır, Kurutma, Bulaşık, Buzdolabı, Fırın, Davlumbaz, TV, Derin Dondurucu veya Klima ile aldıysa listeye ekleme.
+    orders_with_major = set()
     for item in all_raw_rows:
-        # Büyük beyaz eşya, TV, klima, fırın ve ek garanti ürünlerini filtrele
-        if is_excluded_product(item['name']):
+        if is_major_appliance_or_warranty(item['name']):
+            if item.get('order_no'):
+                orders_with_major.add(item['order_no'])
+            if item.get('customer'):
+                orders_with_major.add(canonical_key(item['customer']))
+
+    def is_item_excluded(item):
+        name = item['name']
+        if is_major_appliance_or_warranty(name):
+            return True
+        if is_conditional_appliance(name):
+            ord_no = item.get('order_no', '')
+            cust = canonical_key(item.get('customer', ''))
+            return bool((ord_no and ord_no in orders_with_major) or (cust and cust in orders_with_major))
+        return False
+
+    for item in all_raw_rows:
+        if is_item_excluded(item):
             continue
 
         brand = item['brand']
@@ -584,7 +615,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
             'qty': sum(x['qty'] for x in brand_orders[b])
         })
 
-    excluded_rows = [item for item in all_raw_rows if is_excluded_product(item['name'])]
+    excluded_rows = [item for item in all_raw_rows if is_item_excluded(item)]
 
     summary_filename = source_filenames[0] if len(source_filenames) == 1 else f"{len(source_filenames)} Dosya Birleştirildi"
 

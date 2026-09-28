@@ -76,8 +76,8 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
     - Lenovo Garanti (Lenovo 1 Yıl Garanti Uzatma Paketi vb.)
     - Mikrodalga Fırın (Beko BMD vb.)
-    - Ankastre Ocak / Ocaklar (Beko BOCD, BOI vb.)
-    - Aspiratör / Ankastre Sürgülü Aspiratör (Beko P 38 vb.)
+    - Ankastre Ocak / Ocaklar (Beko BOCD, BOI vb. - Tek başına alındıysa toplanır; Çamaşır, Kurutma, Bulaşık, Buzdolabı, Fırın, Davlumbaz, TV, Dondurucu veya Klima ile alındıysa hariç tutulur)
+    - Aspiratör / Ankastre Sürgülü Aspiratör (Beko P 38 vb. - Tek başına alındıysa toplanır; büyük beyaz eşyalarla birlikte alındıysa hariç tutulur)
     - Saç Kurutma Makinesi (BaByliss, Grundig vb.)
     - Tüm Küçük Ev Aletleri (Kahve/Çay Makinesi, Blender, Ütü, Fritöz, Süpürge, Tost Makinesi vb.), Telefon ve Bilgisayarlar.
 
