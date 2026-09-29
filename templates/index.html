@@ -684,6 +684,117 @@
             font-size: 12px;
         }
 
+        /* 1. Sayfa Özel Not Kutusu */
+        .page1-note-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+        }
+        .page1-note-card:focus-within {
+            border-color: var(--accent-amber);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+        }
+        .note-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .note-card-icon {
+            font-size: 15px;
+        }
+        .note-card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-amber);
+            letter-spacing: 0.02em;
+        }
+        .note-card-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .note-input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 8px 14px;
+            transition: border-color 0.2s ease;
+        }
+        .note-input-container:focus-within {
+            border-color: var(--accent-amber);
+        }
+        .note-card-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .note-card-input::placeholder {
+            color: #64748b;
+        }
+        .btn-note-clear {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .btn-note-clear:hover {
+            background: rgba(239, 68, 68, 0.25);
+            color: #ffffff;
+        }
+
+        /* Web Tablo Not Satırı */
+        tr.row-note {
+            background: rgba(245, 158, 11, 0.08) !important;
+        }
+        tr.row-note td {
+            border-top: 1px solid rgba(245, 158, 11, 0.35) !important;
+            border-bottom: 1px solid rgba(245, 158, 11, 0.35) !important;
+            padding: 10px 14px !important;
+            vertical-align: middle !important;
+        }
+        tr.row-note .note-badge {
+            background: #f59e0b !important;
+            color: #000000 !important;
+            font-weight: 800 !important;
+            font-size: 11px !important;
+            letter-spacing: 0.05em !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            display: inline-block !important;
+            border: none !important;
+        }
+        tr.row-note td.col-name {
+            color: #f8fafc !important;
+            font-size: 13px !important;
+            line-height: 1.4 !important;
+        }
+        tr.row-note td.col-name strong {
+            color: #f59e0b !important;
+            margin-right: 6px !important;
+            font-weight: 700 !important;
+        }
+
         /* Toast Notifications */
         #toast-container {
             position: fixed;
@@ -918,12 +1029,15 @@
                 break-before: page !important;
                 page-break-before: always !important;
             }
-            td, td.col-name, td.col-code, td.col-qty, .qty-badge, td * {
+            td, td.col-name, td.col-code, td.col-qty {
                 border: 1px solid #cbd5e1 !important;
                 padding: 2.2px 6px !important;
                 color: #000000 !important;
                 font-size: 8.5pt !important;
                 vertical-align: middle !important;
+            }
+            td * {
+                border: none !important;
             }
             th.col-qty, td.col-qty {
                 width: 1% !important;
@@ -962,6 +1076,46 @@
                 background: #f1f5f9 !important; /* Biri diğerine göre hafif gri satır */
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+            }
+
+            .page1-note-card {
+                display: none !important;
+            }
+            tr.row-note {
+                background: #fffbeb !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            tr.row-note td {
+                background: #fffbeb !important;
+                border: 1px solid #cbd5e1 !important;
+                color: #000000 !important;
+                font-size: 8.5pt !important;
+                line-height: 1.25 !important;
+                padding: 3px 6px !important;
+                vertical-align: middle !important;
+            }
+            tr.row-note td.col-qty {
+                width: 1% !important;
+                white-space: nowrap !important;
+                text-align: center !important;
+            }
+            tr.row-note td.col-qty .note-badge {
+                font-weight: 800 !important;
+                color: #b45309 !important;
+                background: transparent !important;
+                border: none !important;
+                font-size: 8.5pt !important;
+                padding: 0 !important;
+            }
+            tr.row-note td.col-name {
+                text-align: left !important;
+                color: #000000 !important;
+            }
+            tr.row-note td.col-name strong {
+                font-weight: 800 !important;
+                color: #000000 !important;
+                margin-right: 4px !important;
             }
 
             .print-only {
@@ -1178,6 +1332,28 @@
             <input type="text" class="search-input" id="table-search" placeholder="Listede ara (ürün, stok)..." oninput="filterTable()">
         </div>
 
+        <!-- 1. Sayfa Özel Not Kutusu -->
+        <div class="page1-note-card" id="page1-note-card">
+            <div class="note-card-header">
+                <span class="note-card-icon">📝</span>
+                <span class="note-card-title">1. Sayfa Alt Notu:</span>
+                <span class="note-card-desc">(Yazdığınız metin 1. sayfa listesinin en altına not satırı olarak eklenir)</span>
+            </div>
+            <div class="note-card-body">
+                <div class="note-input-container">
+                    <input type="text" 
+                           class="note-card-input" 
+                           id="page1-note-input" 
+                           placeholder="1. sayfa listesinin en altına not ekleyin (örn: Ahidenal deposu eksikleri tamamlanacak, faturalar hazır)..." 
+                           autocomplete="off"
+                           oninput="handlePage1NoteInput(this.value)">
+                    <button type="button" class="btn-note-clear" id="btn-note-clear" onclick="clearPage1Note()" title="Notu Temizle" style="display: none;">
+                        ✕ Temizle
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="table-responsive" id="table-container">
             <!-- 1. Sayfa Blok: Diğer Markalar -->
             <div class="print-page-block print-page-1" id="print-block-1">
@@ -1277,13 +1453,14 @@
 
     async function processLatestFile() {
         const filterBeko = document.getElementById('toggle-beko').checked;
+        const page1Note = (document.getElementById('page1-note-input')?.value || localStorage.getItem('gokhanos_page1_note') || '').trim();
         showToast("Siparişler işleniyor ve A4 Excel çıktıları oluşturuluyor...");
         
         try {
             const res = await fetch('/api/process-latest', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filter_beko: filterBeko })
+                body: JSON.stringify({ filter_beko: filterBeko, custom_note: page1Note })
             });
             const data = await res.json();
             if (data.success) {
@@ -1304,13 +1481,14 @@
 
     async function processAllRecentFiles() {
         const filterBeko = document.getElementById('toggle-beko').checked;
+        const page1Note = (document.getElementById('page1-note-input')?.value || localStorage.getItem('gokhanos_page1_note') || '').trim();
         showToast("İndirilenlerdeki tüm sipariş dosyaları taranıyor ve birleştiriliyor...");
         
         try {
             const res = await fetch('/api/process-all-recent', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filter_beko: filterBeko })
+                body: JSON.stringify({ filter_beko: filterBeko, custom_note: page1Note })
             });
             const data = await res.json();
             if (data.success) {
@@ -1327,6 +1505,7 @@
     async function handleFileUpload(files) {
         if (!files || files.length === 0) return;
         const filterBeko = document.getElementById('toggle-beko').checked;
+        const page1Note = (document.getElementById('page1-note-input')?.value || localStorage.getItem('gokhanos_page1_note') || '').trim();
         
         const count = files.length;
         if (count === 1) {
@@ -1340,6 +1519,7 @@
             formData.append('files', files[i]);
         }
         formData.append('filter_beko', filterBeko);
+        formData.append('custom_note', page1Note);
 
         try {
             const res = await fetch('/api/upload', {
@@ -1458,6 +1638,16 @@
             tabsContainer.appendChild(bekoTab);
         }
 
+        // Note Input Sync
+        const currentInputVal = (document.getElementById('page1-note-input')?.value || '').trim();
+        const savedNote = currentInputVal || result.custom_note || localStorage.getItem('gokhanos_page1_note') || '';
+        const noteInput = document.getElementById('page1-note-input');
+        const clearBtn = document.getElementById('btn-note-clear');
+        if (noteInput) {
+            noteInput.value = savedNote;
+            if (clearBtn) clearBtn.style.display = savedNote.trim() ? 'inline-flex' : 'none';
+        }
+
         activeTabKey = 'all';
         renderTableRows();
     }
@@ -1466,6 +1656,37 @@
         activeTabKey = key;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         tabEl.classList.add('active');
+        renderTableRows();
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function handlePage1NoteInput(val) {
+        localStorage.setItem('gokhanos_page1_note', val);
+        const clearBtn = document.getElementById('btn-note-clear');
+        if (clearBtn) {
+            clearBtn.style.display = val.trim() ? 'inline-flex' : 'none';
+        }
+        renderTableRows();
+    }
+
+    function clearPage1Note() {
+        const noteInput = document.getElementById('page1-note-input');
+        if (noteInput) {
+            noteInput.value = '';
+            noteInput.focus();
+        }
+        localStorage.removeItem('gokhanos_page1_note');
+        const clearBtn = document.getElementById('btn-note-clear');
+        if (clearBtn) clearBtn.style.display = 'none';
         renderTableRows();
     }
 
@@ -1497,13 +1718,21 @@
         const query = (document.getElementById('table-search').value || '').toLowerCase().trim();
         const matchesQuery = (x) => !query || (x.name && x.name.toLowerCase().includes(query)) || (x.stok && x.stok.toLowerCase().includes(query));
 
+        const page1Note = (document.getElementById('page1-note-input')?.value || '').trim();
+        const noteRowHtml = page1Note ? `
+            <tr class="row-note">
+                <td class="col-qty"><span class="qty-badge note-badge">NOT</span></td>
+                <td class="col-name" colspan="2"><strong>Not:</strong> ${escapeHtml(page1Note)}</td>
+            </tr>
+        ` : '';
+
         if (activeTabKey === 'all') {
             const splitIdx = currentResultData.other_items_count || 0;
             const allItems = currentResultData.grouped_items || [];
             const otherItems = allItems.slice(0, splitIdx).filter(matchesQuery);
             const bekoItems = allItems.slice(splitIdx).filter(matchesQuery);
 
-            if (otherItems.length === 0 && bekoItems.length === 0) {
+            if (otherItems.length === 0 && bekoItems.length === 0 && !page1Note) {
                 tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
                 block1.style.display = 'block';
                 block2.style.display = 'none';
@@ -1511,8 +1740,8 @@
                 return;
             }
 
-            if (otherItems.length > 0) {
-                tbody1.innerHTML = otherItems.map(createRowHtml).join('');
+            if (otherItems.length > 0 || page1Note) {
+                tbody1.innerHTML = otherItems.map(createRowHtml).join('') + noteRowHtml;
                 block1.style.display = 'block';
             } else {
                 block1.style.display = 'none';
@@ -1538,10 +1767,10 @@
 
             items = items.filter(matchesQuery);
 
-            if (items.length === 0) {
+            if (items.length === 0 && !page1Note) {
                 tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
             } else {
-                tbody1.innerHTML = items.map(createRowHtml).join('');
+                tbody1.innerHTML = items.map(createRowHtml).join('') + noteRowHtml;
             }
             block1.style.display = 'block';
             block2.style.display = 'none';
@@ -1654,6 +1883,16 @@
             setTimeout(() => t.remove(), 300);
         }, 3500);
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedNote = localStorage.getItem('gokhanos_page1_note') || '';
+        const noteInput = document.getElementById('page1-note-input');
+        const clearBtn = document.getElementById('btn-note-clear');
+        if (noteInput && savedNote) {
+            noteInput.value = savedNote;
+            if (clearBtn) clearBtn.style.display = 'inline-flex';
+        }
+    });
 </script>
 </body>
 </html>

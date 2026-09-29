@@ -154,3 +154,17 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 * **Zorunlu Güncelleme Kuralı:** Projede yapılan her yenilik, kural güncellemesi, özellik eklemesi veya hata düzeltmesi sonrasında proje MUTLAKA GitHub'a commit ve push (`git push origin main`) edilir.
 * **Canlı Sistem Senkronizasyonu:** Bu sayede [kozan-rtki.vercel.app](https://kozan-rtki.vercel.app) üzerindeki canlı bulut yayını masaüstü sistemiyle daima %100 senkronize ve güncel kalır.
 
+---
+
+## 9. 1. Sayfa Özel Not Kutusu Standardı
+
+* **Özel Not Girişi (`page1-note-input`):**
+  * Web arayüzünde tablo araçlarının üzerinde yer alan özel not kutusu (`.page1-note-card`) sayesinde kullanıcı serbest metin notu girebilir.
+  * Not metni `localStorage` ile tarayıcıda kalıcı olarak saklanır ve tek tıkla temizlenebilir (`clearPage1Note`).
+* **1. Sayfa Sonuna Eklenme Davranışı:**
+  * Girilen not, Ana Toplama Listesinde (1. Sekme) **yalnızca 1. sayfa listesinin en alt sırasına** (`<tr>` olarak) eklenir; 2. sayfaya (Beko, Grundig & Lenovo) asla taşmaz veya sirayet etmez.
+  * Miktar sütununda belirgin **`NOT`** rozeti (`.note-badge`), Ürün Adı ve Stok Kodu sütunlarını kapsayan birleşik alanda (`colspan="2"`) **`Not: [Metin]`** şeklinde basılır.
+  * Hem web ekranında hafif sıcak vurguyla, hem de A4 baskı ve PDF çıktısında (`@media print`) net kenarlıklar ve Segoe UI font standardıyla kusursuz basılır.
+  * Excel çalışma kitabında da (`core_engine.py`) 1. sekmenin 1. sayfa sonuna (sayfa sonu kırılımından hemen önce) otomatik eklenir ve B-C sütunları birleştirilir.
+
+

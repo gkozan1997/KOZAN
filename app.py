@@ -137,9 +137,10 @@ def process_latest():
 
     data = request.get_json(silent=True) or {}
     filter_beko = data.get('filter_beko', False)
+    custom_note = data.get('custom_note', '').strip()
 
     try:
-        result = parse_and_process_file(latest_file, filter_beko=filter_beko)
+        result = parse_and_process_file(latest_file, filter_beko=filter_beko, custom_note=custom_note)
         return jsonify({'success': True, 'result': result})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -159,9 +160,10 @@ def process_all_recent():
 
     data = request.get_json(silent=True) or {}
     filter_beko = data.get('filter_beko', False)
+    custom_note = data.get('custom_note', '').strip()
 
     try:
-        result = parse_and_process_multiple_files(recent_files, filter_beko=filter_beko)
+        result = parse_and_process_multiple_files(recent_files, filter_beko=filter_beko, custom_note=custom_note)
         return jsonify({'success': True, 'result': result})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -175,13 +177,14 @@ def upload_file():
         return jsonify({'success': False, 'error': 'Dosya seçilmedi veya geçerli dosya bulunamadı.'}), 400
 
     filter_beko = (request.form.get('filter_beko', 'false').lower() == 'true')
+    custom_note = request.form.get('custom_note', '').strip()
 
     try:
         if IS_CLOUD:
-            result = process_in_memory(valid_files, filter_beko=filter_beko)
+            result = process_in_memory(valid_files, filter_beko=filter_beko, custom_note=custom_note)
             result = _attach_downloads(result)
         else:
-            result = parse_and_process_multiple_files(valid_files, filter_beko=filter_beko)
+            result = parse_and_process_multiple_files(valid_files, filter_beko=filter_beko, custom_note=custom_note)
         return jsonify({'success': True, 'result': result})
     except Exception as e:
         app.logger.exception('Yukleme hatasi')

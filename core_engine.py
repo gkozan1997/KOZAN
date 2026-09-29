@@ -525,7 +525,7 @@ def get_signature_image_path():
     return None
 
 
-def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
+def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, custom_note=""):
     """
     Mükerrer ürünleri konsolide eder ve A4 formatlı Excel dosyalarını BELLEKTE üretir.
     Bu fonksiyon hiçbir disk yazma işlemi yapmaz; hem masaüstü hem bulut yolu bunu kullanır.
@@ -707,16 +707,17 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
 
         for idx, itm in enumerate(rows_data, 1):
             row_num = idx + 1
+            is_note_row = (str(itm.get('qty', '')).upper() == 'NOT')
 
             c_q = ws.cell(row=row_num, column=1, value=itm['qty'])
             c_q.alignment = Alignment(horizontal='center', vertical='center')
-            c_q.font = f_qty
+            c_q.font = Font(name='Segoe UI', size=10, bold=True, color='B45309') if is_note_row else f_qty
 
             c_n = ws.cell(row=row_num, column=2, value=itm['name'])
             c_n.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
-            c_n.font = f_regular
+            c_n.font = Font(name='Segoe UI', size=9.5, bold=True, color='000000') if is_note_row else f_regular
 
-            c_s = ws.cell(row=row_num, column=3, value=itm['stok'])
+            c_s = ws.cell(row=row_num, column=3, value=itm.get('stok', ''))
             c_s.alignment = Alignment(horizontal='center', vertical='center')
             c_s.font = f_code
 
@@ -725,8 +726,13 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
             for c in range(1, 4):
                 cell = ws.cell(row=row_num, column=c)
                 cell.border = cell_border
-                if idx % 2 == 0:
+                if is_note_row:
+                    cell.fill = PatternFill(start_color='FFFBEB', end_color='FFFBEB', fill_type='solid')
+                elif idx % 2 == 0:
                     cell.fill = fill_zebra
+
+            if is_note_row:
+                ws.merge_cells(start_row=row_num, start_column=2, end_row=row_num, end_column=3)
 
         if has_page_break:
             ws.row_breaks.append(Break(id=page_break_after_idx + 1))
@@ -769,8 +775,20 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
     wb_main = openpyxl.Workbook()
     ws1 = wb_main.active
     # Sheet 1: Genel Toplama Listesi (Sayfa 1: Diger Markalar, Sayfa 2: Beko & Grundig)
+    sheet1_items = list(grouped_items)
     page_break_idx = other_items_count if (other_items_count > 0 and len(beko_grundig_orders) > 0 and not filter_beko) else None
-    setup_a4_sheet(ws1, "Ürün Toplama Listesi", grouped_items, page_break_after_idx=page_break_idx)
+
+    clean_note = (custom_note or '').strip()
+    if clean_note:
+        note_row = {'qty': 'NOT', 'name': f'Not: {clean_note}', 'stok': '', 'brand': 'NOTE'}
+        if other_items_count > 0:
+            sheet1_items.insert(other_items_count, note_row)
+            if page_break_idx is not None:
+                page_break_idx += 1
+        else:
+            sheet1_items.append(note_row)
+
+    setup_a4_sheet(ws1, "Ürün Toplama Listesi", sheet1_items, page_break_after_idx=page_break_idx)
 
     # Sheet 2: BEKO, GRUNDIG & LENOVO Sekmesi (Eger Beko, Grundig veya Lenovo siparisi varsa)
     if beko_grundig_orders and not filter_beko:
@@ -824,6 +842,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
         'brands': brand_stats,
         'grouped_items': grouped_items,
         'beko_items': beko_orders,
+        'custom_note': (custom_note or '').strip(),
         'is_cloud': IS_CLOUD,
         '_wb_main': wb_main,
         '_wb_beko': wb_beko,
@@ -841,7 +860,7 @@ def workbooks_to_bytes(wb_main, wb_beko=None):
     return main_buf.getvalue(), (beko_buf.getvalue() if beko_buf else None)
 
 
-def parse_and_process_multiple_files(files_or_paths, filter_beko=False, target_date=None):
+def parse_and_process_multiple_files(files_or_paths, filter_beko=False, target_date=None, custom_note=""):
     """
     MASAÜSTÜ YOLU: dosyaları işler, konsolide eder ve A4 Excel çıktılarını
     tarih klasörlerine diske yazar. Davranış eskisiyle birebir aynıdır.
@@ -859,7 +878,7 @@ def parse_and_process_multiple_files(files_or_paths, filter_beko=False, target_d
 
     all_raw_rows, source_filenames = read_rows_from_files(files_or_paths, temp_dir=date_folders[0])
 
-    result = consolidate_and_build(all_raw_rows, source_filenames, filter_beko=filter_beko)
+    result = consolidate_and_build(all_raw_rows, source_filenames, filter_beko=filter_beko, custom_note=custom_note)
     wb_main = result.pop('_wb_main')
     wb_beko = result.pop('_wb_beko')
 
@@ -898,7 +917,7 @@ def parse_and_process_multiple_files(files_or_paths, filter_beko=False, target_d
     return result
 
 
-def process_in_memory(files_or_paths, filter_beko=False):
+def process_in_memory(files_or_paths, filter_beko=False, custom_note=""):
     """
     BULUT YOLU: hiçbir disk yazma işlemi yapmaz. Excel çıktıları bellekte üretilir
     ve byte olarak döner. Vercel gibi kalıcı diski olmayan ortamlar içindir.
@@ -906,7 +925,7 @@ def process_in_memory(files_or_paths, filter_beko=False):
     temp_dir = CLOUD_TMP_DIR if IS_CLOUD else None
     all_raw_rows, source_filenames = read_rows_from_files(files_or_paths, temp_dir=temp_dir)
 
-    result = consolidate_and_build(all_raw_rows, source_filenames, filter_beko=filter_beko)
+    result = consolidate_and_build(all_raw_rows, source_filenames, filter_beko=filter_beko, custom_note=custom_note)
     wb_main = result.pop('_wb_main')
     wb_beko = result.pop('_wb_beko')
 
@@ -923,10 +942,10 @@ def process_in_memory(files_or_paths, filter_beko=False):
     })
     return result
 
-def parse_and_process_file(file_path_or_bytes, custom_filename=None, filter_beko=False, target_date=None):
+def parse_and_process_file(file_path_or_bytes, custom_filename=None, filter_beko=False, target_date=None, custom_note=""):
     """
     Backward-compatible wrapper for single file or list of files.
     """
     if isinstance(file_path_or_bytes, (list, tuple)):
-        return parse_and_process_multiple_files(file_path_or_bytes, filter_beko=filter_beko, target_date=target_date)
-    return parse_and_process_multiple_files([file_path_or_bytes], filter_beko=filter_beko, target_date=target_date)
+        return parse_and_process_multiple_files(file_path_or_bytes, filter_beko=filter_beko, target_date=target_date, custom_note=custom_note)
+    return parse_and_process_multiple_files([file_path_or_bytes], filter_beko=filter_beko, target_date=target_date, custom_note=custom_note)
