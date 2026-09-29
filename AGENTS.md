@@ -9,6 +9,7 @@ Bu doküman, projenin mimari yapısını, pazaryeri sipariş formatlarını, iş
 * **Web Arayüzü & Sunucu:** `app.py` (Flask tabanlı, 127.0.0.1:5000 portunda çalışır).
 * **Çekirdek Motor:** `core_engine.py` (Tüm Excel okuma, temizleme, marka tespiti, Beko ayrıştırma ve A4 oluşturma mantığını barındırır).
 * **Konsol / CLI:** `process_orders.py` ve `order_processor.py`.
+* **Canlı Bulut Yayını (7/24 Aktif):** [kozan-rtki.vercel.app](https://kozan-rtki.vercel.app) (Vercel + GitHub `gkozan1997/KOZAN` entegrasyonu ile cep telefonu ve her yerden erişilebilir).
 * **Başlatıcılar:**
   * Proje içindeki `baslat.bat`.
   * Masaüstündeki `Siparis_Toplama_Programi.bat`.
