@@ -686,33 +686,49 @@
 
         /* 1. Sayfa Özel Not Kutusu */
         .page1-note-card {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 2px solid rgba(245, 158, 11, 0.45);
             border-radius: var(--radius-md);
-            padding: 12px 16px;
-            margin-bottom: 18px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 14px 18px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25), 0 0 12px rgba(245, 158, 11, 0.08);
             transition: all 0.2s ease;
         }
         .page1-note-card:focus-within {
             border-color: var(--accent-amber);
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25), 0 6px 20px rgba(0, 0, 0, 0.35);
         }
         .note-card-header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .note-card-title-group {
+            display: flex;
+            align-items: center;
             gap: 8px;
-            margin-bottom: 8px;
             flex-wrap: wrap;
         }
         .note-card-icon {
-            font-size: 15px;
+            font-size: 16px;
         }
         .note-card-title {
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: 800;
             color: var(--accent-amber);
             letter-spacing: 0.02em;
+        }
+        .note-badge-tag {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
         }
         .note-card-desc {
             font-size: 12px;
@@ -725,11 +741,12 @@
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-sm);
-            padding: 8px 14px;
+            padding: 10px 14px;
             transition: border-color 0.2s ease;
         }
         .note-input-container:focus-within {
             border-color: var(--accent-amber);
+            background: rgba(15, 23, 42, 0.95);
         }
         .note-card-input {
             flex: 1;
@@ -737,7 +754,7 @@
             border: none;
             outline: none;
             color: #ffffff;
-            font-size: 13px;
+            font-size: 13.5px;
             font-family: inherit;
         }
         .note-card-input::placeholder {
@@ -747,19 +764,19 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.18);
+            border: 1px solid rgba(239, 68, 68, 0.35);
             color: #fca5a5;
-            border-radius: 4px;
-            padding: 4px 10px;
-            font-size: 11px;
+            border-radius: 5px;
+            padding: 5px 12px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             white-space: nowrap;
         }
         .btn-note-clear:hover {
-            background: rgba(239, 68, 68, 0.25);
+            background: rgba(239, 68, 68, 0.3);
             color: #ffffff;
         }
 
@@ -1273,6 +1290,31 @@
         </div>
     </div>
 
+    <!-- 1. Sayfa Özel Not Kutusu (Daima Ekranda Görünür) -->
+    <div class="page1-note-card" id="page1-note-card-main">
+        <div class="note-card-header">
+            <div class="note-card-title-group">
+                <span class="note-card-icon">📝</span>
+                <span class="note-card-title">1. Sayfa Alt Notu:</span>
+                <span class="note-badge-tag">1. Sayfa En Alt Sırası</span>
+            </div>
+            <span class="note-card-desc">Buraya yazdığınız metin, 1. sayfa listesinin en altına not satırı olarak eklenir.</span>
+        </div>
+        <div class="note-card-body">
+            <div class="note-input-container">
+                <input type="text" 
+                       class="note-card-input page1-note-input-field" 
+                       id="page1-note-input-main" 
+                       placeholder="📝 1. sayfa listesinin en altına eklenecek notu buraya yazın (örn: Ahidenal deposuna teslim edilecek, faturalar hazır)..." 
+                       autocomplete="off"
+                       oninput="handlePage1NoteInput(this.value)">
+                <button type="button" class="btn-note-clear" onclick="clearPage1Note()" title="Notu Temizle" style="display: none;">
+                    ✕ Temizle
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- KPI Summary Section -->
     <div class="kpi-grid" id="kpi-section" style="display: none;">
         <div class="kpi-card kpi-accent-cyan">
@@ -1332,22 +1374,25 @@
             <input type="text" class="search-input" id="table-search" placeholder="Listede ara (ürün, stok)..." oninput="filterTable()">
         </div>
 
-        <!-- 1. Sayfa Özel Not Kutusu -->
-        <div class="page1-note-card" id="page1-note-card">
+        <!-- 1. Sayfa Özel Not Kutusu (Tablo Üstü) -->
+        <div class="page1-note-card" id="page1-note-card-table">
             <div class="note-card-header">
-                <span class="note-card-icon">📝</span>
-                <span class="note-card-title">1. Sayfa Alt Notu:</span>
-                <span class="note-card-desc">(Yazdığınız metin 1. sayfa listesinin en altına not satırı olarak eklenir)</span>
+                <div class="note-card-title-group">
+                    <span class="note-card-icon">📝</span>
+                    <span class="note-card-title">1. Sayfa Alt Notu:</span>
+                    <span class="note-badge-tag">1. Sayfa En Alt Sırası</span>
+                </div>
+                <span class="note-card-desc">Yazdığınız metin aşağıdaki 1. sayfa listesinin en alt sırasına eklenir.</span>
             </div>
             <div class="note-card-body">
                 <div class="note-input-container">
                     <input type="text" 
-                           class="note-card-input" 
-                           id="page1-note-input" 
-                           placeholder="1. sayfa listesinin en altına not ekleyin (örn: Ahidenal deposu eksikleri tamamlanacak, faturalar hazır)..." 
+                           class="note-card-input page1-note-input-field" 
+                           id="page1-note-input-table" 
+                           placeholder="📝 1. sayfa listesinin en altına eklenecek notu buraya yazın..." 
                            autocomplete="off"
                            oninput="handlePage1NoteInput(this.value)">
-                    <button type="button" class="btn-note-clear" id="btn-note-clear" onclick="clearPage1Note()" title="Notu Temizle" style="display: none;">
+                    <button type="button" class="btn-note-clear" onclick="clearPage1Note()" title="Notu Temizle" style="display: none;">
                         ✕ Temizle
                     </button>
                 </div>
@@ -1416,8 +1461,63 @@
     const dateFormatted = today.toISOString().split('T')[0];
     document.getElementById('current-date-text').innerText = `Günün Tarihi: ${dateFormatted}`;
 
-    // On Load: Check latest download file
+    // Note Input Handlers (Daima Ekranda Görünür & Senkronize)
+    function getPage1Note() {
+        const el1 = document.getElementById('page1-note-input-main');
+        const el2 = document.getElementById('page1-note-input-table');
+        const val = el1?.value || el2?.value || localStorage.getItem('gokhanos_page1_note') || '';
+        return val.trim();
+    }
+
+    function syncNoteInputs(val) {
+        const note = (val !== undefined && val !== null) ? val : (localStorage.getItem('gokhanos_page1_note') || '');
+        document.querySelectorAll('.page1-note-input-field').forEach(input => {
+            if (input.value !== note) input.value = note;
+        });
+        document.querySelectorAll('.btn-note-clear').forEach(btn => {
+            btn.style.display = note.trim() ? 'inline-flex' : 'none';
+        });
+    }
+
+    function handlePage1NoteInput(val) {
+        localStorage.setItem('gokhanos_page1_note', val);
+        document.querySelectorAll('.page1-note-input-field').forEach(input => {
+            if (input.value !== val) input.value = val;
+        });
+        document.querySelectorAll('.btn-note-clear').forEach(btn => {
+            btn.style.display = val.trim() ? 'inline-flex' : 'none';
+        });
+        if (currentResultData) {
+            renderTableRows();
+        }
+    }
+
+    function clearPage1Note() {
+        localStorage.removeItem('gokhanos_page1_note');
+        document.querySelectorAll('.page1-note-input-field').forEach(input => {
+            input.value = '';
+        });
+        document.querySelectorAll('.btn-note-clear').forEach(btn => {
+            btn.style.display = 'none';
+        });
+        if (currentResultData) {
+            renderTableRows();
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // On Load: Check latest download file & initialize note box
     window.addEventListener('DOMContentLoaded', () => {
+        syncNoteInputs();
         checkLatestDownload();
     });
 
@@ -1453,7 +1553,7 @@
 
     async function processLatestFile() {
         const filterBeko = document.getElementById('toggle-beko').checked;
-        const page1Note = (document.getElementById('page1-note-input')?.value || localStorage.getItem('gokhanos_page1_note') || '').trim();
+        const page1Note = getPage1Note();
         showToast("Siparişler işleniyor ve A4 Excel çıktıları oluşturuluyor...");
         
         try {
@@ -1481,7 +1581,7 @@
 
     async function processAllRecentFiles() {
         const filterBeko = document.getElementById('toggle-beko').checked;
-        const page1Note = (document.getElementById('page1-note-input')?.value || localStorage.getItem('gokhanos_page1_note') || '').trim();
+        const page1Note = getPage1Note();
         showToast("İndirilenlerdeki tüm sipariş dosyaları taranıyor ve birleştiriliyor...");
         
         try {
@@ -1505,7 +1605,7 @@
     async function handleFileUpload(files) {
         if (!files || files.length === 0) return;
         const filterBeko = document.getElementById('toggle-beko').checked;
-        const page1Note = (document.getElementById('page1-note-input')?.value || localStorage.getItem('gokhanos_page1_note') || '').trim();
+        const page1Note = getPage1Note();
         
         const count = files.length;
         if (count === 1) {
@@ -1639,14 +1739,7 @@
         }
 
         // Note Input Sync
-        const currentInputVal = (document.getElementById('page1-note-input')?.value || '').trim();
-        const savedNote = currentInputVal || result.custom_note || localStorage.getItem('gokhanos_page1_note') || '';
-        const noteInput = document.getElementById('page1-note-input');
-        const clearBtn = document.getElementById('btn-note-clear');
-        if (noteInput) {
-            noteInput.value = savedNote;
-            if (clearBtn) clearBtn.style.display = savedNote.trim() ? 'inline-flex' : 'none';
-        }
+        syncNoteInputs(result.custom_note);
 
         activeTabKey = 'all';
         renderTableRows();
@@ -1656,37 +1749,6 @@
         activeTabKey = key;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         tabEl.classList.add('active');
-        renderTableRows();
-    }
-
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-
-    function handlePage1NoteInput(val) {
-        localStorage.setItem('gokhanos_page1_note', val);
-        const clearBtn = document.getElementById('btn-note-clear');
-        if (clearBtn) {
-            clearBtn.style.display = val.trim() ? 'inline-flex' : 'none';
-        }
-        renderTableRows();
-    }
-
-    function clearPage1Note() {
-        const noteInput = document.getElementById('page1-note-input');
-        if (noteInput) {
-            noteInput.value = '';
-            noteInput.focus();
-        }
-        localStorage.removeItem('gokhanos_page1_note');
-        const clearBtn = document.getElementById('btn-note-clear');
-        if (clearBtn) clearBtn.style.display = 'none';
         renderTableRows();
     }
 
@@ -1718,7 +1780,7 @@
         const query = (document.getElementById('table-search').value || '').toLowerCase().trim();
         const matchesQuery = (x) => !query || (x.name && x.name.toLowerCase().includes(query)) || (x.stok && x.stok.toLowerCase().includes(query));
 
-        const page1Note = (document.getElementById('page1-note-input')?.value || '').trim();
+        const page1Note = getPage1Note();
         const noteRowHtml = page1Note ? `
             <tr class="row-note">
                 <td class="col-qty"><span class="qty-badge note-badge">NOT</span></td>
@@ -1767,10 +1829,10 @@
 
             items = items.filter(matchesQuery);
 
-            if (items.length === 0 && !page1Note) {
+            if (items.length === 0) {
                 tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
             } else {
-                tbody1.innerHTML = items.map(createRowHtml).join('') + noteRowHtml;
+                tbody1.innerHTML = items.map(createRowHtml).join('');
             }
             block1.style.display = 'block';
             block2.style.display = 'none';
@@ -1883,16 +1945,6 @@
             setTimeout(() => t.remove(), 300);
         }, 3500);
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const savedNote = localStorage.getItem('gokhanos_page1_note') || '';
-        const noteInput = document.getElementById('page1-note-input');
-        const clearBtn = document.getElementById('btn-note-clear');
-        if (noteInput && savedNote) {
-            noteInput.value = savedNote;
-            if (clearBtn) clearBtn.style.display = 'inline-flex';
-        }
-    });
 </script>
 </body>
 </html>
