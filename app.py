@@ -20,14 +20,12 @@ from core_engine import (
     get_base_dirs,
 )
 
-if getattr(sys, 'frozen', False):
-    template_folder = os.path.join(sys._MEIPASS, 'templates')
-    static_folder = os.path.join(sys._MEIPASS, 'static')
-    app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
-    BASE_DIR = os.path.dirname(sys.executable)
-else:
-    app = Flask(__name__, template_folder='templates', static_folder='static')
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+is_frozen = getattr(sys, 'frozen', False)
+template_folder = os.path.join(sys._MEIPASS, 'templates') if is_frozen else 'templates'
+static_folder = os.path.join(sys._MEIPASS, 'static') if is_frozen else 'static'
+BASE_DIR = os.path.dirname(sys.executable) if is_frozen else os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
 
 app.config['MAX_CONTENT_LENGTH'] = 64 * 1024 * 1024  # 64 MB - siparis dosyasi yukleme siniri
 
