@@ -146,3 +146,11 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 * **Excel Çalışma Kitabı Çıktısı (`core_engine.py`):**
   * Excel sayfa yapısında her sayfada çıkacak şekilde alt bilgi (`ws.oddFooter.right.text = '&ISaygılarımla,\nGökhan B.'`) tanımlıdır.
   * Ayrıca çalışma sayfasında listenin sağ altına `openpyxl.drawing.image.Image` ve `Pillow` ile transparan imza görseli ve "Saygılarımla," hücresi eklenir.
+
+---
+
+## 8. Otomatik GitHub & Vercel Senkronizasyonu Standardı
+
+* **Zorunlu Güncelleme Kuralı:** Projede yapılan her yenilik, kural güncellemesi, özellik eklemesi veya hata düzeltmesi sonrasında proje MUTLAKA GitHub'a commit ve push (`git push origin main`) edilir.
+* **Canlı Sistem Senkronizasyonu:** Bu sayede [kozan-rtki.vercel.app](https://kozan-rtki.vercel.app) üzerindeki canlı bulut yayını masaüstü sistemiyle daima %100 senkronize ve güncel kalır.
+
