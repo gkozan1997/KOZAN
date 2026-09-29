@@ -715,20 +715,47 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Signature Box on Screen */
+        /* Signature & Page Break Elements */
         .print-signature-footer {
-            display: none;
+            display: none !important;
         }
 
         .screen-signature-box {
+            display: none;
+        }
+
+        .screen-beko-divider {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 22px 0 12px 0;
+            padding: 10px 16px;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-sm);
+            color: var(--accent-amber);
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.02em;
+        }
+
+        .print-only {
+            display: none !important;
+        }
+
+        .print-page-block {
+            width: 100%;
+        }
+
+        .page-signature {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            margin-top: 18px;
-            padding: 8px 12px 0 0;
+            margin-top: 14px;
+            padding: 6px 12px 0 0;
         }
 
-        .screen-signature-box .sig-respect {
+        .page-signature .sig-respect {
             font-size: 13px;
             font-style: italic;
             font-weight: 500;
@@ -736,18 +763,18 @@
             margin-bottom: 2px;
         }
 
-        .screen-signature-box .sig-image {
-            width: 110px;
+        .page-signature .sig-image {
+            width: 105px;
             height: auto;
             opacity: 0.95;
             filter: drop-shadow(0 2px 10px rgba(56, 189, 248, 0.25));
         }
 
-        /* Print View styles - A4 Portrait Optimized (iOS Safari & WebKit Compatible) */
+        /* Print View styles - A4 Portrait Optimized (Mobile Chrome, iOS Safari & Desktop WebKit) */
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 8mm 10mm 18mm 10mm;
+                margin: 8mm 10mm 10mm 10mm;
             }
             html, body {
                 width: 100% !important;
@@ -767,7 +794,7 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            header, .rules-bar, .action-grid, .action-toolbar, .search-input, .brand-tabs, #toast-container, .card, .kpi-grid, #source-files-badge, footer, .screen-signature-box, .section-top {
+            header, .rules-bar, .action-grid, .action-toolbar, .search-input, .brand-tabs, #toast-container, .card, .kpi-grid, #source-files-badge, footer, .screen-signature-box, .section-top, .screen-beko-divider {
                 display: none !important;
                 visibility: hidden !important;
                 height: 0 !important;
@@ -821,6 +848,20 @@
                 max-height: none !important;
                 position: static !important;
             }
+            .print-page-block {
+                display: block !important;
+                width: 100% !important;
+                position: static !important;
+                overflow: visible !important;
+            }
+            .print-page-2 {
+                break-before: page !important;
+                page-break-before: always !important;
+                display: block !important;
+                width: 100% !important;
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+            }
             table {
                 width: 100% !important;
                 table-layout: auto !important;
@@ -828,6 +869,7 @@
                 border: 1px solid #94a3b8 !important;
                 font-size: 8.5pt !important;
                 line-height: 1.15 !important;
+                margin: 0 !important;
             }
             thead {
                 display: table-header-group !important;
@@ -903,38 +945,44 @@
                 print-color-adjust: exact !important;
             }
 
-            /* Sabit A4 İmza Alanı - Her A4 sayfasının sağ alt köşesinde çıkar (iOS Safari & WebKit Uyumlu Block Düzeni) */
-            .print-signature-footer {
+            .print-only {
                 display: block !important;
-                position: fixed !important;
-                bottom: 3.5mm !important;
-                right: 10mm !important;
+            }
+
+            /* Akış İçinde A4 İmza Alanı (Her sayfanın tablo bitiminde doğal olarak basılır, taşma ve çakışma yapmaz) */
+            .page-signature {
+                display: block !important;
                 text-align: right !important;
-                z-index: 9999 !important;
-                pointer-events: none !important;
-                width: auto !important;
-                height: auto !important;
+                margin-top: 5mm !important;
+                margin-right: 2mm !important;
+                padding: 0 !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            .print-signature-footer .sig-respect {
+            .page-signature .sig-respect {
                 display: block !important;
                 font-size: 8.5pt !important;
                 font-style: italic !important;
                 font-weight: 700 !important;
                 color: #1e293b !important;
-                margin-bottom: 2px !important;
+                margin-bottom: 1.5mm !important;
                 text-align: right !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            .print-signature-footer .sig-image {
-                width: 80px !important;
+            .page-signature .sig-image {
+                width: 78px !important;
                 height: auto !important;
                 display: inline-block !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+            }
+
+            .print-signature-footer {
+                display: none !important;
             }
         }
     </style>
@@ -1348,7 +1396,7 @@
 
         const isSpecialBrandName = (name) => {
             const u = (name || '').toUpperCase();
-            return u.includes('BEKO') || u.includes('GRUNDIG') || u.includes('LENOVO');
+            return u.includes('BEKO') || u.includes('GRUNDIG') || u.includes('LENOVO') || u.includes('IDEAPAD');
         };
 
         const bekoInBrands = result.brands.some(b => isSpecialBrandName(b.brand));
@@ -1389,7 +1437,7 @@
 
         const isSpecialBrandName = (name) => {
             const u = (name || '').toUpperCase();
-            return u.includes('BEKO') || u.includes('GRUNDIG') || u.includes('LENOVO');
+            return u.includes('BEKO') || u.includes('GRUNDIG') || u.includes('LENOVO') || u.includes('IDEAPAD');
         };
 
         let items = [];

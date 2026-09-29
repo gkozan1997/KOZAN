@@ -58,9 +58,11 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * Mağaza adı `beko` içeriyorsa (`Bingöl Ticaret - Beko`),
   * Veya ürün Beko model kodlarıyla başlıyorsa (`KMX`, `7053MB`, `CM`, `CMX`, `B 600`, `B 710`, `BKK`, `BFC`, `BDE`, `TKM`, `BEU`, `KMB`, `9704`, `9705`, `31825`, `74826`, `FR 8374` vb.) otomatik olarak **BEKO** markası olarak tanımlanır.
 * **Beko, Grundig ve Lenovo Listeleme Davranışı (2. Sayfa ve 2. Sekme Standardı):**
+  * **IdeaPad Tanıma Kriteri:**
+    - Ürün adında veya marka sütununda `IdeaPad` geçen veya `IdeaPad` ile başlayan tüm ürünler (başında Lenovo yazmasa dahi, örn: 'IdeaPad Slim 3...') otomatik olarak **LENOVO** markası olarak tanımlanır ve doğrudan **2. Sayfaya** basılır.
   * **Genel Liste (1. Sekme - `Ürün Toplama Listesi`):**
     - İlk olarak diğer tüm markalar (Tefal, Babyliss, Philips, Braun, Teka, Bissell vb.) listelenir.
-    - Diğer markaların bittiği satıra dikey sayfa sonu (`Break(id=other_items_count + 1)`) eklenir; böylece **BEKO, GRUNDIG ve LENOVO markalı ürünler doğrudan 2. Sayfaya** basılır.
+    - Diğer markaların bittiği satıra dikey sayfa sonu (`Break(id=other_items_count + 1)`) eklenir; böylece **BEKO, GRUNDIG ve LENOVO (IdeaPad dahil) markalı ürünler doğrudan 2. Sayfaya** basılır.
     - 2. sayfada da `Miktar`, `Ürün Adı`, `Stok Kodu` başlıklarının en üstte tekrarlanması için `ws.print_title_rows = '1:1'` ve `fitToHeight = 2` kullanılır.
   * **Excel Çalışma Kitabı Sekmeleri:**
     - 1. Sekme: `Ürün Toplama Listesi` (Sayfa 1: Diğer Markalar, Sayfa 2: Beko, Grundig & Lenovo).

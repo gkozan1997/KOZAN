@@ -116,7 +116,7 @@ def is_major_appliance_or_warranty(name):
         return False
 
     # 1. KESİNLİKLE KORUNACAKLAR (İstisnalar)
-    if 'lenovo' in norm and 'garanti' in norm:
+    if ('lenovo' in norm or 'ideapad' in norm) and 'garanti' in norm:
         return False
     if 'sac kurutma' in norm:
         return False
@@ -174,6 +174,8 @@ def detect_brand(full_name, store='', brand_col=''):
     if brand_col:
         m = canonical_key(brand_col)
         if m:
+            if 'IDEAPAD' in m or 'LENOVO' in m:
+                return 'LENOVO'
             for kb in KNOWN_BRANDS:
                 if kb in m:
                     return kb
@@ -182,6 +184,10 @@ def detect_brand(full_name, store='', brand_col=''):
     u_upper = canonical_key(full_name)
     words = full_name.split()
     first_word = canonical_key(words[0]) if words else ''
+
+    # 0. Lenovo & IdeaPad kontrolü (IdeaPad içeren veya başlayan tüm ürünler Lenovo olarak atanır ve 2. sayfaya gider)
+    if 'IDEAPAD' in u_upper or 'LENOVO' in u_upper or 'IDEAPAD' in first_word or 'LENOVO' in first_word:
+        return 'LENOVO'
 
     # 1. First word or start of title matches known brand
     for kb in KNOWN_BRANDS:
@@ -498,7 +504,8 @@ def pick_best_name(names, brand=None):
         return ""
     b_upper = (brand or "").upper()
     def score(n):
-        has_brand = 1 if b_upper and b_upper in n.upper() else 0
+        n_up = n.upper()
+        has_brand = 2 if (b_upper and b_upper in n_up) else (1 if (b_upper == 'LENOVO' and 'IDEAPAD' in n_up) else 0)
         has_garbage = -1 if re.search(r'TYC[A-Z0-9]{15,}', n) else 0
         return (has_brand, has_garbage, len(n))
     cleaned_names.sort(key=score, reverse=True)
@@ -565,6 +572,10 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False):
         is_beko = (brand == 'BEKO' or 'BEKO' in canonical_key(item['name']))
         if is_beko:
             brand = 'BEKO'
+
+        is_lenovo = (brand in ('LENOVO', 'IDEAPAD') or 'LENOVO' in canonical_key(item['name']) or 'IDEAPAD' in canonical_key(item['name']))
+        if is_lenovo:
+            brand = 'LENOVO'
 
         clean_name = clean_product_name(item['name'])
         is_valid_stok = bool(stok and len(stok) >= 3 and stok.lower() not in ('-', 'yok', '0', 'none', 'null'))
