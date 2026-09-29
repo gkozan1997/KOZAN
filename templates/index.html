@@ -8,8 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <!-- html2pdf.js for client-side direct PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --bg-base: #090d16;
@@ -524,20 +522,6 @@
 
         .btn-action.highlight:hover {
             background: rgba(56, 189, 248, 0.25);
-        }
-
-        .btn-action.highlight-pdf {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(244, 63, 94, 0.25));
-            border-color: rgba(244, 63, 94, 0.5);
-            color: #fecdd3;
-            font-weight: 700;
-        }
-
-        .btn-action.highlight-pdf:hover {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(244, 63, 94, 0.45));
-            border-color: #f43f5e;
-            color: #ffffff;
-            box-shadow: 0 0 16px rgba(244, 63, 94, 0.35);
         }
 
         /* Results & Table Section */
@@ -1062,17 +1046,13 @@
         </div>
 
         <div class="toolbar-group">
-            <button class="btn-action highlight-pdf" id="btn-download-pdf" onclick="downloadAsPDF()">
-                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span id="btn-pdf-text">📕 PDF Olarak İndir</span>
-            </button>
             <button class="btn-action" onclick="printA4Document()">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                🖨️ A4 Yazdır / PDF Kaydet
+                🖨️ A4 Yazdır
             </button>
             <button class="btn-action" onclick="downloadCurrentExcel()">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                <span id="btn-download-text">📄 Excel İndir</span>
+                <span id="btn-download-text">İndir</span>
             </button>
         </div>
     </div>
@@ -1410,195 +1390,12 @@
         renderTableRows();
     }
 
-    async function downloadAsPDF() {
-        if (!currentResultData || !currentResultData.grouped_items || currentResultData.grouped_items.length === 0) {
-            showToast('⚠️ Lütfen önce bir sipariş dosyası yükleyin.');
-            return;
-        }
-
-        const isSpecialBrandName = (name) => {
-            const u = (name || '').toUpperCase();
-            return u.includes('BEKO') || u.includes('GRUNDIG') || u.includes('LENOVO');
-        };
-
-        let items = [];
-        let tabName = 'Tümü (Ana Liste)';
-        if (activeTabKey === 'all') {
-            items = currentResultData.grouped_items;
-            tabName = 'Tümü (Ana Liste)';
-        } else if (isSpecialBrandName(activeTabKey)) {
-            items = (currentResultData.beko_items && currentResultData.beko_items.length > 0)
-                    ? currentResultData.beko_items
-                    : currentResultData.grouped_items.filter(x => isSpecialBrandName(x.brand));
-            tabName = 'Beko, Grundig & Lenovo';
-        } else {
-            items = currentResultData.grouped_items.filter(x => x.brand === activeTabKey);
-            tabName = activeTabKey;
-        }
-
-        const query = (document.getElementById('table-search')?.value || '').toLowerCase();
-        if (query) {
-            items = items.filter(x => x.name.toLowerCase().includes(query) || x.stok.toLowerCase().includes(query));
-        }
-
-        if (items.length === 0) {
-            showToast('⚠️ İndirilecek ürün bulunamadı.');
-            return;
-        }
-
-        const fileDateStr = new Date().toISOString().slice(0, 10);
-        const safeTabName = tabName.replace(/[^a-zA-Z0-9çÇğĞıİöÖşŞüÜ_-]/g, '_');
-        const filename = `Urun_Toplama_Listesi_${safeTabName}_${fileDateStr}.pdf`;
-
-        if (typeof html2pdf === 'undefined') {
-            showToast('⚠️ Doğrudan yazdırma penceresi açılıyor. "PDF Olarak Kaydet" seçebilirsiniz.');
-            window.print();
-            return;
-        }
-
-        const btnText = document.getElementById('btn-pdf-text');
-        const originalText = btnText ? btnText.innerText : '📕 PDF Olarak İndir';
-        if (btnText) btnText.innerText = '⏳ Hazırlanıyor...';
-        showToast('⏳ A4 düzeninde PDF hazırlanıyor ve indiriliyor...');
-
-        try {
-            // A4 Dikey Orijinal Standart Konteyner (Genişlik 750px, tam A4 190mm)
-            const pdfContainer = document.createElement('div');
-            pdfContainer.style.width = '750px';
-            pdfContainer.style.minWidth = '750px';
-            pdfContainer.style.maxWidth = '750px';
-            pdfContainer.style.boxSizing = 'border-box';
-            pdfContainer.style.margin = '0 auto';
-            pdfContainer.style.padding = '4mm 6mm 10mm 6mm';
-            pdfContainer.style.background = '#ffffff';
-            pdfContainer.style.color = '#000000';
-            pdfContainer.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-            pdfContainer.style.fontSize = '8.5pt';
-            pdfContainer.style.lineHeight = '1.15';
-            pdfContainer.style.position = 'relative';
-
-            // Kompakt Tek Satır Başlık (Sayfayı aşağı itmez)
-            const headerDiv = document.createElement('div');
-            headerDiv.style.display = 'flex';
-            headerDiv.style.justifyContent = 'space-between';
-            headerDiv.style.alignItems = 'center';
-            headerDiv.style.paddingBottom = '4px';
-            headerDiv.style.marginBottom = '6px';
-            headerDiv.style.borderBottom = '1.5px solid #1e293b';
-
-            const todayStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const totalQty = items.reduce((sum, itm) => sum + (parseInt(itm.qty, 10) || 0), 0);
-
-            headerDiv.innerHTML = `
-                <div style="font-size: 10pt; font-weight: 800; color: #1e293b; letter-spacing: -0.01em;">
-                    ÜRÜN TOPLAMA LİSTESİ <span style="font-size: 8.5pt; font-weight: 600; color: #475569;">(${tabName} - ${todayStr})</span>
-                </div>
-                <div style="font-size: 8.5pt; font-weight: 700; color: #1e293b;">
-                    Toplam: <span style="color: #0284c7; font-weight: 800;">${totalQty} Adet</span> (${items.length} Kalem)
-                </div>
-            `;
-            pdfContainer.appendChild(headerDiv);
-
-            // Tablo (A4 Yazdır stilleriyle birebir aynı)
-            const table = document.createElement('table');
-            table.style.width = '100%';
-            table.style.tableLayout = 'auto';
-            table.style.borderCollapse = 'collapse';
-            table.style.border = '1px solid #94a3b8';
-            table.style.fontSize = '8.5pt';
-            table.style.lineHeight = '1.15';
-
-            table.innerHTML = `
-                <thead>
-                    <tr style="background-color: #1e293b !important; color: #ffffff !important;">
-                        <th style="background-color: #1e293b !important; color: #ffffff !important; border: 1px solid #475569; padding: 4px 8px; font-size: 8.5pt; font-weight: 700; text-align: center; width: 1%; white-space: nowrap;">Miktar</th>
-                        <th style="background-color: #1e293b !important; color: #ffffff !important; border: 1px solid #475569; padding: 4px 8px; font-size: 8.5pt; font-weight: 700; text-align: left; width: auto;">Ürün Adı</th>
-                        <th style="background-color: #1e293b !important; color: #ffffff !important; border: 1px solid #475569; padding: 4px 8px; font-size: 8.5pt; font-weight: 700; text-align: center; width: 1%; white-space: nowrap;">Stok Kodu</th>
-                    </tr>
-                </thead>
-                <tbody id="pdf-tbody"></tbody>
-            `;
-            const tbody = table.querySelector('#pdf-tbody');
-
-            const isAllTab = (activeTabKey === 'all');
-            const splitIdx = currentResultData.other_items_count || 0;
-
-            items.forEach((itm, idx) => {
-                const tr = document.createElement('tr');
-                tr.style.breakInside = 'avoid';
-                tr.style.pageBreakInside = 'avoid';
-
-                const isEven = (idx % 2 === 1);
-                tr.style.backgroundColor = isEven ? '#f1f5f9' : '#ffffff';
-
-                // Beko, Grundig & Lenovo başlangıcında 2. sayfaya geç
-                if (isAllTab && splitIdx > 0 && idx === splitIdx) {
-                    tr.style.breakBefore = 'page';
-                    tr.style.pageBreakBefore = 'always';
-                }
-
-                tr.innerHTML = `
-                    <td style="border: 1px solid #cbd5e1; padding: 2.2px 6px; text-align: center; font-weight: 700; font-size: 8.5pt; color: #000000; width: 1%; white-space: nowrap;">${itm.qty}</td>
-                    <td style="border: 1px solid #cbd5e1; padding: 2.2px 6px; text-align: left; font-weight: 500; font-size: 8.5pt; color: #000000; width: auto; word-break: break-word;">${itm.name}</td>
-                    <td style="border: 1px solid #cbd5e1; padding: 2.2px 6px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 8pt; font-weight: 600; color: #000000; width: 1%; white-space: nowrap;">${itm.stok}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-            pdfContainer.appendChild(table);
-
-            // Sağ Alt İmza Kutusu (Gökhan B. & Saygılarımla)
-            const sigDiv = document.createElement('div');
-            sigDiv.style.marginTop = '14px';
-            sigDiv.style.display = 'flex';
-            sigDiv.style.flexDirection = 'column';
-            sigDiv.style.alignItems = 'flex-end';
-            sigDiv.style.textAlign = 'right';
-            sigDiv.style.paddingRight = '8px';
-            sigDiv.style.breakInside = 'avoid';
-            sigDiv.style.pageBreakInside = 'avoid';
-
-            const sigImgSrc = document.querySelector('.sig-image')?.getAttribute('src') || '';
-            sigDiv.innerHTML = `
-                <span style="font-size: 8.5pt; font-style: italic; font-weight: 700; color: #1e293b; margin-bottom: 2px;">Saygılarımla,</span>
-                ${sigImgSrc ? `<img src="${sigImgSrc}" style="width: 80px; height: auto; display: block;" alt="Gökhan B.">` : '<span style="font-weight: 700; color: #0284c7;">Gökhan B.</span>'}
-            `;
-            pdfContainer.appendChild(sigDiv);
-
-            // html2pdf seçenekleri - A4 Dikey, Tam Boyut Sabitlenmiş
-            const opt = {
-                margin: [8, 8, 10, 8],
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2.5,
-                    useCORS: true,
-                    letterRendering: true,
-                    backgroundColor: '#ffffff',
-                    logging: false,
-                    windowWidth: 794
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'], avoid: 'tr' }
-            };
-
-            await html2pdf().set(opt).from(pdfContainer).save();
-            showToast('✅ PDF A4 düzeninde başarıyla indirildi!');
-        } catch (err) {
-            console.error('PDF üretme hatası:', err);
-            showToast('⚠️ Doğrudan yazdırma penceresi açılıyor (PDF Olarak Kaydet seçebilirsiniz).');
-            window.print();
-        } finally {
-            if (btnText) btnText.innerText = originalText;
-        }
-    }
-
     function printA4Document() {
         if (!currentResultData || !currentResultData.grouped_items || currentResultData.grouped_items.length === 0) {
             showToast('⚠️ Lütfen önce bir sipariş dosyası yükleyin veya "Bu Dosyayı Getir" butonuna basın.');
             return;
         }
-        showToast('💡 İpucu: Açılan pencerede Hedef/Yazıcı olarak "PDF Olarak Kaydet"i seçebilirsiniz.');
-        setTimeout(() => window.print(), 250);
+        window.print();
     }
 
     // Windows Action Triggers
