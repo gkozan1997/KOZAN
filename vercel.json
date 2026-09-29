@@ -1,34 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "functions": {
-    "app.py": {
-      "maxDuration": 60
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/app.py"
     }
-  ],
-  "excludeFiles": [
-    "dist/**",
-    "build/**",
-    "__pycache__/**",
-    "*.pyc",
-    "*.spec",
-    ".agents/**",
-    ".claude/**",
-    ".vscode/**",
-    "2026-*/**",
-    "2025-*/**",
-    "Siparis/**",
-    "_tasarim_yedek/**",
-    "_*.py",
-    "baslat.bat",
-    "*.zip",
-    "*.xls",
-    "*.xlsx",
-    ".git/**"
   ]
 }
