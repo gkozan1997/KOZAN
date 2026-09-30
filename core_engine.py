@@ -137,6 +137,12 @@ EXCLUDE_PRODUCT_KEYWORDS = [
     'yazar kasa',
     'pos cihazi',
     'odeme kaydedici',
+    'termosifon',
+    'sofben',
+    'kombi',
+    'boyler',
+    'ani su isitici',
+    'ani su isiticisi',
 ]
 
 def is_conditional_appliance(name):
@@ -177,7 +183,13 @@ def is_major_appliance_or_warranty(name):
     if 'pos' in cleaned_words and ('yazar' in norm or 'kasa' in norm or 'x30' in norm or '300 tr' in norm or '220' in norm or '400' in norm or 'mobil' in norm or 'cihaz' in norm or 'eft' in norm):
         return True
 
-    # 6. Diğer beyaz eşya & garanti listesi
+    # 6. Termosifon, şofben, kombi, boyler ve ani su ısıtıcıları (Büyük su ısıtma ve ısıtma cihazları)
+    if 'termosifon' in norm or 'sofben' in norm or 'boyler' in norm or 'ani su isitici' in norm or 'ani su isiticisi' in norm:
+        return True
+    if re.search(r'\bkombi\b', norm):
+        return True
+
+    # 7. Diğer beyaz eşya & garanti listesi
     for kw in EXCLUDE_PRODUCT_KEYWORDS:
         if kw in norm:
             return True

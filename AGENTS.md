@@ -91,12 +91,14 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - TV / Televizyon (QLED, OLED, Smart LED vb.)
     - Derin Dondurucu (Çekmeceli, Sandık tipi vb.)
     - Klima (Split, Inverter, Salon tipi vb.)
+    - Termosifon, Şofben, Kombi, Boyler ve Ani Su Isıtıcıları (Beko BKT 500 E BS Dijital Termosifon vb. büyük su ısıtma ve ısıtma cihazları)
     - Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS, 300 TR vb. mali cihazlar)
   * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
     - Lenovo Garanti ve Bilgisayarlar (Lenovo 1 Yıl Garanti Uzatma Paketi, IdeaPad vb.)
     - Mikrodalga Fırın (Beko BMD vb.)
-    - Ankastre Ocak / Ocaklar (Beko BOCD, BOI vb. - Tek başına alındıysa toplanır; Çamaşır, Kurutma, Bulaşık, Buzdolabı, Fırın, Davlumbaz, TV, Dondurucu veya Klima ile alındıysa hariç tutulur)
+    - Ankastre Ocak / Ocaklar (Beko BOCD, BOI vb. - Tek başına alındıysa toplanır; Çamaşır, Kurutma, Bulaşık, Buzdolabı, Fırın, Davlumbaz, TV, Dondurucu, Klima veya Termosifon ile alındıysa hariç tutulur)
     - Aspiratör / Ankastre Sürgülü Aspiratör (Beko P 38 vb. - Tek başına alındıysa toplanır; büyük beyaz eşyalarla birlikte alındıysa hariç tutulur)
+    - Su Isıtıcı / Su Isıtıcısı (Kettle - Mutfak tipi tezgah üstü kettle cihazları küçük ev aletidir, listede toplanmaya devam eder)
     - Saç Kurutma Makinesi (BaByliss, Grundig vb.)
     - Tüm Küçük Ev Aletleri (Kahve/Çay Makinesi, Blender, Ütü, Fritöz, Süpürge, Tost Makinesi vb.), Telefon ve Bilgisayarlar.
 
