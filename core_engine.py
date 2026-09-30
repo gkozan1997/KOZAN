@@ -78,11 +78,11 @@ BEKO_START_MODELS = [
     'KMX', '7053', 'CM ', 'CMX', 'B 600', 'B 710', 'B600', 'B710',
     'BKK', 'BK RHC', 'BK ', 'BFC', 'BDE', 'TKM', 'BEU', 'KMB', 
     '9704', '9705', '31825', '74826', 'FR 8374', 'FRA ', 'FRA', 
-    'RHB', 'CFM', 'FK 81', 'FK81'
+    'RHB', 'CFM', 'FK 81', 'FK81', 'ADP', 'ADE', 'BOCD'
 ]
 
 BEKO_INLINE_REGEX = re.compile(
-    r'\b(7053MB|BKK\s*\d+|TKM\s*\d+|BEU\s*\d+|BFC\s*\d+|BDE\s*\d+|KMX\s*\d+|CMX\s*\d+|FRA\s*\d+|RHB\s*\d+|CFM\s*\d+|CM\s*\d{3,4}|BK\s*(?:RHC|\d{3,4}))\b',
+    r'\b(7053MB|BKK\s*\d+|TKM\s*\d+|BEU\s*\d+|BFC\s*\d+|BDE\s*\d+[A-Z0-9]*|ADP\s*\d+[A-Z0-9]*|ADE\s*\d+[A-Z0-9]*|BOCD\s*[A-Z0-9]+|KMX\s*\d+|CMX\s*\d+|FRA\s*\d+|RHB\s*\d+|CFM\s*\d+|CM\s*\d{3,4}|BK\s*(?:RHC|\d{3,4}))\b',
     re.IGNORECASE
 )
 
@@ -146,7 +146,11 @@ EXCLUDE_PRODUCT_KEYWORDS = [
 
 def is_conditional_appliance(name):
     norm = normalize_tr(name)
-    return ('aspirator' in norm or 'ocak' in norm or 'davlumbaz' in norm)
+    if 'aspirator' in norm or 'ocak' in norm or 'davlumbaz' in norm:
+        return True
+    if re.search(r'\b(adp\s*\d+[a-z0-9]*|bde\s*\d+[a-z0-9]*|ade\s*\d+[a-z0-9]*|hde\s*\d+[a-z0-9]*|cde\s*\d+[a-z0-9]*|bocd\s*[a-z0-9]+|p\s*38|p\s*27)\b', norm):
+        return True
+    return False
 
 def is_major_appliance_or_warranty(name):
     norm = normalize_tr(name)
