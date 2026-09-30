@@ -128,7 +128,6 @@ EXCLUDE_PRODUCT_KEYWORDS = [
     'ankastre firin',
     'mini firin',
     'derin dondurucu',
-    'davlumbaz',
     'klima',
     'ek garanti',
     'garanti uzatma',
@@ -147,7 +146,7 @@ EXCLUDE_PRODUCT_KEYWORDS = [
 
 def is_conditional_appliance(name):
     norm = normalize_tr(name)
-    return ('aspirator' in norm or 'ocak' in norm)
+    return ('aspirator' in norm or 'ocak' in norm or 'davlumbaz' in norm)
 
 def is_major_appliance_or_warranty(name):
     norm = normalize_tr(name)

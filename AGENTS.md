@@ -87,7 +87,6 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Ankastre Fırın, Mini Fırın, Solo Fırın, Buhar Destekli Fırın
     - Çamaşır Makinesi
     - Ek Garanti, Garanti Uzatma Paketleri (Beko vb. ek garantiler - Lenovo Garanti hariç)
-    - Davlumbaz
     - TV / Televizyon (QLED, OLED, Smart LED vb.)
     - Derin Dondurucu (Çekmeceli, Sandık tipi vb.)
     - Klima (Split, Inverter, Salon tipi vb.)
@@ -96,7 +95,8 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
     - Lenovo Garanti ve Bilgisayarlar (Lenovo 1 Yıl Garanti Uzatma Paketi, IdeaPad vb.)
     - Mikrodalga Fırın (Beko BMD vb.)
-    - Ankastre Ocak / Ocaklar (Beko BOCD, BOI vb. - Tek başına alındıysa toplanır; Çamaşır, Kurutma, Bulaşık, Buzdolabı, Fırın, Davlumbaz, TV, Dondurucu, Klima veya Termosifon ile alındıysa hariç tutulur)
+    - Davlumbaz / Duvar Tipi Davlumbaz (Beko ADP61420B vb. - Tek başına alındıysa toplanır; Çamaşır, Kurutma, Bulaşık, Buzdolabı, Fırın, TV, Dondurucu, Klima veya Termosifon gibi büyük beyaz eşyalarla birlikte alındıysa hariç tutulur)
+    - Ankastre Ocak / Ocaklar (Beko BOCD, BOI vb. - Tek başına alındıysa toplanır; Çamaşır, Kurutma, Bulaşık, Buzdolabı, Fırın, TV, Dondurucu, Klima veya Termosifon ile alındıysa hariç tutulur)
     - Aspiratör / Ankastre Sürgülü Aspiratör (Beko P 38 vb. - Tek başına alındıysa toplanır; büyük beyaz eşyalarla birlikte alındıysa hariç tutulur)
     - Su Isıtıcı / Su Isıtıcısı (Kettle - Mutfak tipi tezgah üstü kettle cihazları küçük ev aletidir, listede toplanmaya devam eder)
     - Saç Kurutma Makinesi (BaByliss, Grundig vb.)
