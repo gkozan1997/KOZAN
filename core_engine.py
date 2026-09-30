@@ -47,14 +47,47 @@ KNOWN_BRANDS = [
     'LENOVO', 'BEKO', 'GRUNDIG', 'BISSELL', 'ARIETE', 'LAURASTAR', 
     'TEKA', 'IPHONE', 'APPLE', 'FAKIR', 'ARZUM', 'KARACA', 
     'KORKMAZ', 'DYSON', 'SAMSUNG', 'XIAOMI', 'BOSCH', 'SIEMENS',
-    'HOTPOINT', 'ROWENTA'
+    'HOTPOINT', 'ROWENTA',
+    'DELONGHI', 'THOR', 'NESPRESSO', 'KRUPS', 'MELITTA', 'SAGE', 
+    'JURA', 'ELECTROLUX', 'KARCHER', 'MOULINEX', 'SIMFER', 'KUMTEL', 
+    'LUXELL', 'SINBO', 'KING', 'GOLDMASTER', 'REMINGTON', 'CONTESSE',
+    'PANASONIC', 'SONY', 'LG', 'HUAWEI', 'HONOR', 'OPPO', 'VIVO', 
+    'REALME', 'ASUS', 'ACER', 'HP', 'DELL', 'MSI', 'CASPER', 
+    'MONSTER', 'TOSHIBA', 'ANKER', 'JBL', 'MARSHALL', 'HARMAN KARDON', 
+    'LOGITECH', 'RAZER', 'STEELSERIES', 'CORSAIR', 'STANLEY', 'COSORI', 
+    'NINJA', 'INSTANT POT', 'SCHAFER', 'EMSAN', 'NEVA', 'TAC', 'TACH', 
+    'BERGHOFF', 'ZWILLING', 'PASABAHCE', 'LAV', 'BORCAM', 'SINFONIA', 
+    'SMEG', 'BERETTA', 'FERROLI', 'DEMIRDOKUM', 'ECA', 'BAYMAK', 
+    'VAILLANT', 'VIESSMANN', 'BUDERUS', 'DAIKIN', 'MITSUBISHI',
+    'HITACHI', 'SHARP', 'PIONEER', 'HOMEND', 'COSMED', 'AWOX'
 ]
 
-BEKO_MODELS = [
-    'KMX', '7053', 'CM', 'CMX', 'B 600', 'B 710', 'BKK', 'BK ', 'BFC', 'BDE', 
-    'TKM', 'BEU', 'KMB', '9704', '9705', '31825', '74826', 'FR 8374', 'FRA', 
-    'RHB', 'CFM', 'FK 81'
+BRAND_ALIASES = {
+    "DE'LONGHI": "DELONGHI",
+    "DELONGHI": "DELONGHI",
+    "DE LONGHI": "DELONGHI",
+    "THOR KITCHEN": "THOR",
+    "THOR": "THOR",
+    "BABYLSS": "BABYLISS",
+    "BABBYLISS": "BABYLISS",
+    "IPHONE": "IPHONE",
+    "APPLE": "IPHONE",
+}
+
+BEKO_START_MODELS = [
+    'KMX', '7053', 'CM ', 'CMX', 'B 600', 'B 710', 'B600', 'B710',
+    'BKK', 'BK RHC', 'BK ', 'BFC', 'BDE', 'TKM', 'BEU', 'KMB', 
+    '9704', '9705', '31825', '74826', 'FR 8374', 'FRA ', 'FRA', 
+    'RHB', 'CFM', 'FK 81', 'FK81'
 ]
+
+BEKO_INLINE_REGEX = re.compile(
+    r'\b(7053MB|BKK\s*\d+|TKM\s*\d+|BEU\s*\d+|BFC\s*\d+|BDE\s*\d+|KMX\s*\d+|CMX\s*\d+|FRA\s*\d+|RHB\s*\d+|CFM\s*\d+|CM\s*\d{3,4}|BK\s*(?:RHC|\d{3,4}))\b',
+    re.IGNORECASE
+)
+
+BEKO_MODELS = BEKO_START_MODELS
+
 
 def normalize_text(s):
     if not s:
@@ -154,6 +187,9 @@ def is_major_appliance_or_warranty(name):
 def is_excluded_product(name, brand=''):
     if brand and brand != 'BEKO' and 'BEKO' not in canonical_key(name):
         return False
+    u_name = canonical_key(name)
+    if any(kb in u_name for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO')):
+        return False
     return is_major_appliance_or_warranty(name)
 
 def find_column_index(headers, possible_names):
@@ -174,41 +210,52 @@ def detect_brand(full_name, store='', brand_col=''):
     if brand_col:
         m = canonical_key(brand_col)
         if m:
-            if 'IDEAPAD' in m or 'LENOVO' in m:
+            m_norm = BRAND_ALIASES.get(m, m)
+            if 'IDEAPAD' in m_norm or 'LENOVO' in m_norm:
                 return 'LENOVO'
-            for kb in KNOWN_BRANDS:
-                if kb in m:
-                    return kb
-            return m
+            for kb in sorted(KNOWN_BRANDS, key=len, reverse=True):
+                if kb == m_norm or f" {kb} " in f" {m_norm} ":
+                    return BRAND_ALIASES.get(kb, kb)
+            return m_norm
 
     u_upper = canonical_key(full_name)
     words = full_name.split()
     first_word = canonical_key(words[0]) if words else ''
+    first_word_norm = BRAND_ALIASES.get(first_word, first_word)
 
     # 0. Lenovo & IdeaPad kontrolü (IdeaPad içeren veya başlayan tüm ürünler Lenovo olarak atanır ve 2. sayfaya gider)
     if 'IDEAPAD' in u_upper or 'LENOVO' in u_upper or 'IDEAPAD' in first_word or 'LENOVO' in first_word:
         return 'LENOVO'
 
-    # 1. First word or start of title matches known brand
-    for kb in KNOWN_BRANDS:
-        if kb in first_word or u_upper.startswith(kb):
-            return kb
+    # 1. Başlangıç veya ilk kelime bilinen marka mı? (Delonghi, Thor, Philips, Tefal, vb.)
+    for kb in sorted(KNOWN_BRANDS, key=len, reverse=True):
+        if kb == first_word_norm or first_word.startswith(kb) or u_upper.startswith(kb):
+            return BRAND_ALIASES.get(kb, kb)
 
-    # 2. Known Beko model codes (like 7053MB, KMX 1002, etc.)
-    for bmp in BEKO_MODELS:
-        if bmp in u_upper:
-            return 'BEKO'
+    # 2. Ürün adının herhangi bir yerinde tam kelime / ayraç içi olarak bilinen marka var mı?
+    for kb in sorted(KNOWN_BRANDS, key=len, reverse=True):
+        pattern = r'(?:^|[\s\(\[\-\/\,\.\"])' + re.escape(kb) + r'(?:$|[\s\)\]\-\/\,\.\"])'
+        if re.search(pattern, u_upper):
+            return BRAND_ALIASES.get(kb, kb)
 
-    # 3. Store name has Beko or title has Beko
-    if 'BEKO' in canonical_key(store) or 'BEKO' in u_upper:
+    # 3. Ürün adında açıkça BEKO geçiyor mu?
+    if 'BEKO' in u_upper:
         return 'BEKO'
 
-    # 4. Known brand anywhere in title
-    for kb in KNOWN_BRANDS:
-        if f" {kb} " in f" {u_upper} " or f"({kb})" in u_upper or f"[{kb}]" in u_upper:
-            return kb
+    # 4. Ürün adı doğrudan bir Beko model koduyla başlıyor mu? (KMX, 7053MB, CM 5964, B 710 vb.)
+    for bmp in BEKO_START_MODELS:
+        if u_upper.startswith(bmp) or first_word.startswith(bmp):
+            return 'BEKO'
 
-    return first_word or 'DİĞER'
+    # 5. Başlıkta net Beko model kodu kalıbı var mı? (örn: CM 5964, BKK 2300, BK RHC 1800)
+    if BEKO_INLINE_REGEX.search(u_upper):
+        return 'BEKO'
+
+    # 6. Mağaza adında Beko geçiyor mu?
+    if 'BEKO' in canonical_key(store):
+        return 'BEKO'
+
+    return first_word_norm or 'DİĞER'
 
 def get_base_dirs():
     """Returns dynamic base dirs that work on ANY computer."""
@@ -535,10 +582,14 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     beko_consolidated = dict()
 
     # Büyük beyaz eşya içeren sipariş/müşteri kümesi (SADECE BEKO İÇİN)
-    # Kural: Bu filtreleme sadece Beko markası için uygulanır. Geriye kalan tüm markalar (Tefal, Philips, Teka vb.) doğrudan listelenir.
+    # Kural: Bu filtreleme sadece Beko markası için uygulanır. Geriye kalan tüm markalar (Delonghi, Thor, Tefal, Philips, Teka vb.) doğrudan listelenir.
     orders_with_beko_major = set()
     for item in all_raw_rows:
-        is_beko = (item['brand'] == 'BEKO' or 'BEKO' in canonical_key(item['name']))
+        i_brand = item.get('brand', '')
+        if i_brand in KNOWN_BRANDS and i_brand not in ('BEKO', 'GRUNDIG', 'LENOVO'):
+            is_beko = False
+        else:
+            is_beko = (i_brand == 'BEKO' or ('BEKO' in canonical_key(item['name']) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO'))))
         if is_beko and is_major_appliance_or_warranty(item['name']):
             if item.get('order_no'):
                 orders_with_beko_major.add(item['order_no'])
@@ -546,7 +597,10 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
                 orders_with_beko_major.add(canonical_key(item['customer']))
 
     def is_item_excluded(item):
-        is_beko = (item['brand'] == 'BEKO' or 'BEKO' in canonical_key(item['name']))
+        i_brand = item.get('brand', '')
+        if i_brand in KNOWN_BRANDS and i_brand not in ('BEKO', 'GRUNDIG', 'LENOVO'):
+            return False
+        is_beko = (i_brand == 'BEKO' or ('BEKO' in canonical_key(item['name']) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO'))))
         # Sadece BEKO markasına uygulanır, diğer markalar asla elenmez
         if not is_beko:
             return False
@@ -569,7 +623,10 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         if stok.endswith('.0'):
             stok = stok[:-2]
 
-        is_beko = (brand == 'BEKO' or 'BEKO' in canonical_key(item['name']))
+        if brand in KNOWN_BRANDS and brand not in ('BEKO', 'GRUNDIG', 'LENOVO'):
+            is_beko = False
+        else:
+            is_beko = (brand == 'BEKO' or ('BEKO' in canonical_key(item['name']) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO'))))
         if is_beko:
             brand = 'BEKO'
 

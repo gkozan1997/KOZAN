@@ -56,26 +56,27 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 * **Beko Tanıma Kriterleri:**
   * Ürün adı veya ilk kelimesi `BEKO` içeriyorsa,
   * Mağaza adı `beko` içeriyorsa (`Bingöl Ticaret - Beko`),
-  * Veya ürün Beko model kodlarıyla başlıyorsa (`KMX`, `7053MB`, `CM`, `CMX`, `B 600`, `B 710`, `BKK`, `BFC`, `BDE`, `TKM`, `BEU`, `KMB`, `9704`, `9705`, `31825`, `74826`, `FR 8374` vb.) otomatik olarak **BEKO** markası olarak tanımlanır.
+  * Veya ürün adı doğrudan Beko model kodlarıyla başlıyorsa (`KMX`, `7053MB`, `CM `, `CMX`, `B 600`, `B 710`, `BKK`, `BK RHC`, `BFC`, `BDE`, `TKM`, `BEU`, `KMB`, `9704`, `9705`, `31825`, `74826`, `FR 8374`, `FRA ` vb.) ya da net Beko model regex kalıbı taşıyorsa otomatik olarak **BEKO** markası olarak tanımlanır. (Not: Metin içindeki santimetre "CM" veya renk kodu "BK" gibi kısaltmalar ya da diğer markalar asla Beko ile karıştırılmaz).
 * **Beko, Grundig ve Lenovo Listeleme Davranışı (2. Sayfa ve 2. Sekme Standardı):**
   * **IdeaPad Tanıma Kriteri:**
     - Ürün adında veya marka sütununda `IdeaPad` geçen veya `IdeaPad` ile başlayan tüm ürünler (başında Lenovo yazmasa dahi, örn: 'IdeaPad Slim 3...') otomatik olarak **LENOVO** markası olarak tanımlanır ve doğrudan **2. Sayfaya** basılır.
   * **Genel Liste (1. Sekme - `Ürün Toplama Listesi`):**
-    - İlk olarak diğer tüm markalar (Tefal, Babyliss, Philips, Braun, Teka, Bissell vb.) listelenir.
+    - İlk olarak diğer tüm markalar (Delonghi, Thor, Tefal, Babyliss, Philips, Braun, Teka, Bissell vb.) listelenir.
     - Diğer markaların bittiği satıra dikey sayfa sonu (`Break(id=other_items_count + 1)`) eklenir; böylece **BEKO, GRUNDIG ve LENOVO (IdeaPad dahil) markalı ürünler doğrudan 2. Sayfaya** basılır.
     - 2. sayfada da `Miktar`, `Ürün Adı`, `Stok Kodu` başlıklarının en üstte tekrarlanması için `ws.print_title_rows = '1:1'` ve `fitToHeight = 2` kullanılır.
   * **Excel Çalışma Kitabı Sekmeleri:**
     - 1. Sekme: `Ürün Toplama Listesi` (Sayfa 1: Diğer Markalar, Sayfa 2: Beko, Grundig & Lenovo).
     - 2. Sekme: Özel **`BEKO, GRUNDIG & LENOVO`** sekmesi (tüm Beko, Grundig ve Lenovo siparişleri burada toplanır).
-    - 3+ Sekmeler: Diğer markaların alfabetik/adet sıralı özel sekmeleri (`TEFAL`, `BABYLISS`, `PHILIPS` vb.).
+    - 3+ Sekmeler: Diğer markaların alfabetik/adet sıralı özel sekmeleri (`TEFAL`, `BABYLISS`, `DELONGHI`, `THOR`, `PHILIPS` vb.).
   * **Web Arayüzü Sekmeleri:**
     - 1. Sekme: `Tümü (Ana Liste)`
     - 2. Sekme: `🛡️ BEKO, GRUNDIG & LENOVO (X Adet)`
-    - 3+ Sekmeler: `TEFAL`, `BABYLISS`, vb.
+    - 3+ Sekmeler: `DELONGHI`, `THOR`, `TEFAL`, `BABYLISS`, vb.
   * **Bağımsız Dosya:** `Beko_Urun_Toplama_Listesi_A4.xlsx` eş zamanlı olarak tüm Beko, Grundig & Lenovo siparişlerini bağımsız A4 listesi olarak üretir.
   * **Seçenekli Ayrıştırma (`filter_beko=True`):** Kullanıcı arayüzdeki "Beko, Grundig & Lenovo siparişlerini ana listeden ayır" onay kutusunu işaretlerse, bu ürünler ana listeden çıkarılır ve yalnızca bağımsız listede yer alır.
-* **Diğer Markalar:**
-  * `TEFAL`, `BABYLISS`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ` vb.
+* **Diğer Markalar (1. Sayfa Standardı):**
+  * `DELONGHI`, `THOR`, `TEFAL`, `BABYLISS`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ`, `NESPRESSO`, `KRUPS`, `MELITTA`, `SAGE`, `SIMFER`, `KUMTEL`, `LUXELL`, `SINBO`, `KARCHER`, `ROWENTA` vb.
+  * Delonghi, Thor ve benzeri tüm markalar doğrudan **1. Sayfaya** basılır. Asla 2. Sayfaya (Beko, Grundig & Lenovo) kaymaz.
   * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
 * **Büyük Beyaz Eşya, TV ve Garanti Filtrelemesi (`is_excluded_product`):**
   * Bu filtreleme **YALNIZCA BEKO markalı ürünlere** uygulanır. Diğer tüm markalar (Lenovo, Tefal, Babyliss, Philips, Braun, Teka, Bissell, Laurastar, WMF, Kenwood vb.) doğrudan listelenir.
