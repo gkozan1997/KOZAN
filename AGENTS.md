@@ -138,19 +138,11 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 
 ---
 
-## 7. Sayfa İmzası (Gökhan B. & Saygılarımla Standardı)
+## 7. Sayfa İmzası & Kapanış Metni Durumu
 
-* **Web Arayüzü & A4 Baskı Önizlemesi (`@media print`):**
-  * Kullanıcının mavi mürekkepli **Gökhan B.** imzası saydamlaştırılarak (transparan arka plan) sisteme entegre edilmiştir.
-  * Ağ gecikmesi, 404 önbellek veya offline durumlardan etkilenmemesi için imza doğrudan **Inline Base64 Data URI** olarak HTML içine gömülüdür.
-  * Masaüstü Google Chrome ve fiziksel yazıcıların yazdırma kenar boşluklarında `position: fixed` elemanlarını kırpmasını önlemek için imza, her A4 sayfa bloğuna (`.print-page-block` / `min-height: 276mm; position: relative;`) doğrudan `position: absolute; bottom: 2mm; right: 2mm;` olarak bağlanmıştır.
-  * Bu sayede tarayıcıdan A4 yazdırıldığında (`printA4Document()`), tabloda ister 10 ister 34 ürün olsun, **"Saygılarımla,"** yazısı ve **Gökhan B.** imzası her A4 sayfasının tam sağ alt köşesinde (kırmızı işaretli hedef alanda) kusursuz ve eksiksiz basılır; Chrome'da asla kaybolmaz veya kesilmez.
-  * Beko siparişi olmadığında yalnızca 1 sayfa basılır, gereksiz boş 2. sayfa çıkmaz. Beko siparişi olduğunda hem 1. sayfanın hem 2. sayfanın sağ alt köşesinde imza yer alır.
-  * Tarayıcının "Arka plan grafikleri" seçeneğine bakılmaksızın imza mürekkebinin tam çıkması için `-webkit-print-color-adjust: exact !important` ve `print-color-adjust: exact !important` kuralları aktiftir.
-  * Web ekranında da tablonun hemen altında sağa dayalı imza alanı yer alır.
-* **Excel Çalışma Kitabı Çıktısı (`core_engine.py`):**
-  * Excel sayfa yapısında her sayfada çıkacak şekilde alt bilgi (`ws.oddFooter.right.text = '&ISaygılarımla,\nGökhan B.'`) tanımlıdır.
-  * Ayrıca çalışma sayfasında listenin sağ altına `openpyxl.drawing.image.Image` ve `Pillow` ile transparan imza görseli ve "Saygılarımla," hücresi eklenir.
+* Kullanıcı talebi doğrultusunda hem web arayüzünden (ekran tablosu ve `@media print` A4 baskı önizlemesi), hem de Excel çıktılarından (`core_engine.py`) **"Saygılarımla,"** yazısı ve **Gökhan B.** imza görseli tamamen kaldırılmıştır.
+* A4 baskı ve Excel listeleri sade, temiz ve yalnızca sipariş toplama kalemlerine odaklı olarak üretilmektedir.
+* Web arayüzünden 4 adet 46KB'lık gömülü base64 veri bloğu temizlenerek sayfa yüklenme hızı ve kaynak verimliliği maksimuma çıkarılmıştır.
 
 ---
 
