@@ -574,6 +574,90 @@ def pick_best_name(names, brand=None):
     return cleaned_names[0]
 
 
+COLOR_WORDS = [
+    'beyaz', 'siyah', 'kirmizi', 'mavi', 'gri', 'inox', 'antrasit',
+    'pembe', 'mor', 'bordo', 'yesil', 'sari', 'bej', 'gold', 'silver',
+    'gumus', 'bakir', 'turuncu', 'krem', 'rose', 'rosegold',
+    'white', 'black', 'red', 'blue', 'gray', 'grey', 'green', 'yellow', 'pink', 'purple', 'orange'
+]
+
+UNITS_OF_MEASURE = {
+    'W', 'V', 'KG', 'GR', 'CM', 'MM', 'GB', 'TB', 
+    'BTU', 'HZ', 'BAR', 'KPA', 'RPM', 'DEVIR', 'LT'
+}
+
+MODEL_CODE_RE = re.compile(
+    r'\b([A-Z]{1,5}(?:\s+[A-Z]{1,2})?\s*\d{2,5})\s*([A-Z]{1,3})\b',
+    re.IGNORECASE
+)
+
+def extract_product_sort_keys(name):
+    """
+    Ürün adından model gövdesini (base) ve renk/varyant kodunu (color_key) ayıklar.
+    Böylece aynı modelin farklı renkleri (ör: CM 5964 R ve CM 5964 B) aynı base anahtarına sahip olur.
+    """
+    norm = normalize_tr(name)
+    found_color = ""
+    for c in COLOR_WORDS:
+        if re.search(r'\b' + re.escape(c) + r'\b', norm):
+            found_color = c
+            break
+
+    m = MODEL_CODE_RE.search(name)
+    if m and m.group(2).upper() not in UNITS_OF_MEASURE:
+        model_num = m.group(1).upper()
+        suffix = m.group(2).upper()
+        clean_base = name[:m.start()] + model_num + name[m.end():]
+        if found_color:
+            clean_base = re.sub(r'\b' + re.escape(found_color) + r'\b', '', clean_base, flags=re.IGNORECASE)
+        clean_base = re.sub(r'\s+', ' ', clean_base).strip()
+        color_key = suffix + ("_" + found_color if found_color else "")
+        return canonical_key(clean_base), color_key
+    else:
+        clean_base = name
+        if found_color:
+            clean_base = re.sub(r'\b' + re.escape(found_color) + r'\b', '', clean_base, flags=re.IGNORECASE)
+        clean_base = re.sub(r'\s+', ' ', clean_base).strip()
+        color_key = found_color or "ZZZ"
+        return canonical_key(clean_base), color_key
+
+def sort_items_by_family_and_color(items):
+    """
+    Aynı ürün/model ailesine ait farklı renk ve varyantları bir araya toplar (alt alta)
+    ve kendi içinde renklerine göre sıralar.
+    
+    Örnek:
+    - Beko CM 5964 B Floral Çay Makinesi
+    - Beko CM 5964 R Floral Çay Makinesi
+    - Beko TKM 2341 Keyf-i Bol Beyaz
+    - Beko TKM 2341 Keyf-i Bol Siyah
+    """
+    if not items:
+        return []
+
+    # 1. Ürün ailesine göre grupla
+    groups = defaultdict(list)
+    for itm in items:
+        base_key, color_key = extract_product_sort_keys(itm['name'])
+        groups[base_key].append((color_key, itm))
+
+    # 2. Her aileyi kendi içinde renge ve miktara göre sırala
+    sorted_groups = []
+    for base_key, member_list in groups.items():
+        member_list.sort(key=lambda x: (x[0], -x[1]['qty']))
+        sorted_members = [m[1] for m in member_list]
+        max_qty = max(m['qty'] for m in sorted_members)
+        sorted_groups.append((max_qty, base_key, sorted_members))
+
+    # 3. Grupları sırala: önce grup içindeki en yüksek miktar (büyükten küçüğe),
+    #    miktarlar eşitse model/ürün adına göre alfabetik
+    sorted_groups.sort(key=lambda g: (-g[0], g[1]))
+
+    # 4. Düz liste haline getir
+    result = []
+    for _, _, members in sorted_groups:
+        result.extend(members)
+    return result
 
 
 def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, custom_note=""):
@@ -672,12 +756,12 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
                 'qty': data['qty'],
                 'brand': data['brand']
             })
-        brand_orders[brand] = sorted(processed_list, key=lambda x: x['qty'], reverse=True)
+        brand_orders[brand] = sort_items_by_family_and_color(processed_list)
 
     beko_list = list(brand_orders.get('BEKO', []))
     grundig_list = list(brand_orders.get('GRUNDIG', []))
     lenovo_list = list(brand_orders.get('LENOVO', []))
-    beko_grundig_orders = sorted(beko_list + grundig_list + lenovo_list, key=lambda x: x['qty'], reverse=True)
+    beko_grundig_orders = beko_list + grundig_list + lenovo_list
 
     if filter_beko:
         processed_beko = []
@@ -689,7 +773,16 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
                 'qty': data['qty'],
                 'brand': data['brand']
             })
-        beko_orders = sorted(processed_beko, key=lambda x: x['qty'], reverse=True)
+        b_beko = [x for x in processed_beko if x['brand'] == 'BEKO']
+        b_grundig = [x for x in processed_beko if x['brand'] == 'GRUNDIG']
+        b_lenovo = [x for x in processed_beko if x['brand'] == 'LENOVO']
+        b_other = [x for x in processed_beko if x['brand'] not in ('BEKO', 'GRUNDIG', 'LENOVO')]
+        beko_orders = (
+            sort_items_by_family_and_color(b_beko) +
+            sort_items_by_family_and_color(b_grundig) +
+            sort_items_by_family_and_color(b_lenovo) +
+            sort_items_by_family_and_color(b_other)
+        )
         beko_grundig_orders = beko_orders
     else:
         beko_orders = beko_grundig_orders

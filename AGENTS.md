@@ -164,4 +164,18 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * Hem web ekranında hafif sıcak vurguyla, hem de A4 baskı ve PDF çıktısında (`@media print`) net kenarlıklar ve Segoe UI font standardıyla kusursuz basılır.
   * Excel çalışma kitabında da (`core_engine.py`) 1. sekmenin 1. sayfa sonuna (sayfa sonu kırılımından hemen önce) otomatik eklenir ve B-C sütunları birleştirilir.
 
+---
+
+## 10. Ürün Ailesi ve Renk/Varyant Sıralama Standardı (Alt Alta Gruplama)
+
+* **Aynı Modelin Renk Varyantları:** Farklı renk veya varyanta sahip aynı ürün/model kalemleri (örnek: `Beko CM 5964 R Floral Çay Makinesi`, `Beko CM 5964 B Floral Çay Makinesi`, `Beko TKM 2341 Keyf-i Bol Beyaz / Siyah`, `Beko BMD 200 B / G / S Mikrodalga Fırın`) araya başka ürün girmeden **doğrudan alt alta** basılır.
+* **Akıllı Ürün Ailesi & Renk Ayrıştırma (`extract_product_sort_keys`):**
+  * Ürün başlığındaki model numarası ve renk eki (R, B, S, G, I, M, K, EB, TB, DS vb.) veya Türkçe/İngilizce renk kelimeleri (Beyaz, Siyah, Kırmızı, Mavi, Gri vb.) ayrıştırılarak ortak `base` gövde anahtarı üretilir.
+  * Ölçü birimleri (W, V, Kg, Gr, Cm, Mm, Gb, Tb, Btu vb.) renk ekiyle karıştırılmaz.
+* **Grup İçi & Genel Sıralama (`sort_items_by_family_and_color`):**
+  * Ürün ailesi içindeki varyantlar kendi içinde renk koduna göre sıralanır.
+  * Ürün aileleri ise depoda toplama kolaylığı sağlamak adına öncelikle en yüksek sipariş adedine (`max_qty`), adetler eşitse ürün adına göre alfabetik olarak sıralanır.
+  * Bu sıralama hem Web canlı ekranında ve A4 baskıda (`grouped_items`), hem Excel genel listesinde, hem Beko bağımsız dosyasında hem de her markanın kendi sekmesinde geçerlidir.
+
+
 
