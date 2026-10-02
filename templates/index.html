@@ -2,7 +2,12 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="theme-color" content="#090d16">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gökhan OS">
+    <meta name="format-detection" content="telephone=no">
     <title>Depo Paneli | E-Ticaret Depo & Sipariş Toplama Sistemi</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1558,7 +1563,15 @@
             }
         }
 
-        @media (max-width: 1024px) {
+        /* ==============================================================
+           MOBİL UYUMLULUK VE RESPONSİVE SİSTEM (MOBILE FIRST DOCK & TOP BAR)
+           ============================================================== */
+        .mobile-top-bar,
+        .mobile-bottom-nav {
+            display: none;
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
             .app-layout-wrapper {
                 flex-direction: column;
             }
@@ -1575,7 +1588,511 @@
                 overflow-x: auto;
             }
             .sidebar-nav-btn {
-                min-width: 220px;
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Masaüstü Sidebar'ını gizle */
+            .app-sidebar {
+                display: none !important;
+            }
+
+            /* Mobil Üst Çubuk (Sticky Header) */
+            .mobile-top-bar {
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                position: sticky;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                height: 52px;
+                padding: 0 14px;
+                background: rgba(11, 16, 28, 0.96);
+                backdrop-filter: blur(18px);
+                -webkit-backdrop-filter: blur(18px);
+                border-bottom: 1px solid var(--border-subtle);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+            }
+
+            .mobile-top-left {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .mobile-top-brand-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: var(--radius-sm);
+                background: linear-gradient(135deg, #0284c7, #2563eb);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff;
+                box-shadow: 0 2px 10px rgba(2, 132, 199, 0.4);
+                flex-shrink: 0;
+            }
+
+            .mobile-top-titles {
+                display: flex;
+                flex-direction: column;
+                line-height: 1.15;
+            }
+
+            .mobile-brand-title {
+                font-size: 14px;
+                font-weight: 800;
+                color: #ffffff;
+                letter-spacing: 0.04em;
+            }
+
+            .mobile-brand-sub {
+                font-size: 9px;
+                font-weight: 700;
+                color: var(--accent-cyan);
+                letter-spacing: 0.05em;
+            }
+
+            .mobile-status-dot {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                background-color: var(--accent-emerald);
+                box-shadow: 0 0 8px var(--accent-emerald);
+                display: inline-block;
+                animation: pulse 2s infinite;
+                margin-left: 2px;
+            }
+
+            .mobile-module-pill {
+                font-size: 11px;
+                font-weight: 700;
+                padding: 4px 10px;
+                border-radius: 999px;
+                white-space: nowrap;
+            }
+
+            /* Mobil Sabit Alt Navigasyon (Bottom Dock) */
+            .mobile-bottom-nav {
+                display: flex !important;
+                justify-content: space-around;
+                align-items: center;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 9999;
+                height: 60px;
+                padding-bottom: max(4px, env(safe-area-inset-bottom, 0px));
+                background: rgba(11, 16, 28, 0.98);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-top: 1px solid var(--border-subtle);
+                box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.65);
+                user-select: none;
+            }
+
+            .mobile-nav-item {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 2px;
+                height: 100%;
+                background: transparent;
+                border: none;
+                outline: none;
+                color: var(--text-muted);
+                cursor: pointer;
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                padding: 4px 0;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .mobile-nav-icon-wrap {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 36px;
+                height: 28px;
+                border-radius: 14px;
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .mobile-nav-label {
+                font-size: 10.5px;
+                font-weight: 700;
+                letter-spacing: 0.02em;
+                transition: color 0.2s ease;
+            }
+
+            /* Mobil Aktif Sekme Vurguları */
+            .mobile-nav-item#mobile-nav-siparis.active {
+                color: var(--accent-cyan);
+            }
+            .mobile-nav-item#mobile-nav-siparis.active .mobile-nav-icon-wrap {
+                background: rgba(56, 189, 248, 0.18);
+                color: var(--accent-cyan);
+                transform: translateY(-2px);
+            }
+
+            .mobile-nav-item#mobile-nav-barkod.active {
+                color: var(--accent-emerald);
+            }
+            .mobile-nav-item#mobile-nav-barkod.active .mobile-nav-icon-wrap {
+                background: rgba(16, 185, 129, 0.18);
+                color: var(--accent-emerald);
+                transform: translateY(-2px);
+            }
+
+            .mobile-nav-item#mobile-nav-oliz.active {
+                color: var(--accent-amber);
+            }
+            .mobile-nav-item#mobile-nav-oliz.active .mobile-nav-icon-wrap {
+                background: rgba(245, 158, 11, 0.18);
+                color: var(--accent-amber);
+                transform: translateY(-2px);
+            }
+
+            /* Ana Görünüm & Konteynır Boşlukları */
+            .app-layout-wrapper {
+                display: block !important;
+                width: 100% !important;
+                min-height: auto;
+            }
+
+            .app-main-viewport {
+                padding: 10px 8px 76px 8px !important;
+                width: 100% !important;
+                overflow-x: hidden;
+            }
+
+            .container {
+                padding: 10px 6px 76px 6px !important;
+                max-width: 100% !important;
+            }
+
+            /* Başlık ve Üst Bilgi */
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                margin-bottom: 16px !important;
+                padding-bottom: 12px !important;
+            }
+
+            .brand-box {
+                gap: 10px;
+                width: 100%;
+            }
+
+            .brand-icon {
+                width: 38px;
+                height: 38px;
+                border-radius: var(--radius-sm);
+                flex-shrink: 0;
+            }
+
+            .brand-icon svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .brand-title h1 {
+                font-size: 15px !important;
+                line-height: 1.25;
+            }
+
+            .brand-title p {
+                font-size: 11px;
+                line-height: 1.3;
+            }
+
+            .header-meta {
+                width: 100%;
+            }
+
+            .date-badge {
+                font-size: 11px;
+                padding: 5px 10px;
+                width: fit-content;
+            }
+
+            /* Kurallar Çubuğu */
+            .rules-bar {
+                padding: 10px 12px;
+                margin-bottom: 14px;
+                gap: 8px;
+            }
+
+            .rules-items {
+                flex-direction: column;
+                gap: 6px;
+                width: 100%;
+            }
+
+            .rule-tag {
+                font-size: 11.5px;
+            }
+
+            /* Aksiyon Grid & Kartlar */
+            .action-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px;
+                margin-bottom: 14px;
+            }
+
+            .card {
+                padding: 14px 12px;
+                border-radius: var(--radius-md);
+            }
+
+            .card-header {
+                gap: 10px;
+                margin-bottom: 12px;
+            }
+
+            .card-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                flex-shrink: 0;
+            }
+
+            .card-header h2 {
+                font-size: 13.5px;
+            }
+
+            .card-header p {
+                font-size: 11px;
+            }
+
+            .detected-file-box {
+                padding: 10px 12px;
+                margin-bottom: 12px;
+            }
+
+            .file-name {
+                font-size: 12.5px;
+            }
+
+            .file-details {
+                font-size: 11px;
+            }
+
+            .dropzone {
+                padding: 22px 12px;
+            }
+
+            .dropzone svg {
+                width: 30px;
+                height: 30px;
+                margin-bottom: 6px;
+            }
+
+            .dropzone p {
+                font-size: 12.5px;
+            }
+
+            .dropzone span {
+                font-size: 10.5px;
+            }
+
+            .options-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                margin-top: 12px;
+                padding-top: 12px;
+            }
+
+            .toggle-label {
+                font-size: 12px;
+            }
+
+            /* Butonlar: Mobil Dokunmatik Alan Standardı */
+            .btn {
+                min-height: 42px;
+                font-size: 12.5px;
+                justify-content: center;
+                width: 100%;
+                border-radius: var(--radius-sm);
+            }
+
+            /* KPI İstatistik Kartları (2x2 Grid) */
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px;
+                margin-bottom: 14px;
+            }
+
+            .kpi-card {
+                padding: 10px 12px;
+            }
+
+            .kpi-label {
+                font-size: 10px;
+                letter-spacing: 0.02em;
+                margin-bottom: 4px;
+            }
+
+            .kpi-value {
+                font-size: 20px;
+                gap: 4px;
+            }
+
+            .kpi-unit {
+                font-size: 11px;
+            }
+
+            /* Araç Çubuğu (Toolbar) */
+            .action-toolbar {
+                padding: 10px 8px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                margin-bottom: 14px;
+            }
+
+            .toolbar-group {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+                width: 100%;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+                padding: 9px 6px;
+                font-size: 11px;
+                min-height: 40px;
+                text-align: center;
+            }
+
+            /* Sonuç Tablo Alanı & Marka Sekmeleri */
+            .results-section {
+                padding: 12px 6px;
+                margin-bottom: 16px;
+                border-radius: var(--radius-md);
+            }
+
+            .section-top {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                margin-bottom: 12px;
+            }
+
+            .brand-tabs {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 4px;
+                gap: 6px;
+            }
+
+            .tab-btn {
+                padding: 6px 12px;
+                font-size: 11.5px;
+            }
+
+            .search-input {
+                width: 100%;
+                font-size: 13.5px;
+                padding: 8px 12px;
+            }
+
+            /* 1. Sayfa Özel Not Kutusu */
+            .page1-note-card {
+                padding: 10px 12px;
+                margin-bottom: 12px;
+            }
+
+            .note-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .note-card-title {
+                font-size: 13px;
+            }
+
+            .note-card-desc {
+                font-size: 11px;
+            }
+
+            .note-input-container {
+                padding: 6px 10px;
+                width: 100%;
+            }
+
+            .note-card-input {
+                font-size: 13px;
+            }
+
+            /* Sipariş Tablosu Hücre Düzeni */
+            .table-responsive {
+                border-radius: var(--radius-sm);
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th {
+                padding: 10px 6px;
+                font-size: 11.5px;
+            }
+
+            th.col-qty, td.col-qty {
+                width: 44px;
+                padding: 8px 4px;
+            }
+
+            .qty-badge {
+                font-size: 12px;
+                padding: 3px 6px;
+                min-width: 28px;
+            }
+
+            th.col-name, td.col-name {
+                padding: 8px 6px;
+                font-size: 12px;
+                line-height: 1.35;
+            }
+
+            th.col-code, td.col-code {
+                padding: 8px 4px;
+                font-size: 11px;
+                max-width: 85px;
+                word-break: break-all;
+                white-space: normal;
+            }
+
+            /* Ekran Ayırıcı */
+            .screen-beko-divider {
+                padding: 8px 12px;
+                font-size: 11.5px;
+                margin: 14px 0 10px 0;
+            }
+
+            /* Toast Bildirimleri (Alt Barın Üzerinde Kalır) */
+            #toast-container {
+                bottom: 74px !important;
+                right: 12px !important;
+                left: 12px !important;
+            }
+
+            .toast {
+                padding: 10px 14px;
+                font-size: 12px;
             }
         }
     </style>
@@ -1589,6 +2106,28 @@
     <script src="/static/js/oliz_main.js?v=2.0"></script>
 </head>
 <body>
+
+    <!-- MOBİL ÜST ÇUBUK (MOBILE STICKY TOP BAR) -->
+    <header class="mobile-top-bar no-print" id="mobile-top-bar">
+        <div class="mobile-top-left">
+            <div class="mobile-top-brand-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                </svg>
+            </div>
+            <div class="mobile-top-titles">
+                <span class="mobile-brand-title">GÖKHAN OS</span>
+                <span class="mobile-brand-sub">DEPO SİSTEMİ</span>
+            </div>
+            <span class="mobile-status-dot" title="Sistem Çevrimiçi"></span>
+        </div>
+        <div class="mobile-top-right">
+            <span class="mobile-module-pill pill-cyan" id="mobile-module-badge">📦 Sipariş & Toplama</span>
+        </div>
+    </header>
 
 <div class="app-layout-wrapper">
     <!-- SOL KENAR MENÜSÜ (SIDEBAR) -->
@@ -1680,7 +2219,6 @@
     <!-- 1. GÖRÜNÜM: SİPARİŞ & ÜRÜN TOPLAMA -->
     <div id="view-siparis" class="app-view-panel active">
         <div class="container">
-<div class="container">
     <!-- Header -->
     <header>
         <div class="brand-box">
@@ -1940,7 +2478,6 @@
         </div>
     </div>
 </div>
-        </div> <!-- .container -->
     </div> <!-- #view-siparis -->
 
     <!-- 2. GÖRÜNÜM: TOPLU BARKOD & KARGO ETİKETİ -->
@@ -2458,18 +2995,61 @@
     </div> <!-- .app-main-viewport -->
 </div> <!-- .app-layout-wrapper -->
 
+    <!-- MOBİL SABİT ALT NAVİGASYON (MOBILE BOTTOM DOCK) -->
+    <nav class="mobile-bottom-nav no-print" id="mobile-bottom-nav">
+        <!-- 1. Sekme -->
+        <button class="mobile-nav-item active" id="mobile-nav-siparis" onclick="switchMainTab('siparis')" type="button">
+            <div class="mobile-nav-icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1">
+                    <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <span class="mobile-nav-label">Sipariş</span>
+        </button>
+
+        <!-- 2. Sekme -->
+        <button class="mobile-nav-item" id="mobile-nav-barkod" onclick="switchMainTab('barkod')" type="button">
+            <div class="mobile-nav-icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1">
+                    <path d="M3 5v14"></path>
+                    <path d="M8 5v14"></path>
+                    <path d="M12 5v14"></path>
+                    <path d="M17 5v14"></path>
+                    <path d="M21 5v14"></path>
+                </svg>
+            </div>
+            <span class="mobile-nav-label">Barkod</span>
+        </button>
+
+        <!-- 3. Sekme -->
+        <button class="mobile-nav-item" id="mobile-nav-oliz" onclick="switchMainTab('oliz')" type="button">
+            <div class="mobile-nav-icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+            </div>
+            <span class="mobile-nav-label">Oliz</span>
+        </button>
+    </nav>
+
 
 <script>
     
     
     // ==============================================================
-    // 3 SAYFA GEÇİŞ YÖNETİCİSİ (SOL KENAR MENÜSÜ DASHBOARD)
+    // 3 SAYFA GEÇİŞ YÖNETİCİSİ (SOL KENAR MENÜSÜ & MOBİL ALT BAR DASHBOARD)
     // ==============================================================
     function switchMainTab(tab) {
-        // Sol Menü Butonları
+        // Sol Menü Butonları (Masaüstü)
         const sideSiparis = document.getElementById('side-nav-siparis');
         const sideBarkod = document.getElementById('side-nav-barkod');
         const sideOliz = document.getElementById('side-nav-oliz');
+
+        // Mobil Alt Menü Butonları
+        const mobSiparis = document.getElementById('mobile-nav-siparis');
+        const mobBarkod = document.getElementById('mobile-nav-barkod');
+        const mobOliz = document.getElementById('mobile-nav-oliz');
+        const mobBadge = document.getElementById('mobile-module-badge');
 
         // Sayfa / Görünüm Konteynırları
         const viewSiparis = document.getElementById('view-siparis');
@@ -2477,7 +3057,7 @@
         const viewOliz = document.getElementById('view-oliz');
 
         // Tüm butonların active sınıfını temizle
-        [sideSiparis, sideBarkod, sideOliz].forEach(el => {
+        [sideSiparis, sideBarkod, sideOliz, mobSiparis, mobBarkod, mobOliz].forEach(el => {
             if (el) el.classList.remove('active');
         });
 
@@ -2494,6 +3074,11 @@
 
         if (tab === 'barkod') {
             if (sideBarkod) sideBarkod.classList.add('active');
+            if (mobBarkod) mobBarkod.classList.add('active');
+            if (mobBadge) {
+                mobBadge.textContent = '🏷️ Toplu Barkod';
+                mobBadge.className = 'mobile-module-pill pill-emerald';
+            }
             if (viewBarkod) { viewBarkod.style.display = 'block'; viewBarkod.classList.add('active'); }
             document.body.classList.add('active-tab-barkod');
             try { history.replaceState(null, null, '#barkod'); } catch (e) {}
@@ -2503,6 +3088,11 @@
             }
         } else if (tab === 'oliz') {
             if (sideOliz) sideOliz.classList.add('active');
+            if (mobOliz) mobOliz.classList.add('active');
+            if (mobBadge) {
+                mobBadge.textContent = '🎁 Oliz Kampanya';
+                mobBadge.className = 'mobile-module-pill pill-amber';
+            }
             if (viewOliz) { viewOliz.style.display = 'block'; viewOliz.classList.add('active'); }
             document.body.classList.add('active-tab-oliz');
             try { history.replaceState(null, null, '#oliz'); } catch (e) {}
@@ -2513,6 +3103,11 @@
             }
         } else {
             if (sideSiparis) sideSiparis.classList.add('active');
+            if (mobSiparis) mobSiparis.classList.add('active');
+            if (mobBadge) {
+                mobBadge.textContent = '📦 Sipariş & Toplama';
+                mobBadge.className = 'mobile-module-pill pill-cyan';
+            }
             if (viewSiparis) { viewSiparis.style.display = 'block'; viewSiparis.classList.add('active'); }
             document.body.classList.add('active-tab-siparis');
             try { history.replaceState(null, null, '#siparis'); } catch (e) {}

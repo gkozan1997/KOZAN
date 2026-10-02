@@ -204,6 +204,33 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   - Bağımsız rotalar: `/barkod` ve `/oliz` doğrudan ilgili sayfayı açar.
 * **Baskı İzolasyonu:** `@media print` sırasında sol menü gizlenir (`display: none !important`), baskı alanı sayfa genişliğini tam doldurur.
 
+---
+
+## 13. Mobil Uyumluluk ve Responsive Sistem Standardı (Mobile-First Dashboard Standardı)
+
+* **Mobil Navigasyon Mimarisi (`<= 768px`):**
+  - **Masaüstü Sidebar İzolasyonu:** Geniş sol menü (`.app-sidebar`) mobil ekranlarda gizlenir (`display: none !important;`) ve ekranda dikey yer işgal etmesi önlenir.
+  - **Kompakt Mobil Üst Çubuk (`.mobile-top-bar`):** Ekranın en üstünde yapışkan (sticky), modern cam efektli logo, çevrimiçi göstergesi ve anlık aktif modülü belirten dinamik rozet (`#mobile-module-badge`) yer alır.
+  - **Mobil Sabit Alt Menü Dok'u (`.mobile-bottom-nav`):** Ekranın en altında sabit (fixed), başparmakla tek dokunuşla erişilebilir 3 ana modül butonu (`Sipariş`, `Barkod`, `Oliz`) konumlanır.
+  - **İki Yönlü Durum Senkronizasyonu (`switchMainTab`):** Sekme geçişlerinde hem masaüstü sol menü, hem mobil alt menü, hem de URL hash'i eş zamanlı aktifleşir.
+  - **Güvenli Alan (Safe Area Inset):** iPhone çentiği ve alt ev çubuğu için `viewport-fit=cover` ve `padding-bottom: max(4px, env(safe-area-inset-bottom))` tam uyumludur.
+* **Modül Bazlı Mobil Uyarlamalar:**
+  - **Sipariş & Toplama Modülü:**
+    - Çift sarmal container temizlendi; padding mobil ekranlar için optimize edildi.
+    - KPI özet kartları kompakt 2x2 grid yapısına dönüştürüldü.
+    - Tablo sütunları (`Miktar`, `Ürün Adı`, `Stok Kodu`) mobil ekran genişliğine tam sığacak dinamik genişlik ve metin sarma kurallarına kavuştu.
+    - Araç çubuğu (toolbar) butonları 2 sütunlu dokunmatik grid olarak düzenlendi.
+    - Bildirim pencereleri (toast) alt menü dok'unun hemen üzerinde görüntülenecek şekilde konumlandırıldı.
+  - **Toplu Barkod & Kargo Modülü:**
+    - Üst aksiyon butonları ve sütun eşleme seçicileri 2 sütunlu dokunmatik ızgaraya dönüştürüldü.
+    - 10cm x 10cm etiket önizleme kartları mobil ekranlarda tekli tam kart genişliğinde ortalanarak kusursuz kare oranını ve SVG netliğini korur.
+  - **Oliz Kampanya Modülü:**
+    - İstatistik kartları 2x2 mobil grid formatına uyarlandı.
+    - Hızlı deneme butonları yatay kaydırılabilir dokunmatik çip şeridi haline getirildi.
+    - 4 ürün giriş kutusu ve aksiyon butonları dikey akışa optimize edildi.
+* **Masaüstü ve Baskı Koruma Garantisi:**
+  - Masaüstü görünüm (`> 768px`) ve A4 / 100x100mm termal baskı kuralları (`@media print`) bu geliştirmelerden bağımsız olarak %100 korunmaktadır.
+
 
 
 

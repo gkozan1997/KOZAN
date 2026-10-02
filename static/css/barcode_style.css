@@ -512,6 +512,213 @@
 }
 
 /* ==============================================================
+   MOBİL EKRAN OPTİMİZASYONU (TOPLU BARKOD & 10x10cm ETİKET)
+   ============================================================== */
+@media screen and (max-width: 768px) {
+    .app-header {
+        padding: 12px 14px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .brand-info h1 {
+        font-size: 1rem;
+        line-height: 1.25;
+    }
+
+    .brand-sub {
+        font-size: 0.75rem;
+    }
+
+    .header-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+    }
+
+    .header-actions .btn {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.75rem;
+        padding: 8px 6px;
+    }
+
+    .app-main {
+        padding: 10px 8px 80px 8px;
+        gap: 14px;
+    }
+
+    .drop-card {
+        padding: 22px 12px;
+        border-radius: var(--radius-md);
+    }
+
+    .drop-icon svg {
+        width: 36px;
+        height: 36px;
+    }
+
+    .drop-text h3 {
+        font-size: 1rem;
+    }
+
+    .drop-text p {
+        font-size: 0.8rem;
+    }
+
+    .drop-badges {
+        gap: 6px;
+    }
+
+    .badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+
+    /* Sütun Eşleşmesi Alanı */
+    .mapping-section {
+        padding: 12px 10px;
+    }
+
+    .mapping-selectors {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .select-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        width: 100%;
+    }
+
+    .custom-select {
+        width: 100%;
+        font-size: 0.8rem;
+        padding: 6px 8px;
+    }
+
+    #btn-apply-remap {
+        grid-column: 1 / -1;
+        width: 100%;
+        padding: 9px;
+        justify-content: center;
+        font-size: 0.85rem;
+    }
+
+    /* Araç Çubuğu (Toolbar) */
+    .toolbar-section {
+        padding: 12px 10px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .search-box input {
+        font-size: 0.85rem;
+    }
+
+    .mode-toggle {
+        width: 100%;
+    }
+
+    .mode-btn {
+        flex: 1;
+        justify-content: center;
+        font-size: 0.75rem;
+        padding: 8px 6px;
+    }
+
+    .toolbar-right .btn-lg {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 14px;
+        font-size: 0.875rem;
+    }
+
+    /* 10x10 Kartlar Listesi (Mobil: Tam Genişlikte 1'er Kart) */
+    .labels-grid-section {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .label-card-wrapper {
+        max-width: 360px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .label-card {
+        padding: 16px 12px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .label-customer-name {
+        font-size: 1.05rem;
+    }
+
+    .label-customer-addr {
+        font-size: 0.82rem;
+    }
+
+    .label-customer-city {
+        font-size: 0.85rem;
+    }
+
+    .label-customer-phone {
+        font-size: 0.88rem;
+    }
+
+    .label-barcode-svg {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .label-product-title {
+        font-size: 0.95rem;
+    }
+
+    /* Modal Pencere Mobil */
+    .modal-card {
+        max-width: calc(100% - 24px);
+        margin: 12px;
+        max-height: 88vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-body {
+        overflow-y: auto;
+        padding: 14px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .w-100px {
+        width: 100%;
+    }
+}
+
+/* ==============================================================
    EKRAN GÖRÜNÜMÜ: YAZDIRMA ALANI GİZLE
    ============================================================== */
 .print-only {

@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    OLİZ KAMPANYA & İNDİRİM YÖNETİM SİSTEMİ - MODERN TASARIM SİSTEMİ
    ========================================================================== */
 
@@ -949,6 +949,196 @@
 .dropzone-icon {
   font-size: 38px;
   margin-bottom: 10px;
+}
+
+/* ==========================================================================
+   MOBİL EKRAN OPTİMİZASYONU (OLİZ KAMPANYA & SEPET ANALİZİ)
+   ========================================================================== */
+@media screen and (max-width: 768px) {
+  .oliz-container {
+    padding: 10px 8px 80px 8px;
+  }
+
+  .header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 12px;
+  }
+
+  .brand-wrapper {
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 20px;
+  }
+
+  .brand-text h1 {
+    font-size: 17px;
+  }
+
+  .brand-text p {
+    font-size: 11px;
+  }
+
+  .header-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .header-actions .badge-info {
+    grid-column: 1 / -1;
+    justify-content: center;
+    text-align: center;
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .header-actions .btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 11.5px;
+    padding: 9px 8px;
+  }
+
+  /* 2x2 İstatistik Grid */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .stat-card {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .stat-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+
+  .stat-info .stat-value {
+    font-size: 18px;
+  }
+
+  .stat-info .stat-label {
+    font-size: 10.5px;
+  }
+
+  /* Hızlı Deneme Çipleri */
+  .section-title-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .chips-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    padding-bottom: 6px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .chip-btn {
+    font-size: 11px;
+    padding: 5px 10px;
+    flex-shrink: 0;
+  }
+
+  /* 4 Ürün Giriş Slotları */
+  .slots-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .slot-box {
+    padding: 12px;
+  }
+
+  .slot-input {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  /* Aksiyon Barı */
+  .slots-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .slots-action-bar > div:last-child {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .slots-action-bar .btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 12px;
+    padding: 10px 8px;
+  }
+
+  /* Paket Eşleşme Kartı & Finansal Grid */
+  .package-match-card {
+    padding: 16px 12px;
+  }
+
+  .pkg-title {
+    font-size: 17px;
+  }
+
+  .pkg-financials-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .fin-item .amount {
+    font-size: 18px;
+  }
+
+  /* Kıyaslama Tablosu */
+  .summary-comparison-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .comparison-card {
+    padding: 14px 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .comparison-table {
+    min-width: 480px;
+    font-size: 12px;
+  }
+
+  .comparison-table th, .comparison-table td {
+    padding: 8px 10px;
+  }
+
+  /* Modal Mobil */
+  .modal-content {
+    max-width: calc(100% - 24px);
+    padding: 18px 14px;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
 }
 
 /* ==========================================================================
