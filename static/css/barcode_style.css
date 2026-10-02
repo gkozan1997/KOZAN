@@ -1,0 +1,649 @@
+/* 
+   Toplu Barkod & 10x10cm Termal Kargo Etiketi
+   Kullanıcının gönderdiği görsele tam uyumlu tasarım
+*/
+
+:root {
+    --bg-page: #0F172A;
+    --bg-card: #1E293B;
+    --bg-card-hover: #334155;
+    --border-color: #334155;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    
+    --primary: #3B82F6;
+    --primary-hover: #2563EB;
+    --success: #10B981;
+    --success-hover: #059669;
+    --accent: #F59E0B;
+    
+    --label-bg: #FFFFFF;
+    --label-text: #000000;
+    --label-border: #CBD5E1;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.barcode-view-scope {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.brand-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFF;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+.brand-info h1 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #FFF;
+    letter-spacing: 0.5px;
+}
+
+.brand-sub {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+}
+
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+.btn-lg { padding: 10px 20px; font-size: 0.95rem; }
+
+.btn-primary { background: var(--primary); color: #FFF; }
+.btn-primary:hover { background: var(--primary-hover); }
+
+.btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); }
+.btn-secondary:hover { background: var(--bg-card-hover); border-color: #475569; }
+
+.btn-success { background: var(--success); color: #FFF; }
+.btn-success:hover { background: var(--success-hover); }
+
+.app-main {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.drop-card {
+    border: 2px dashed #475569;
+    border-radius: var(--radius-lg);
+    background: rgba(30, 41, 59, 0.5);
+    padding: 36px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.drop-card:hover, .drop-card.drag-over {
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.drop-icon { color: var(--primary); }
+.drop-text h3 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); }
+.drop-text p { font-size: 0.875rem; color: var(--text-secondary); }
+.file-input-hidden { display: none; }
+
+.drop-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 6px;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-subtle { background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); }
+.badge-link { background: rgba(59, 130, 246, 0.2); color: #93C5FD; text-decoration: none; }
+.badge-link:hover { background: rgba(59, 130, 246, 0.35); }
+.badge-count { background: rgba(0, 0, 0, 0.25); color: #FFF; margin-left: 4px; }
+
+.mapping-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px 20px;
+}
+
+.mapping-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mapping-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.text-accent { color: var(--accent); }
+
+.mapping-selectors {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.select-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.custom-select {
+    background: #0F172A;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    outline: none;
+}
+
+.toolbar-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 12px 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.toolbar-left, .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #0F172A;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    width: 280px;
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    outline: none;
+    width: 100%;
+}
+
+.mode-toggle {
+    display: flex;
+    background: #0F172A;
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    border: 1px solid var(--border-color);
+}
+
+.mode-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mode-btn.active { background: var(--primary); color: #FFF; }
+
+/* 10x10 Kartlar Grid */
+.labels-grid-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+}
+
+.empty-icon { font-size: 3rem; margin-bottom: 12px; }
+
+.label-card-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label-card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px;
+}
+
+/* 10cm x 10cm Tam Kare Kart - Kullanıcı Görseli İle Birebir */
+.label-card {
+    background: var(--label-bg);
+    color: var(--label-text);
+    border-radius: 4px;
+    aspect-ratio: 1 / 1;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--label-border);
+    position: relative;
+    user-select: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.label-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
+.label-card.deselected {
+    opacity: 0.4;
+    filter: grayscale(1);
+}
+
+/* Üst Kısım: Müşteri Bilgileri (Görselle Aynı) */
+.label-header-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2px;
+}
+
+.label-customer-name {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #000;
+    line-height: 1.25;
+}
+
+.label-customer-addr {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #111827;
+    line-height: 1.3;
+    max-width: 95%;
+}
+
+.label-customer-city {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #111827;
+    line-height: 1.3;
+}
+
+.label-customer-phone {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #111827;
+    line-height: 1.3;
+}
+
+/* Orta Kısım: Barkod SVG */
+.label-barcode-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 4px 0;
+}
+
+.label-barcode-container svg {
+    width: 100%;
+    max-height: 75px;
+}
+
+/* Alt Kısım (Kırmızıyla Çizilen Yer): Ürün Adı */
+.label-product-name-bottom {
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 800;
+    text-align: center;
+    color: #000;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    border-top: 1px dashed #E2E8F0;
+    padding-top: 6px;
+}
+
+/* Modallar */
+.modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+.modal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 520px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+.modal-close:hover { color: #FFF; }
+
+.modal-.barcode-view-scope {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"] {
+    background: #0F172A;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.form-group input:focus { border-color: var(--primary); }
+.form-row { display: flex; gap: 12px; }
+.flex-1 { flex: 1; }
+.w-100px { width: 100px; }
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* ==============================================================
+   EKRAN GÖRÜNÜMÜ: YAZDIRMA ALANI GİZLE
+   ============================================================== */
+.print-only {
+    display: none !important;
+}
+
+/* ==============================================================
+   YAZDIRMA STANDARDI (@media print)
+   10cm x 10cm (100mm x 100mm) Termal Rulo Kağıt
+   ============================================================== */
+@page {
+    size: 100mm 100mm;
+    margin: 0;
+}
+
+
+
+
+
+/* ==============================================================
+   TERMAL BARKOD YAZDIRMA (100mm x 100mm)
+   Yalnızca Toplu Barkod sekmesi aktifken devreye girer
+   ============================================================== */
+@media print {
+    body.active-tab-barkod,
+    body.active-tab-barkod html {
+        width: 100mm !important;
+        height: 100mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #FFF !important;
+        color: #000 !important;
+    }
+
+    body.active-tab-barkod .container,
+    body.active-tab-barkod .main-tabs-nav,
+    body.active-tab-barkod header,
+    body.active-tab-barkod #view-siparis,
+    body.active-tab-barkod .app-layout,
+    body.active-tab-barkod .no-print {
+        display: none !important;
+    }
+
+    body.active-tab-barkod .print-only {
+        display: block !important;
+    }
+
+    body.active-tab-barkod .thermal-label-page {
+        width: 100mm !important;
+        height: 100mm !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        padding: 6mm 5mm !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        background: #FFF !important;
+        color: #000 !important;
+        overflow: hidden !important;
+        border: none !important;
+    }
+
+    body.active-tab-barkod .thermal-label-page.with-border {
+        border: 1px solid #000 !important;
+    }
+
+    body.active-tab-barkod .print-header-info {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 1.5mm !important;
+        border-bottom: 1.5px solid #000 !important;
+        padding-bottom: 2mm !important;
+    }
+
+    body.active-tab-barkod .print-cust-name {
+        font-size: 13pt !important;
+        font-weight: 800 !important;
+        color: #000 !important;
+        line-height: 1.2 !important;
+    }
+
+    body.active-tab-barkod .print-cust-address {
+        font-size: 10pt !important;
+        font-weight: 600 !important;
+        color: #000 !important;
+        line-height: 1.2 !important;
+        max-width: 95% !important;
+        word-break: break-word !important;
+    }
+
+    body.active-tab-barkod .print-cust-city {
+        font-size: 11pt !important;
+        font-weight: 800 !important;
+        color: #000 !important;
+        line-height: 1.2 !important;
+    }
+
+    body.active-tab-barkod .print-cust-phone {
+        font-size: 10pt !important;
+        font-weight: 700 !important;
+        color: #000 !important;
+        line-height: 1.2 !important;
+    }
+
+    body.active-tab-barkod .print-barcode-box {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 2mm 0 !important;
+    }
+
+    body.active-tab-barkod .print-barcode-box svg {
+        width: 92% !important;
+        max-height: 28mm !important;
+    }
+
+    body.active-tab-barkod .print-product-title {
+        width: 100% !important;
+        font-size: 11.5pt !important;
+        font-weight: 800 !important;
+        text-align: center !important;
+        color: #000 !important;
+        line-height: 1.2 !important;
+        border-top: 1.5px solid #000 !important;
+        padding-top: 2.5mm !important;
+        word-break: break-word !important;
+    }
+}

@@ -1096,7 +1096,159 @@
 
 
         }
+    
+        /* ==============================================================
+           PROJE 1 & PROJE 3 ANA SEKME GEÇİŞİ (MAIN TABS NAV)
+           ============================================================== */
+        .main-tabs-nav {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            background: rgba(17, 23, 38, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 8px;
+            margin-bottom: 26px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .main-tab-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            padding: 12px 18px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-muted);
+            text-align: left;
+            outline: none;
+            position: relative;
+            user-select: none;
+        }
+
+        .main-tab-btn:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-main);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .main-tab-btn.active {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(59, 130, 246, 0.16));
+            border-color: rgba(56, 189, 248, 0.5);
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn-inner {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .tab-btn-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-sm);
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .main-tab-btn.active .tab-btn-icon {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+            transform: scale(1.05);
+        }
+
+        .tab-btn-icon.icon-barcode {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-emerald);
+        }
+
+        .main-tab-btn.active .tab-btn-icon.icon-barcode {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+        }
+
+        .tab-btn-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .tab-btn-title {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .tab-btn-sub {
+            font-size: 12px;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        .main-tab-btn.active .tab-btn-sub {
+            color: var(--text-muted);
+        }
+
+        .tab-badge-pill {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            white-space: nowrap;
+        }
+
+        .tab-badge-pill.pill-accent {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-emerald);
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+
+        .main-tab-btn.active .tab-badge-pill {
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* App View Panels */
+        .app-view-panel {
+            display: none;
+            animation: fadeInView 0.25s ease forwards;
+        }
+
+        .app-view-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeInView {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .main-tabs-nav {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
+    <!-- Toplu Barkod & Kargo Etiketi (Proje 3) Kaynakları -->
+    <link rel="stylesheet" href="/static/css/barcode_style.css?v=2.0">
+    <script src="/static/js/JsBarcode.all.min.js"></script>
+    <script src="/static/js/barcode_app.js?v=2.0"></script>
 </head>
 <body>
 
@@ -1122,6 +1274,47 @@
             </div>
         </div>
     </header>
+
+    <!-- Main App Navigation Tabs (Proje 1 & Proje 3 Birlesimi) -->
+    <nav class="main-tabs-nav no-print" id="main-tabs-nav">
+        <button class="main-tab-btn active" id="tab-nav-siparis" onclick="switchMainTab('siparis')">
+            <div class="tab-btn-inner">
+                <div class="tab-btn-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <div class="tab-btn-text">
+                    <span class="tab-btn-title">Sipariş & Ürün Toplama</span>
+                    <span class="tab-btn-sub">Pazaryeri Konsolidasyonu & A4 Baskı</span>
+                </div>
+                <span class="tab-badge-pill">A4 Dikey</span>
+            </div>
+        </button>
+
+        <button class="main-tab-btn" id="tab-nav-barkod" onclick="switchMainTab('barkod')">
+            <div class="tab-btn-inner">
+                <div class="tab-btn-icon icon-barcode">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M3 5v14"></path>
+                        <path d="M8 5v14"></path>
+                        <path d="M12 5v14"></path>
+                        <path d="M17 5v14"></path>
+                        <path d="M21 5v14"></path>
+                    </svg>
+                </div>
+                <div class="tab-btn-text">
+                    <span class="tab-btn-title">Toplu Barkod & Kargo Etiketi</span>
+                    <span class="tab-btn-sub">Müşteri + Takip Barkodu + Ürün Adı</span>
+                </div>
+                <span class="tab-badge-pill pill-accent">10x10cm Termal</span>
+            </div>
+        </button>
+    </nav>
+
+    <!-- SEKME 1: SİPARİŞ & ÜRÜN TOPLAMA GÖRÜNÜMÜ -->
+    <div id="view-siparis" class="app-view-panel active">
+
 
     <!-- Operational Rules Bar -->
     <div class="rules-bar">
@@ -1361,10 +1554,337 @@
     </div>
 </div>
 
+    <!-- SEKME 2: TOPLU BARKOD & KARGO ETİKETİ GÖRÜNÜMÜ -->
+    <div id="view-barkod" class="app-view-panel" style="display: none;">
+        
+    <div class="app-layout no-print">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="brand-icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 5v14"></path>
+                        <path d="M8 5v14"></path>
+                        <path d="M12 5v14"></path>
+                        <path d="M17 5v14"></path>
+                        <path d="M21 5v14"></path>
+                    </svg>
+                </div>
+                <div class="brand-info">
+                    <h1>TOPLU BARKOD & KARGO ETİKET SİSTEMİ</h1>
+                    <span class="brand-sub">10cm x 10cm Termal Etiket Formatı (Müşteri + Barkod + Ürün Adı)</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn btn-secondary btn-sm" id="btn-sample-load" title="Örnek kargo listesiyle sistemi test edin">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span>Örnek Listeyi Yükle</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btn-load-downloads" title="İndirilenler klasöründeki en son sipariş dosyasını alır">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>İndirilenlerden Al</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btn-manual-add" title="Excel olmadan anlık etiket oluştur">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Manuel Etiket Ekle</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btn-open-settings" title="Etiket ayarları">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    <span>Ayarlar</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <!-- Dropzone -->
+            <section class="upload-section" id="upload-zone">
+                <div class="drop-card" id="drop-area">
+                    <input type="file" id="barcode-file-input" accept=".xlsx,.xls,.csv" class="file-input-hidden">
+                    <div class="drop-icon">
+                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                            <line x1="9" y1="15" x2="12" y2="12"></line>
+                            <line x1="15" y1="15" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="drop-text">
+                        <h3>Sipariş Excel veya CSV Dosyanızı Buraya Sürükleyin</h3>
+                        <p>veya bilgisayarınızdan seçmek için <strong>tıklayın</strong> (.xlsx, .xls, .csv)</p>
+                    </div>
+                    <div class="drop-badges">
+                        <span class="badge badge-subtle">Otomatik Sütun Tespiti (Müşteri, Adres, Barkod, Ürün)</span>
+                        <span class="badge badge-subtle">10cm x 10cm Termal Rulo Uyumlu</span>
+                        <span class="badge badge-subtle">Trendyol / Hepsiburada / Excel Tam Uyum</span>
+                        <a href="/api/download-sample-excel" class="badge badge-link" title="Örnek formatı indir">📥 Örnek Şablon Excel İndir</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Toolbar -->
+            <section class="toolbar-section" id="toolbar" style="display: none;">
+                <div class="toolbar-left">
+                    <label class="checkbox-label select-all-label">
+                        <input type="checkbox" id="check-select-all" checked>
+                        <span>Tümünü Seç (<span id="count-selected">0</span>/<span id="count-total-items">0</span> Sipariş)</span>
+                    </label>
+
+                    <div class="search-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="input-search" placeholder="Müşteri, barkod, şehir veya ürün ara...">
+                    </div>
+
+                    <button class="btn btn-secondary btn-sm" id="btn-toggle-mapping" type="button" title="Excel sütun eşleştirmelerini aç veya gizle">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        <span id="mapping-btn-label">Sütun Eşleşmesi</span>
+                        <span id="mapping-btn-arrow" style="font-size: 11px; margin-left: 2px;">▾</span>
+                    </button>
+                </div>
+
+                <div class="toolbar-right">
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" id="btn-mode-qty" title="Excel'deki Adet sayısı kadar etiket üretir">
+                            <span>Adet Kadar Bas</span>
+                            <span class="badge badge-count" id="badge-total-labels">0 Etiket</span>
+                        </button>
+                        <button class="mode-btn" id="btn-mode-single" title="Her satırdan 1 adet etiket basar">
+                            <span>Her Satırdan 1 Adet</span>
+                        </button>
+                    </div>
+
+                    <button class="btn btn-success btn-lg" id="btn-print-bulk">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        <span>Toplu Yazdır (10x10cm Termal)</span>
+                    </button>
+
+                    <button class="btn btn-primary btn-lg" id="btn-download-pdf">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Toplu PDF İndir (10cm x 10cm)</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Sütun Eşleştirme Barı (İsteğe Bağlı Açılır) -->
+            <section class="mapping-section" id="mapping-bar" style="display: none;">
+                <div class="mapping-container">
+                    <div class="mapping-title">
+                        <div class="mapping-title-left">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                            <span>Sütun Eşleşmesi:</span>
+                            <strong id="active-filename" class="text-accent">Dosya</strong>
+                            <span class="badge badge-success" style="font-size: 11px; padding: 2px 8px; background: rgba(34, 197, 94, 0.15); color: #4ADE80; border: 1px solid rgba(34, 197, 94, 0.3);">✓ Otomatik Eşleşti</span>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-close-mapping" title="Paneli Gizle" style="padding: 4px 10px; font-size: 12px; margin-left: auto;">
+                            ✕ Gizle
+                        </button>
+                    </div>
+
+                    <div class="mapping-selectors">
+                        <div class="select-group">
+                            <label>Müşteri:</label>
+                            <select id="select-cust-col" class="custom-select"></select>
+                        </div>
+                        <div class="select-group">
+                            <label>Adres:</label>
+                            <select id="select-addr-col" class="custom-select"></select>
+                        </div>
+                        <div class="select-group">
+                            <label>İlçe:</label>
+                            <select id="select-dist-col" class="custom-select"></select>
+                        </div>
+                        <div class="select-group">
+                            <label>İl:</label>
+                            <select id="select-city-col" class="custom-select"></select>
+                        </div>
+                        <div class="select-group">
+                            <label>Telefon:</label>
+                            <select id="select-phone-col" class="custom-select"></select>
+                        </div>
+                        <div class="select-group">
+                            <label>Barkod:</label>
+                            <select id="select-barcode-col" class="custom-select"></select>
+                        </div>
+                        <div class="select-group">
+                            <label>Ürün Adı (Altta):</label>
+                            <select id="select-name-col" class="custom-select"></select>
+                        </div>
+                        <div class="select-group">
+                            <label>Adet:</label>
+                            <select id="select-qty-col" class="custom-select"></select>
+                        </div>
+                        <button class="btn btn-primary btn-sm" id="btn-apply-remap">Eşleştirmeyi Uygula</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 10x10cm Kartlar Grid -->
+            <section class="labels-grid-section" id="labels-container">
+                <div class="empty-state" id="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <h3>Henüz etiket yüklenmedi</h3>
+                    <p>Sipariş Excel dosyanızı yukarıya sürükleyin veya <strong>"Örnek Listeyi Yükle"</strong> butonuna basarak deneyin.</p>
+                </div>
+            </section>
+        </main>
+    
+    </div>
+</div>
+
 <!-- Toast Messages Container -->
 <div id="toast-container"></div>
 
+
+</div>
+
+    <!-- Yazdırma Alanı (@media print) -->
+    <div id="print-sheet-container" class="print-only"></div>
+
+    <!-- Ayarlar Modalı -->
+    <div class="modal-backdrop" id="modal-settings" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Etiket & Yazdırma Ayarları</h3>
+                <button class="modal-close" id="btn-close-settings">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Barkod Yüksekliği:</label>
+                    <select id="setting-barcode-height" class="custom-select">
+                        <option value="20">Kompakt (20 mm)</option>
+                        <option value="24" selected>Standart (24 mm - Önerilen)</option>
+                        <option value="30">Geniş (30 mm)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Ürün Adı Yazı Boyutu (Alt Kısım):</label>
+                    <select id="setting-font-size" class="custom-select">
+                        <option value="11">Küçük (11 pt)</option>
+                        <option value="12" selected>Standart (12 pt - Önerilen)</option>
+                        <option value="14">Büyük (14 pt)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="setting-show-border">
+                        <span>Etiket Etrafında İnce Kesim Çizgisi Göster</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-settings">İptal</button>
+                <button class="btn btn-primary" id="btn-save-settings">Ayarları Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manuel Etiket Modalı -->
+    <div class="modal-backdrop" id="modal-manual" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Manuel Kargo Etiketi Ekle</h3>
+                <button class="modal-close" id="btn-close-manual">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Müşteri Adı Soyadı: *</label>
+                    <input type="text" id="manual-cust" placeholder="Örn: mehmet ali tezcan">
+                </div>
+                <div class="form-group">
+                    <label>Adres: *</label>
+                    <input type="text" id="manual-addr" placeholder="Örn: çelebiler mahalesi 1409 sokak no:2 MERKEZ">
+                </div>
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label>İlçe:</label>
+                        <input type="text" id="manual-dist" placeholder="Örn: Isparta veya Merkez">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label>İl:</label>
+                        <input type="text" id="manual-city" placeholder="Örn: Isparta">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Telefon:</label>
+                    <input type="text" id="manual-phone" placeholder="Örn: 0(532) 231 78 65">
+                </div>
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label>Barkod (Kargo / Takip No): *</label>
+                        <input type="text" id="manual-barcode" placeholder="Örn: 1092488">
+                    </div>
+                    <div class="form-group w-100px">
+                        <label>Adet:</label>
+                        <input type="number" id="manual-qty" value="1" min="1" max="999">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Ürün Adı (Barkod Altına Eklenecek): *</label>
+                    <input type="text" id="manual-name" placeholder="Örn: Tefal FV5715 Easygliss Plus 2400 W Buharlı Ütü">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-manual">Vazgeç</button>
+                <button class="btn btn-success" id="btn-save-manual">Listeye Ekle</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js?v=1.2"></script>
+
 <script>
+    // ==============================================================
+    // ANA SEKME GEÇİŞ YÖNETİCİSİ (SİPARİŞ TOPLAMA <-> TOPLU BARKOD)
+    // ==============================================================
+    function switchMainTab(tab) {
+        const tabSiparis = document.getElementById('tab-nav-siparis');
+        const tabBarkod = document.getElementById('tab-nav-barkod');
+        const viewSiparis = document.getElementById('view-siparis');
+        const viewBarkod = document.getElementById('view-barkod');
+
+        if (!tabSiparis || !tabBarkod || !viewSiparis || !viewBarkod) return;
+
+        if (tab === 'barkod') {
+            tabSiparis.classList.remove('active');
+            tabBarkod.classList.add('active');
+            viewSiparis.style.display = 'none';
+            viewSiparis.classList.remove('active');
+            viewBarkod.style.display = 'block';
+            viewBarkod.classList.add('active');
+            document.body.classList.remove('active-tab-siparis');
+            document.body.classList.add('active-tab-barkod');
+            try { history.replaceState(null, null, '#barkod'); } catch (e) {}
+
+            // Toplu Barkod etiketlerini yeniden render et
+            if (window.barcodeAppState && typeof renderLabels === 'function' && window.barcodeAppState.items && window.barcodeAppState.items.length > 0) {
+                renderLabels();
+            }
+        } else {
+            tabBarkod.classList.remove('active');
+            tabSiparis.classList.add('active');
+            viewBarkod.style.display = 'none';
+            viewBarkod.classList.remove('active');
+            viewSiparis.style.display = 'block';
+            viewSiparis.classList.add('active');
+            document.body.classList.remove('active-tab-barkod');
+            document.body.classList.add('active-tab-siparis');
+            try { history.replaceState(null, null, '#siparis'); } catch (e) {}
+        }
+    }
+
+    // Hash kontrolü ile ilk sekme belirleme
+    window.addEventListener('DOMContentLoaded', () => {
+        const hash = window.location.hash;
+        if (hash === '#barkod') {
+            switchMainTab('barkod');
+        } else {
+            document.body.classList.add('active-tab-siparis');
+        }
+    });
+
     let currentResultData = null;
     let activeTabKey = 'all';
     let IS_CLOUD = false;

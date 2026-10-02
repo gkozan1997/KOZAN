@@ -257,6 +257,245 @@ def download_file():
     return send_file(path, as_attachment=True, download_name=os.path.basename(path))
 
 
+
+# ---------------------------------------------------------------------------
+# TOPLU BARKOD & 10x10cm TERMAL KARGO ETIKET MODULU (PROJE 3 ENTEGRASYONU)
+# ---------------------------------------------------------------------------
+import glob
+from werkzeug.utils import secure_filename
+from core_barcode import (
+    read_excel_or_csv as barcode_read_excel_or_csv,
+    extract_items as barcode_extract_items,
+    generate_labels_pdf as barcode_generate_labels_pdf,
+    create_sample_excel as barcode_create_sample_excel,
+    init_fonts as barcode_init_fonts,
+)
+
+# Termal fontlari baslat
+barcode_init_fonts()
+
+if IS_CLOUD:
+    BARCODE_UPLOAD_FOLDER = '/tmp'
+else:
+    BARCODE_UPLOAD_FOLDER = os.path.join(BASE_DIR, 'temp_barcode_uploads')
+os.makedirs(BARCODE_UPLOAD_FOLDER, exist_ok=True)
+
+BARCODE_SESSION_CACHE = {
+    'headers': [],
+    'data_rows': [],
+    'mapping': {},
+    'items': []
+}
+
+
+@app.route('/barkod')
+def barkod_view():
+    return render_template('index.html', is_cloud=IS_CLOUD, initial_tab='barkod')
+
+
+@app.route('/api/barcode/upload', methods=['POST'])
+def barcode_upload_file():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'message': 'Lütfen bir dosya seçin.'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'success': False, 'message': 'Dosya seçilmedi.'}), 400
+
+    filename = secure_filename(file.filename)
+    ext = os.path.splitext(filename)[1].lower()
+    if ext not in ['.xlsx', '.xls', '.csv']:
+        return jsonify({'success': False, 'message': 'Yalnızca .xlsx, .xls veya .csv dosyaları desteklenir.'}), 400
+
+    file_path = os.path.join(BARCODE_UPLOAD_FOLDER, f"upload_{secrets.token_hex(4)}_{filename}")
+    file.save(file_path)
+
+    try:
+        headers, data_rows, mapping = barcode_read_excel_or_csv(file_path)
+        if not headers or not data_rows:
+            return jsonify({'success': False, 'message': 'Dosyada geçerli veri veya başlık satırı bulunamadı.'}), 400
+
+        items = barcode_extract_items(headers, data_rows, mapping)
+
+        BARCODE_SESSION_CACHE['headers'] = headers
+        BARCODE_SESSION_CACHE['data_rows'] = data_rows
+        BARCODE_SESSION_CACHE['mapping'] = mapping
+        BARCODE_SESSION_CACHE['items'] = items
+
+        total_labels = sum(item.get('quantity', 1) for item in items)
+
+        return jsonify({
+            'success': True,
+            'filename': filename,
+            'headers': headers,
+            'mapping': mapping,
+            'items': items,
+            'total_items': len(items),
+            'total_labels': total_labels
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Dosya işlenirken hata oluştu: {str(e)}'}), 500
+    finally:
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except Exception:
+                pass
+
+
+@app.route('/api/barcode/remap', methods=['POST'])
+def barcode_remap_columns():
+    data = request.get_json(silent=True) or {}
+    headers = BARCODE_SESSION_CACHE.get('headers', [])
+    data_rows = BARCODE_SESSION_CACHE.get('data_rows', [])
+
+    if not headers or not data_rows:
+        return jsonify({'success': False, 'message': 'Aktif kargo dosyası bulunamadı.'}), 400
+
+    def parse_idx(key):
+        val = data.get(key)
+        return int(val) if val is not None and str(val).isdigit() else None
+
+    mapping = {
+        'cust_idx': parse_idx('cust_idx'),
+        'addr_idx': parse_idx('addr_idx'),
+        'dist_idx': parse_idx('dist_idx'),
+        'city_idx': parse_idx('city_idx'),
+        'phone_idx': parse_idx('phone_idx'),
+        'barcode_idx': parse_idx('barcode_idx'),
+        'name_idx': parse_idx('name_idx'),
+        'qty_idx': parse_idx('qty_idx'),
+    }
+
+    items = barcode_extract_items(headers, data_rows, mapping)
+    BARCODE_SESSION_CACHE['mapping'] = mapping
+    BARCODE_SESSION_CACHE['items'] = items
+
+    total_labels = sum(item.get('quantity', 1) for item in items)
+    return jsonify({
+        'success': True,
+        'mapping': mapping,
+        'items': items,
+        'total_items': len(items),
+        'total_labels': total_labels
+    })
+
+
+@app.route('/api/barcode/load-sample', methods=['GET'])
+def barcode_load_sample_data():
+    sample_bytes = barcode_create_sample_excel()
+    sample_path = os.path.join(BARCODE_UPLOAD_FOLDER, f'sample_{secrets.token_hex(4)}.xlsx')
+    with open(sample_path, 'wb') as f:
+        f.write(sample_bytes)
+
+    try:
+        headers, data_rows, mapping = barcode_read_excel_or_csv(sample_path)
+        items = barcode_extract_items(headers, data_rows, mapping)
+
+        BARCODE_SESSION_CACHE['headers'] = headers
+        BARCODE_SESSION_CACHE['data_rows'] = data_rows
+        BARCODE_SESSION_CACHE['mapping'] = mapping
+        BARCODE_SESSION_CACHE['items'] = items
+
+        total_labels = sum(item.get('quantity', 1) for item in items)
+        return jsonify({
+            'success': True,
+            'filename': 'Ornek_Kargo_Listesi.xlsx',
+            'headers': headers,
+            'mapping': mapping,
+            'items': items,
+            'total_items': len(items),
+            'total_labels': total_labels
+        })
+    finally:
+        if os.path.exists(sample_path):
+            try:
+                os.remove(sample_path)
+            except Exception:
+                pass
+
+
+@app.route('/api/barcode/download-sample-excel', methods=['GET'])
+def barcode_download_sample_excel():
+    buf_bytes = barcode_create_sample_excel()
+    return send_file(
+        io.BytesIO(buf_bytes),
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='Ornek_Kargo_Listesi.xlsx'
+    )
+
+
+@app.route('/api/barcode/load-downloads', methods=['GET'])
+def barcode_load_recent_downloads():
+    if IS_CLOUD:
+        return jsonify({'success': False, 'message': 'Bulut sürümünde yerel İndirilenler klasörü taranamıyor. Lütfen dosya yükleyin.'}), 501
+
+    downloads_path = os.path.join(os.path.expanduser('~'), 'Downloads')
+    if not os.path.exists(downloads_path):
+        return jsonify({'success': False, 'message': 'İndirilenler klasörü bulunamadı.'}), 404
+
+    patterns = ['*.xlsx', '*.xls', '*.csv']
+    candidates = []
+    for pat in patterns:
+        candidates.extend(glob.glob(os.path.join(downloads_path, pat)))
+
+    candidates = [f for f in candidates if not os.path.basename(f).startswith('~$')]
+    if not candidates:
+        return jsonify({'success': False, 'message': 'İndirilenler klasöründe uygun Excel/CSV dosyası bulunamadı.'}), 404
+
+    latest_file = max(candidates, key=os.path.getmtime)
+    filename = os.path.basename(latest_file)
+
+    try:
+        headers, data_rows, mapping = barcode_read_excel_or_csv(latest_file)
+        if not headers or not data_rows:
+            return jsonify({'success': False, 'message': f'{filename} dosyasında geçerli veri bulunamadı.'}), 400
+
+        items = barcode_extract_items(headers, data_rows, mapping)
+        BARCODE_SESSION_CACHE['headers'] = headers
+        BARCODE_SESSION_CACHE['data_rows'] = data_rows
+        BARCODE_SESSION_CACHE['mapping'] = mapping
+        BARCODE_SESSION_CACHE['items'] = items
+
+        total_labels = sum(item.get('quantity', 1) for item in items)
+        return jsonify({
+            'success': True,
+            'filename': filename,
+            'headers': headers,
+            'mapping': mapping,
+            'items': items,
+            'total_items': len(items),
+            'total_labels': total_labels
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Dosya okunurken hata: {str(e)}'}), 500
+
+
+@app.route('/api/barcode/generate-pdf', methods=['POST'])
+def barcode_generate_pdf_endpoint():
+    data = request.get_json(silent=True) or {}
+    items = data.get('items', [])
+    options = data.get('options', {})
+
+    if not items:
+        items = BARCODE_SESSION_CACHE.get('items', [])
+
+    if not items:
+        return jsonify({'success': False, 'message': 'PDF üretilecek sipariş listesi bulunamadı.'}), 400
+
+    try:
+        pdf_bytes = barcode_generate_labels_pdf(items, options)
+        return send_file(
+            io.BytesIO(pdf_bytes),
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name='Kargo_Barkod_10x10cm.pdf'
+        )
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'PDF oluşturulamadı: {str(e)}'}), 500
+
+
 def open_browser():
     webbrowser.open_new('http://127.0.0.1:5000')
 

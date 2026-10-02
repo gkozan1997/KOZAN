@@ -175,5 +175,26 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * Ürün aileleri ise depoda toplama kolaylığı sağlamak adına öncelikle en yüksek sipariş adedine (`max_qty`), adetler eşitse ürün adına göre alfabetik olarak sıralanır.
   * Bu sıralama hem Web canlı ekranında ve A4 baskıda (`grouped_items`), hem Excel genel listesinde, hem Beko bağımsız dosyasında hem de her markanın kendi sekmesinde geçerlidir.
 
+---
+
+## 11. Toplu Barkod & Kargo Etiketi Modülü Entegrasyonu (Sekmeli Çatı Standardı)
+
+* **Birleşik Mimari (Proje 1 & Proje 3 Birleşimi):**
+  - Proje 1 (`projem`) ana başlık altına üst düzey **Sekme Çubuğu (`.main-tabs-nav`)** eklenmiştir:
+    - **1. Sekme (`#tab-nav-siparis`):** `📦 Sipariş & Ürün Toplama` (Ana Toplama Listesi, Beko/Grundig/Lenovo ayrımı, A4 dikey baskı).
+    - **2. Sekme (`#tab-nav-barkod`):** `🏷️ Toplu Barkod & Kargo Etiketi` (10cm x 10cm Termal Rulo Baskı formatı).
+* **Sekme Yönetimi ve URL Hash (`switchMainTab`):**
+  - Sekme geçişleri sayfa yenilenmeden dinamik olarak gerçekleşir (`switchMainTab('siparis')` / `switchMainTab('barkod')`).
+  - URL hash `#siparis` ve `#barkod` senkronize edilir; `/barkod` rotası doğrudan barkod sekmesini açar.
+* **Toplu Barkod Çekirdeği (`core_barcode.py`):**
+  - Excel/CSV otomatik sütun algılama (Alıcı, Adres, İlçe, İl, Telefon, Barkod/Takip No, Ürün Adı, Adet).
+  - Manuel dinamik sütun eşleştirme çubuğu (`#mapping-bar`).
+  - JsBarcode ile istemci tarafında SVG Code128 canlı etiket önizleme.
+  - ReportLab ile 100mm x 100mm yüksek kaliteli PDF üretimi (`/api/barcode/generate-pdf`).
+* **İzole Çift Baskı Standardı (`@media print`):**
+  - Sipariş Toplama sekmesinde iken standart A4 dikey baskı kuralları çalışır.
+  - Barkod sekmesinde iken `body.active-tab-barkod` devreye girerek `@page { size: 100mm 100mm; margin: 0; }` termal yazıcı formatında sayfa sayfa baskı verir. İki baskı sistemi asla birbirine karışmaz.
+
+
 
 
