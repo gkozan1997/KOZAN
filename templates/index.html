@@ -1677,6 +1677,9 @@
     <div class="app-main-viewport">
 
 
+    <!-- 1. GÖRÜNÜM: SİPARİŞ & ÜRÜN TOPLAMA -->
+    <div id="view-siparis" class="app-view-panel active">
+        <div class="container">
 <div class="container">
     <!-- Header -->
     <header>
@@ -1699,70 +1702,6 @@
             </div>
         </div>
     </header>
-
-    <!-- Main App Navigation Tabs (Proje 1 & Proje 3 Birlesimi) -->
-
-    <!-- Main App Navigation Tabs (3 ANA MODUL SEKME ÇUBUĞU) -->
-    <nav class="main-tabs-nav no-print" id="main-tabs-nav">
-        <!-- 1. Sekme -->
-        <button class="main-tab-btn active" id="tab-nav-siparis" onclick="switchMainTab('siparis')">
-            <div class="tab-btn-inner">
-                <div class="tab-btn-icon icon-siparis">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                </div>
-                <div class="tab-btn-text">
-                    <span class="tab-btn-title">Sipariş & Ürün Toplama</span>
-                    <span class="tab-btn-sub">Pazaryeri Konsolidasyonu & A4 Baskı</span>
-                </div>
-                <span class="tab-badge-pill pill-cyan">A4 Dikey</span>
-            </div>
-        </button>
-
-        <!-- 2. Sekme -->
-        <button class="main-tab-btn" id="tab-nav-barkod" onclick="switchMainTab('barkod')">
-            <div class="tab-btn-inner">
-                <div class="tab-btn-icon icon-barkod">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <path d="M3 5v14"></path>
-                        <path d="M8 5v14"></path>
-                        <path d="M12 5v14"></path>
-                        <path d="M17 5v14"></path>
-                        <path d="M21 5v14"></path>
-                    </svg>
-                </div>
-                <div class="tab-btn-text">
-                    <span class="tab-btn-title">Toplu Barkod & Kargo Etiketi</span>
-                    <span class="tab-btn-sub">Müşteri + Takip Barkodu + Ürün Adı</span>
-                </div>
-                <span class="tab-badge-pill pill-emerald">10x10cm Termal</span>
-            </div>
-        </button>
-
-        <!-- 3. Sekme: Oliz Kampanya -->
-        <button class="main-tab-btn" id="tab-nav-oliz" onclick="switchMainTab('oliz')">
-            <div class="tab-btn-inner">
-                <div class="tab-btn-icon icon-oliz">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
-                </div>
-                <div class="tab-btn-text">
-                    <span class="tab-btn-title">Oliz Kampanya & İndirim</span>
-                    <span class="tab-btn-sub">Beko & Arçelik Paket & Kupon</span>
-                </div>
-                <span class="tab-badge-pill pill-amber">Fırsat & Analiz</span>
-            </div>
-        </button>
-    </nav>
-
-
-    
-
-    <!-- SEKME 1: SİPARİŞ & ÜRÜN TOPLAMA GÖRÜNÜMÜ -->
-    <div id="view-siparis" class="app-view-panel active">
-
 
     <!-- Operational Rules Bar -->
     <div class="rules-bar">
@@ -2001,10 +1940,11 @@
         </div>
     </div>
 </div>
+        </div> <!-- .container -->
+    </div> <!-- #view-siparis -->
 
-    <!-- SEKME 2: TOPLU BARKOD & KARGO ETİKETİ GÖRÜNÜMÜ -->
+    <!-- 2. GÖRÜNÜM: TOPLU BARKOD & KARGO ETİKETİ -->
     <div id="view-barkod" class="app-view-panel" style="display: none;">
-        
     <div class="app-layout no-print">
         <!-- Header -->
         <header class="app-header">
@@ -2179,11 +2119,105 @@
     
     </div>
 
-        <!-- 3. GÖRÜNÜM: OLİZ KAMPANYA & İNDİRİM ANALİZİ -->
-        <div id="view-oliz" class="app-view-panel" style="display: none;">
-            
+    <!-- Yazdırma Alanı (@media print) -->
+    <div id="print-sheet-container" class="print-only"></div>
 
-  <div class="container">
+    <!-- Ayarlar Modalı -->
+    <div class="modal-backdrop" id="modal-settings" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Etiket & Yazdırma Ayarları</h3>
+                <button class="modal-close" id="btn-close-settings">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Barkod Yüksekliği:</label>
+                    <select id="setting-barcode-height" class="custom-select">
+                        <option value="20">Kompakt (20 mm)</option>
+                        <option value="24" selected>Standart (24 mm - Önerilen)</option>
+                        <option value="30">Geniş (30 mm)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Ürün Adı Yazı Boyutu (Alt Kısım):</label>
+                    <select id="setting-font-size" class="custom-select">
+                        <option value="11">Küçük (11 pt)</option>
+                        <option value="12" selected>Standart (12 pt - Önerilen)</option>
+                        <option value="14">Büyük (14 pt)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="setting-show-border">
+                        <span>Etiket Etrafında İnce Kesim Çizgisi Göster</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-settings">İptal</button>
+                <button class="btn btn-primary" id="btn-save-settings">Ayarları Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manuel Etiket Modalı -->
+    <div class="modal-backdrop" id="modal-manual" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Manuel Kargo Etiketi Ekle</h3>
+                <button class="modal-close" id="btn-close-manual">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Müşteri Adı Soyadı: *</label>
+                    <input type="text" id="manual-cust" placeholder="Örn: mehmet ali tezcan">
+                </div>
+                <div class="form-group">
+                    <label>Adres: *</label>
+                    <input type="text" id="manual-addr" placeholder="Örn: çelebiler mahalesi 1409 sokak no:2 MERKEZ">
+                </div>
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label>İlçe:</label>
+                        <input type="text" id="manual-dist" placeholder="Örn: Isparta veya Merkez">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label>İl:</label>
+                        <input type="text" id="manual-city" placeholder="Örn: Isparta">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Telefon:</label>
+                    <input type="text" id="manual-phone" placeholder="Örn: 0(532) 231 78 65">
+                </div>
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label>Barkod (Kargo / Takip No): *</label>
+                        <input type="text" id="manual-barcode" placeholder="Örn: 1092488">
+                    </div>
+                    <div class="form-group w-100px">
+                        <label>Adet:</label>
+                        <input type="number" id="manual-qty" value="1" min="1" max="999">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Ürün Adı (Barkod Altına Eklenecek): *</label>
+                    <input type="text" id="manual-name" placeholder="Örn: Tefal FV5715 Easygliss Plus 2400 W Buharlı Ütü">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-manual">Vazgeç</button>
+                <button class="btn btn-success" id="btn-save-manual">Listeye Ekle</button>
+            </div>
+        </div>
+    </div>
+    </div> <!-- #view-barkod -->
+
+    <!-- 3. GÖRÜNÜM: OLİZ KAMPANYA & İNDİRİM ANALİZİ -->
+    <div id="view-oliz" class="app-view-panel oliz-view-scope" style="display: none;">
+  <div class="oliz-container">
     <!-- HEADER BAR -->
     <header class="header-bar">
       <div class="brand-wrapper">
@@ -2397,116 +2431,7 @@
     </section>
 
   </div>
-
-  <!-- EXCEL UPLOAD MODAL -->
-  
-        </div>
-
-</div>
-
-<!-- Toast Messages Container -->
-<div id="toast-container"></div>
-
-
-</div>
-
-    <!-- Yazdırma Alanı (@media print) -->
-    <div id="print-sheet-container" class="print-only"></div>
-
-    <!-- Ayarlar Modalı -->
-    <div class="modal-backdrop" id="modal-settings" style="display: none;">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>Etiket & Yazdırma Ayarları</h3>
-                <button class="modal-close" id="btn-close-settings">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Barkod Yüksekliği:</label>
-                    <select id="setting-barcode-height" class="custom-select">
-                        <option value="20">Kompakt (20 mm)</option>
-                        <option value="24" selected>Standart (24 mm - Önerilen)</option>
-                        <option value="30">Geniş (30 mm)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Ürün Adı Yazı Boyutu (Alt Kısım):</label>
-                    <select id="setting-font-size" class="custom-select">
-                        <option value="11">Küçük (11 pt)</option>
-                        <option value="12" selected>Standart (12 pt - Önerilen)</option>
-                        <option value="14">Büyük (14 pt)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="setting-show-border">
-                        <span>Etiket Etrafında İnce Kesim Çizgisi Göster</span>
-                    </label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="btn-cancel-settings">İptal</button>
-                <button class="btn btn-primary" id="btn-save-settings">Ayarları Kaydet</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Manuel Etiket Modalı -->
-    <div class="modal-backdrop" id="modal-manual" style="display: none;">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>Manuel Kargo Etiketi Ekle</h3>
-                <button class="modal-close" id="btn-close-manual">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Müşteri Adı Soyadı: *</label>
-                    <input type="text" id="manual-cust" placeholder="Örn: mehmet ali tezcan">
-                </div>
-                <div class="form-group">
-                    <label>Adres: *</label>
-                    <input type="text" id="manual-addr" placeholder="Örn: çelebiler mahalesi 1409 sokak no:2 MERKEZ">
-                </div>
-                <div class="form-row">
-                    <div class="form-group flex-1">
-                        <label>İlçe:</label>
-                        <input type="text" id="manual-dist" placeholder="Örn: Isparta veya Merkez">
-                    </div>
-                    <div class="form-group flex-1">
-                        <label>İl:</label>
-                        <input type="text" id="manual-city" placeholder="Örn: Isparta">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Telefon:</label>
-                    <input type="text" id="manual-phone" placeholder="Örn: 0(532) 231 78 65">
-                </div>
-                <div class="form-row">
-                    <div class="form-group flex-1">
-                        <label>Barkod (Kargo / Takip No): *</label>
-                        <input type="text" id="manual-barcode" placeholder="Örn: 1092488">
-                    </div>
-                    <div class="form-group w-100px">
-                        <label>Adet:</label>
-                        <input type="number" id="manual-qty" value="1" min="1" max="999">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Ürün Adı (Barkod Altına Eklenecek): *</label>
-                    <input type="text" id="manual-name" placeholder="Örn: Tefal FV5715 Easygliss Plus 2400 W Buharlı Ütü">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="btn-cancel-manual">Vazgeç</button>
-                <button class="btn btn-success" id="btn-save-manual">Listeye Ekle</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="/static/js/app.js?v=1.2"></script>
-
+    <div id="toast-container"></div>
 
 <div class="modal-overlay" id="upload-modal">
     <div class="modal-content">
@@ -2528,15 +2453,17 @@
 
       <div id="upload-status" style="font-size: 13px; text-align: center; margin-top: 10px;"></div>
     </div>
-  </div>
+    </div> <!-- #view-oliz -->
 
-  <script src="/static/js/main.js"></script>
+    </div> <!-- .app-main-viewport -->
+</div> <!-- .app-layout-wrapper -->
+
 
 <script>
     
     
     // ==============================================================
-    // 3 SAYFA GEÇİŞ YÖNETİCİSİ (HEM SOL MENÜ HEM ÜST SEKME ÇUBUĞU)
+    // 3 SAYFA GEÇİŞ YÖNETİCİSİ (SOL KENAR MENÜSÜ DASHBOARD)
     // ==============================================================
     function switchMainTab(tab) {
         // Sol Menü Butonları
@@ -2544,18 +2471,13 @@
         const sideBarkod = document.getElementById('side-nav-barkod');
         const sideOliz = document.getElementById('side-nav-oliz');
 
-        // Üst Sekme Butonları
-        const tabSiparis = document.getElementById('tab-nav-siparis');
-        const tabBarkod = document.getElementById('tab-nav-barkod');
-        const tabOliz = document.getElementById('tab-nav-oliz');
-
         // Sayfa / Görünüm Konteynırları
         const viewSiparis = document.getElementById('view-siparis');
         const viewBarkod = document.getElementById('view-barkod');
         const viewOliz = document.getElementById('view-oliz');
 
         // Tüm butonların active sınıfını temizle
-        [sideSiparis, sideBarkod, sideOliz, tabSiparis, tabBarkod, tabOliz].forEach(el => {
+        [sideSiparis, sideBarkod, sideOliz].forEach(el => {
             if (el) el.classList.remove('active');
         });
 
@@ -2572,7 +2494,6 @@
 
         if (tab === 'barkod') {
             if (sideBarkod) sideBarkod.classList.add('active');
-            if (tabBarkod) tabBarkod.classList.add('active');
             if (viewBarkod) { viewBarkod.style.display = 'block'; viewBarkod.classList.add('active'); }
             document.body.classList.add('active-tab-barkod');
             try { history.replaceState(null, null, '#barkod'); } catch (e) {}
@@ -2582,22 +2503,46 @@
             }
         } else if (tab === 'oliz') {
             if (sideOliz) sideOliz.classList.add('active');
-            if (tabOliz) tabOliz.classList.add('active');
             if (viewOliz) { viewOliz.style.display = 'block'; viewOliz.classList.add('active'); }
             document.body.classList.add('active-tab-oliz');
             try { history.replaceState(null, null, '#oliz'); } catch (e) {}
 
-            if (typeof loadStats === 'function') {
-                loadStats();
+            loadOlizStats();
+            if (typeof loadCatalog === 'function') {
+                loadCatalog(typeof currentCatalogType !== 'undefined' ? currentCatalogType : 'tekil');
             }
         } else {
             if (sideSiparis) sideSiparis.classList.add('active');
-            if (tabSiparis) tabSiparis.classList.add('active');
             if (viewSiparis) { viewSiparis.style.display = 'block'; viewSiparis.classList.add('active'); }
             document.body.classList.add('active-tab-siparis');
             try { history.replaceState(null, null, '#siparis'); } catch (e) {}
         }
     }
+
+    async function loadOlizStats() {
+        try {
+            const res = await fetch('/api/oliz/stats');
+            const data = await res.json();
+            if (data.success && data.stats) {
+                const s = data.stats;
+                const elTekil = document.getElementById('stat-tekil');
+                const elPaket = document.getElementById('stat-paket');
+                const elToptan = document.getElementById('stat-toptan');
+                const elTotal = document.getElementById('stat-total');
+                const elBadge = document.getElementById('active-file-badge');
+                if (elTekil) elTekil.innerText = s.tekil_count || 0;
+                if (elPaket) elPaket.innerText = s.paket_count || 0;
+                if (elToptan) elToptan.innerText = s.toptan_count || 0;
+                if (elTotal) elTotal.innerText = s.total_products || 0;
+                if (elBadge && s.file_info && s.file_info.filename) {
+                    elBadge.innerHTML = `📁 ${s.file_info.filename}`;
+                }
+            }
+        } catch (e) {
+            console.warn('Oliz stats error:', e);
+        }
+    }
+    window.loadStats = loadOlizStats;
 
 
     // Hash kontrolü & Tarih Başlatma
