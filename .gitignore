@@ -17,6 +17,10 @@ dist/
 .claude/
 .vscode/
 _tasarim_yedek/
+_YEDEKLER/
+*.zip
+GERI_YUKLE_*.bat
+
 
 # Gecici test/deneme betikleri
 _*.py
