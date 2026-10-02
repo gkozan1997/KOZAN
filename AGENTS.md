@@ -215,10 +215,13 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   - **İki Yönlü Durum Senkronizasyonu (`switchMainTab`):** Sekme geçişlerinde hem masaüstü sol menü, hem mobil alt menü, hem de URL hash'i eş zamanlı aktifleşir.
   - **Güvenli Alan (Safe Area Inset):** iPhone çentiği ve alt ev çubuğu için `viewport-fit=cover` ve `padding-bottom: max(4px, env(safe-area-inset-bottom))` tam uyumludur.
 * **Modül Bazlı Mobil Uyarlamalar:**
-  - **Sipariş & Toplama Modülü:**
+  - **Sipariş & Toplama Modülü (Mobil Tablo Standardı):**
     - Çift sarmal container temizlendi; padding mobil ekranlar için optimize edildi.
     - KPI özet kartları kompakt 2x2 grid yapısına dönüştürüldü.
-    - Tablo sütunları (`Miktar`, `Ürün Adı`, `Stok Kodu`) mobil ekran genişliğine tam sığacak dinamik genişlik ve metin sarma kurallarına kavuştu.
+    - **`table-layout: fixed !important` Standardı:** 1. Tablo (Diğer Markalar) ile 2. Tablo (Beko, Grundig & Lenovo) kolonları mobilde `50px` (Miktar), `auto` (Ürün Adı) ve `96px` (Stok Kodu) olarak kilitlendi; dikey sütun çizgilerinin kayması ve hizasızlıklar tamamen önlendi.
+    - **Stok Kodu Okunabilirlik Standardı:** `word-break: break-all` kaldırıldı; stok kodlarının harf ve rakamlarının dikeyde bölünmesi engellendi, `code-badge` içinde tek parça ve okunabilir monospace format sağlandı.
+    - **Dokunmatik Toplama Kontrolü (`toggleRowCollected`):** Depo personeli telefonda ürünü aldığında satıra dokunarak yeşil vurgu ve üstü çizili olarak işaretleyebilir; baskıda bu durum asla görünmez.
+    - **Baskı İzolasyonu (`@media screen and (max-width: 768px)`):** Mobil ekran kuralları `@media print` A4 dikey baskı motoruna asla sızmaz, cep telefonundan dahi yazdırılsa tam 2 sayfa A4 standardı kusursuz korunur.
     - Araç çubuğu (toolbar) butonları 2 sütunlu dokunmatik grid olarak düzenlendi.
     - Bildirim pencereleri (toast) alt menü dok'unun hemen üzerinde görüntülenecek şekilde konumlandırıldı.
   - **Toplu Barkod & Kargo Modülü:**
