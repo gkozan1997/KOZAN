@@ -13,8 +13,6 @@ Bu doküman, projenin mimari yapısını, pazaryeri sipariş formatlarını, iş
 * **Başlatıcılar:**
   * Proje içindeki `baslat.bat`.
   * Masaüstündeki `Siparis_Toplama_Programi.bat`.
-  * Derlenmiş bağımsız paket: `dist/SiparisToplama/SiparisToplama.exe` ve `C:\Users\ugurk\OneDrive\Masaüstü\Siparis`.
-  * Taşınabilir zip: `C:\Users\ugurk\OneDrive\Masaüstü\Siparis_Toplama_Programi_Paketi.zip`.
 
 ---
 
