@@ -222,6 +222,7 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - **Stok Kodu Okunabilirlik Standardı:** `word-break: break-all` kaldırıldı; stok kodlarının harf ve rakamlarının dikeyde bölünmesi engellendi, `code-badge` içinde tek parça ve okunabilir monospace format sağlandı.
     - **Dokunmatik Toplama Kontrolü (`toggleRowCollected`):** Depo personeli telefonda ürünü aldığında satıra dokunarak yeşil vurgu ve üstü çizili olarak işaretleyebilir; baskıda bu durum asla görünmez.
     - **Baskı İzolasyonu (`@media screen and (max-width: 768px)`):** Mobil ekran kuralları `@media print` A4 dikey baskı motoruna asla sızmaz, cep telefonundan dahi yazdırılsa tam 2 sayfa A4 standardı kusursuz korunur.
+    - **Mobil A4 Yazdırma & Boş Sayfa İzolasyonu:** `.print-page-block` üzerindeki `break-inside: avoid` kaldırıldı; tarayıcının 1. sayfayı boş geçerek içeriği 2. sayfaya fırlatması engellendi. CSS'in en sonuna eklenen nihai `@media print` bloğu ile `.mobile-bottom-nav` ve `.mobile-top-bar` yazdırılan A4 çıktısından kesin olarak silindi; siyah mobil barın tablonun ortasına yapışması tamamen önlendi.
     - Araç çubuğu (toolbar) butonları 2 sütunlu dokunmatik grid olarak düzenlendi.
     - Bildirim pencereleri (toast) alt menü dok'unun hemen üzerinde görüntülenecek şekilde konumlandırıldı.
   - **Toplu Barkod & Kargo Modülü:**
