@@ -233,7 +233,8 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Hızlı deneme butonları yatay kaydırılabilir dokunmatik çip şeridi haline getirildi.
     - 4 ürün giriş kutusu ve aksiyon butonları dikey akışa optimize edildi.
 * **Masaüstü ve Baskı Koruma Garantisi:**
-  - Masaüstü görünüm (`> 768px`) ve A4 / 100x100mm termal baskı kuralları (`@media print`) bu geliştirmelerden bağımsız olarak %100 korunmaktadır.
+  - Masaüstü görünüm (`> 768px` ve laptop ekranları dahil): `.app-sidebar` her zaman sol tarafta dikey (sticky, 260px genişlik) olarak kalır, asla yatay çubuğa dönüşmez. `.mobile-top-bar` ve `.mobile-bottom-nav` masaüstünde daima gizlidir (`display: none !important;`).
+  - A4 / 100x100mm termal baskı kuralları (`@media print`) bu geliştirmelerden bağımsız olarak %100 korunmaktadır.
 
 
 
