@@ -35,4 +35,6 @@ _*.py
 Siparis/
 *.xls
 *.xlsx
+!data/*.xlsx
 *.pdf
+

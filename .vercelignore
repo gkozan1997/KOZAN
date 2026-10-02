@@ -10,6 +10,7 @@ Siparis/
 Downloads/
 *.xls
 *.xlsx
+!data/*.xlsx
 !templates/**
 
 # --- DERLEME CIKTILARI ---

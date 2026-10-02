@@ -5,8 +5,10 @@ import time
 import secrets
 import threading
 import traceback
+import tempfile
 import webbrowser
 from collections import OrderedDict
+from werkzeug.utils import secure_filename
 
 from flask import Flask, render_template, request, jsonify, send_file
 
@@ -70,7 +72,7 @@ def pop_download(token):
 
 @app.route('/')
 def index():
-    return render_template('index.html', is_cloud=IS_CLOUD, stats=campaign_engine.get_stats())
+    return render_template('index.html', is_cloud=IS_CLOUD)
 
 
 @app.route('/api/status', methods=['GET'])
@@ -275,10 +277,13 @@ from core_barcode import (
 barcode_init_fonts()
 
 if IS_CLOUD:
-    BARCODE_UPLOAD_FOLDER = '/tmp'
+    BARCODE_UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'barcode_uploads')
 else:
     BARCODE_UPLOAD_FOLDER = os.path.join(BASE_DIR, 'temp_barcode_uploads')
-os.makedirs(BARCODE_UPLOAD_FOLDER, exist_ok=True)
+try:
+    os.makedirs(BARCODE_UPLOAD_FOLDER, exist_ok=True)
+except Exception:
+    pass
 
 BARCODE_SESSION_CACHE = {
     'headers': [],
@@ -502,17 +507,39 @@ def barcode_generate_pdf_endpoint():
 # ---------------------------------------------------------------------------
 from core_campaign import CampaignEngine
 
-OLIZ_DATA_DIR = os.path.join(BASE_DIR, "data")
-OLIZ_UPLOAD_DIR = os.path.join(BASE_DIR, "temp_uploads")
-os.makedirs(OLIZ_DATA_DIR, exist_ok=True)
-os.makedirs(OLIZ_UPLOAD_DIR, exist_ok=True)
+if IS_CLOUD:
+    OLIZ_DATA_DIR = os.path.join(BASE_DIR, "data")
+    OLIZ_UPLOAD_DIR = os.path.join(tempfile.gettempdir(), "oliz_uploads")
+else:
+    OLIZ_DATA_DIR = os.path.join(BASE_DIR, "data")
+    OLIZ_UPLOAD_DIR = os.path.join(BASE_DIR, "temp_uploads")
+    try:
+        os.makedirs(OLIZ_DATA_DIR, exist_ok=True)
+    except Exception:
+        pass
 
-default_campaign_file = os.path.join(OLIZ_DATA_DIR, "1-15_EKIM.xlsx")
-if not os.path.exists(default_campaign_file):
-    c_files = [os.path.join(OLIZ_DATA_DIR, f) for f in os.listdir(OLIZ_DATA_DIR) if f.endswith(".xlsx")]
-    default_campaign_file = c_files[0] if c_files else None
+try:
+    os.makedirs(OLIZ_UPLOAD_DIR, exist_ok=True)
+except Exception:
+    pass
 
-campaign_engine = CampaignEngine(default_campaign_file)
+default_campaign_file = None
+if os.path.exists(OLIZ_DATA_DIR):
+    candidate = os.path.join(OLIZ_DATA_DIR, "1-15_EKIM.xlsx")
+    if os.path.exists(candidate):
+        default_campaign_file = candidate
+    else:
+        try:
+            c_files = [os.path.join(OLIZ_DATA_DIR, f) for f in os.listdir(OLIZ_DATA_DIR) if f.endswith(".xlsx")]
+            default_campaign_file = c_files[0] if c_files else None
+        except Exception:
+            default_campaign_file = None
+
+try:
+    campaign_engine = CampaignEngine(default_campaign_file)
+except Exception as e:
+    print(f"Oliz CampaignEngine init fallback: {e}")
+    campaign_engine = CampaignEngine(None)
 
 @app.context_processor
 def inject_global_template_context():
@@ -523,11 +550,9 @@ def inject_global_template_context():
     return dict(stats=st)
 
 
-
 @app.route('/oliz')
 def oliz_view():
-    stats = campaign_engine.get_stats()
-    return render_template('index.html', is_cloud=IS_CLOUD, initial_tab='oliz', stats=stats)
+    return render_template('index.html', is_cloud=IS_CLOUD, initial_tab='oliz')
 
 
 @app.route('/api/oliz/stats', methods=['GET'])
@@ -612,7 +637,7 @@ def oliz_upload_endpoint():
         return jsonify({'success': False, 'message': 'Lütfen geçerli bir Excel (.xlsx / .xls) dosyası yükleyin.'}), 400
 
     filename = secure_filename(file.filename) or 'kampanya.xlsx'
-    dest_path = os.path.join(OLIZ_DATA_DIR, filename)
+    dest_path = os.path.join(OLIZ_UPLOAD_DIR, filename)
     file.save(dest_path)
     try:
         campaign_engine.load_from_excel(dest_path)
