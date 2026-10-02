@@ -70,7 +70,7 @@ def pop_download(token):
 
 @app.route('/')
 def index():
-    return render_template('index.html', is_cloud=IS_CLOUD)
+    return render_template('index.html', is_cloud=IS_CLOUD, stats=campaign_engine.get_stats())
 
 
 @app.route('/api/status', methods=['GET'])
@@ -494,6 +494,138 @@ def barcode_generate_pdf_endpoint():
         )
     except Exception as e:
         return jsonify({'success': False, 'message': f'PDF oluşturulamadı: {str(e)}'}), 500
+
+
+
+# ---------------------------------------------------------------------------
+# OLIZ KAMPANYA & INDIRIM ANALIZ MODULU (PROJE 3 ENTEGRASYONU)
+# ---------------------------------------------------------------------------
+from core_campaign import CampaignEngine
+
+OLIZ_DATA_DIR = os.path.join(BASE_DIR, "data")
+OLIZ_UPLOAD_DIR = os.path.join(BASE_DIR, "temp_uploads")
+os.makedirs(OLIZ_DATA_DIR, exist_ok=True)
+os.makedirs(OLIZ_UPLOAD_DIR, exist_ok=True)
+
+default_campaign_file = os.path.join(OLIZ_DATA_DIR, "1-15_EKIM.xlsx")
+if not os.path.exists(default_campaign_file):
+    c_files = [os.path.join(OLIZ_DATA_DIR, f) for f in os.listdir(OLIZ_DATA_DIR) if f.endswith(".xlsx")]
+    default_campaign_file = c_files[0] if c_files else None
+
+campaign_engine = CampaignEngine(default_campaign_file)
+
+@app.context_processor
+def inject_global_template_context():
+    try:
+        st = campaign_engine.get_stats()
+    except Exception:
+        st = {}
+    return dict(stats=st)
+
+
+
+@app.route('/oliz')
+def oliz_view():
+    stats = campaign_engine.get_stats()
+    return render_template('index.html', is_cloud=IS_CLOUD, initial_tab='oliz', stats=stats)
+
+
+@app.route('/api/oliz/stats', methods=['GET'])
+@app.route('/api/stats', methods=['GET'])
+def oliz_stats_endpoint():
+    return jsonify({
+        'success': True,
+        'stats': campaign_engine.get_stats()
+    })
+
+
+@app.route('/api/oliz/autocomplete', methods=['GET'])
+@app.route('/api/autocomplete', methods=['GET'])
+def oliz_autocomplete_endpoint():
+    q = request.args.get('q', '').strip()
+    limit = int(request.args.get('limit', 15))
+    results = campaign_engine.search_products(q, limit=limit)
+    return jsonify({
+        'success': True,
+        'results': results
+    })
+
+
+@app.route('/api/oliz/analyze', methods=['POST'])
+@app.route('/api/analyze', methods=['POST'])
+def oliz_analyze_endpoint():
+    data = request.get_json(silent=True) or {}
+    products = data.get('products', [])
+    if not isinstance(products, list):
+        products = [products]
+    clean_products = [str(p).strip() for p in products if p and str(p).strip()][:4]
+    analysis = campaign_engine.analyze_bundle(clean_products)
+    return jsonify({
+        'success': True,
+        'data': analysis
+    })
+
+
+@app.route('/api/oliz/single-search', methods=['GET'])
+@app.route('/api/single-search', methods=['GET'])
+def oliz_single_search_endpoint():
+    q = request.args.get('q', '').strip()
+    if not q:
+        return jsonify({'success': False, 'message': 'Arama sorgusu boş.'})
+    res = campaign_engine.analyze_single_product(q)
+    if not res:
+        return jsonify({'success': False, 'message': 'Ürün bulunamadı veya kampanya listesinde yer almıyor.'})
+    return jsonify({
+        'success': True,
+        'data': res
+    })
+
+
+@app.route('/api/oliz/catalog', methods=['GET'])
+@app.route('/api/catalog', methods=['GET'])
+def oliz_catalog_endpoint():
+    cat_type = request.args.get('type', 'tekil').lower()
+    if cat_type == 'tekil':
+        items = campaign_engine.get_all_tekil()
+    elif cat_type == 'toptan':
+        items = campaign_engine.get_all_toptan()
+    elif cat_type == 'paket':
+        items = campaign_engine.get_all_paket()
+    else:
+        items = campaign_engine.get_all_tekil()
+    return jsonify({
+        'success': True,
+        'type': cat_type,
+        'count': len(items),
+        'items': items
+    })
+
+
+@app.route('/api/oliz/upload', methods=['POST'])
+def oliz_upload_endpoint():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'message': 'Dosya yüklenmedi.'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'success': False, 'message': 'Seçilen dosya boş.'}), 400
+    if not (file.filename.endswith('.xlsx') or file.filename.endswith('.xls')):
+        return jsonify({'success': False, 'message': 'Lütfen geçerli bir Excel (.xlsx / .xls) dosyası yükleyin.'}), 400
+
+    filename = secure_filename(file.filename) or 'kampanya.xlsx'
+    dest_path = os.path.join(OLIZ_DATA_DIR, filename)
+    file.save(dest_path)
+    try:
+        campaign_engine.load_from_excel(dest_path)
+        return jsonify({
+            'success': True,
+            'message': f"'{filename}' başarıyla yüklendi ve işlendi!",
+            'stats': campaign_engine.get_stats()
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Dosya işlenirken hata oluştu: {str(e)}'
+        }), 500
 
 
 def open_browser():

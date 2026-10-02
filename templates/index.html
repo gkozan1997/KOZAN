@@ -1244,13 +1244,413 @@
                 grid-template-columns: 1fr;
             }
         }
+    
+        /* ==============================================================
+           GÖKHAN OS - SOL KENAR ÇUBUĞU MENÜSÜ (SIDEBAR LAYOUT)
+           ============================================================== */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background-color: var(--bg-base);
+        }
+
+        .app-layout-wrapper {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .app-sidebar {
+            width: 290px;
+            min-width: 290px;
+            background: rgba(11, 16, 28, 0.96);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 1000;
+            box-shadow: 4px 0 35px rgba(0, 0, 0, 0.5);
+            user-select: none;
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: linear-gradient(180deg, rgba(2, 132, 199, 0.08), transparent);
+        }
+
+        .sidebar-brand-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(2, 132, 199, 0.4);
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand-info h2 {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 0.06em;
+            line-height: 1.2;
+        }
+
+        .sidebar-brand-info p {
+            font-size: 11px;
+            color: var(--accent-cyan);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+
+        .sidebar-nav-container {
+            padding: 22px 14px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-group-label {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            color: var(--text-sub);
+            padding: 0 10px 14px 10px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            outline: none;
+            position: relative;
+        }
+
+        .sidebar-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.08);
+            transform: translateX(3px);
+        }
+
+        .sidebar-nav-btn.active {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(59, 130, 246, 0.16));
+            border-color: rgba(56, 189, 248, 0.4);
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-nav-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .sidebar-nav-icon.icon-siparis {
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-cyan);
+        }
+
+        .sidebar-nav-btn.active .sidebar-nav-icon.icon-siparis {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+            transform: scale(1.05);
+        }
+
+        .sidebar-nav-icon.icon-barkod {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-emerald);
+        }
+
+        .sidebar-nav-btn.active .sidebar-nav-icon.icon-barkod {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            transform: scale(1.05);
+        }
+
+        .sidebar-nav-icon.icon-oliz {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-amber);
+        }
+
+        .sidebar-nav-btn.active .sidebar-nav-icon.icon-oliz {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            transform: scale(1.05);
+        }
+
+        .sidebar-nav-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .nav-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-desc {
+            font-size: 11px;
+            color: var(--text-sub);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-nav-btn.active .nav-desc {
+            color: var(--text-muted);
+        }
+
+        .nav-pill {
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        .pill-cyan {
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .pill-emerald {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .pill-amber {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        .sidebar-nav-btn.active .nav-pill {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-footer {
+            padding: 20px 18px;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-status-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--accent-emerald);
+            font-weight: 600;
+        }
+
+        .status-indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-emerald);
+            box-shadow: 0 0 10px var(--accent-emerald);
+            animation: pulse 2s infinite;
+        }
+
+        .sidebar-date-box {
+            font-size: 11px;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        /* Ana İçerik Görüntüleyici (Main Viewport) */
+        .app-main-viewport {
+            flex: 1;
+            min-width: 0;
+            padding: 24px 32px 60px 32px;
+            overflow-y: auto;
+        }
+
+        /* Gizleme & Yazdırma Kuralları */
+        @media print {
+            .app-sidebar, .no-print {
+                display: none !important;
+            }
+            .app-layout-wrapper {
+                display: block !important;
+            }
+            .app-main-viewport {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .app-layout-wrapper {
+                flex-direction: column;
+            }
+            .app-sidebar {
+                width: 100%;
+                min-width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid var(--border-subtle);
+            }
+            .sidebar-nav-menu {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+            .sidebar-nav-btn {
+                min-width: 220px;
+            }
+        }
     </style>
     <!-- Toplu Barkod & Kargo Etiketi (Proje 3) Kaynakları -->
     <link rel="stylesheet" href="/static/css/barcode_style.css?v=2.0">
     <script src="/static/js/JsBarcode.all.min.js"></script>
     <script src="/static/js/barcode_app.js?v=2.0"></script>
+    <!-- Oliz Kampanya & İndirim Analiz Kaynakları -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/oliz_style.css?v=2.0">
+    <script src="/static/js/oliz_main.js?v=2.0"></script>
 </head>
 <body>
+
+<div class="app-layout-wrapper">
+    <!-- SOL KENAR MENÜSÜ (SIDEBAR) -->
+    <aside class="app-sidebar no-print" id="app-sidebar">
+        <!-- Logo / Brand Header -->
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                </svg>
+            </div>
+            <div class="sidebar-brand-info">
+                <h2>GÖKHAN OS</h2>
+                <p>E-TİCARET & DEPO SİSTEMİ</p>
+            </div>
+        </div>
+
+        <!-- Modül Seçici Navigasyon (3 Sayfa) -->
+        <div class="sidebar-nav-container">
+            <div class="sidebar-group-label">ANA MODÜLLER (3 SAYFA)</div>
+            <nav class="sidebar-nav-menu">
+                <!-- 1. Sayfa -->
+                <button class="sidebar-nav-btn active" id="side-nav-siparis" onclick="switchMainTab('siparis')">
+                    <div class="sidebar-nav-icon icon-siparis">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="sidebar-nav-text">
+                        <span class="nav-title">Sipariş & Toplama</span>
+                        <span class="nav-desc">Pazaryeri & A4 Dikey</span>
+                    </div>
+                    <span class="nav-pill pill-cyan">A4</span>
+                </button>
+
+                <!-- 2. Sayfa -->
+                <button class="sidebar-nav-btn" id="side-nav-barkod" onclick="switchMainTab('barkod')">
+                    <div class="sidebar-nav-icon icon-barkod">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 5v14"></path>
+                            <path d="M8 5v14"></path>
+                            <path d="M12 5v14"></path>
+                            <path d="M17 5v14"></path>
+                            <path d="M21 5v14"></path>
+                        </svg>
+                    </div>
+                    <div class="sidebar-nav-text">
+                        <span class="nav-title">Toplu Barkod & Kargo</span>
+                        <span class="nav-desc">10x10cm Termal Etiket</span>
+                    </div>
+                    <span class="nav-pill pill-emerald">10x10</span>
+                </button>
+
+                <!-- 3. Sayfa -->
+                <button class="sidebar-nav-btn" id="side-nav-oliz" onclick="switchMainTab('oliz')">
+                    <div class="sidebar-nav-icon icon-oliz">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    </div>
+                    <div class="sidebar-nav-text">
+                        <span class="nav-title">Oliz Kampanya</span>
+                        <span class="nav-desc">Beko & Arçelik Paket</span>
+                    </div>
+                    <span class="nav-pill pill-amber">Fırsat</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <div class="sidebar-status-box">
+                <span class="status-indicator-dot"></span>
+                <span class="status-indicator-text">Sistem Çevrimiçi</span>
+            </div>
+            <div class="sidebar-date-box" id="sidebar-date-display">
+                <!-- Tarih JS ile yazdırılır -->
+            </div>
+        </div>
+    </aside>
+
+    <!-- SAĞ TARAF: ANA GÖRÜNÜM ALANI (MAIN CONTENT VIEWPORT) -->
+    <div class="app-main-viewport">
+
 
 <div class="container">
     <!-- Header -->
@@ -1276,41 +1676,7 @@
     </header>
 
     <!-- Main App Navigation Tabs (Proje 1 & Proje 3 Birlesimi) -->
-    <nav class="main-tabs-nav no-print" id="main-tabs-nav">
-        <button class="main-tab-btn active" id="tab-nav-siparis" onclick="switchMainTab('siparis')">
-            <div class="tab-btn-inner">
-                <div class="tab-btn-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                </div>
-                <div class="tab-btn-text">
-                    <span class="tab-btn-title">Sipariş & Ürün Toplama</span>
-                    <span class="tab-btn-sub">Pazaryeri Konsolidasyonu & A4 Baskı</span>
-                </div>
-                <span class="tab-badge-pill">A4 Dikey</span>
-            </div>
-        </button>
-
-        <button class="main-tab-btn" id="tab-nav-barkod" onclick="switchMainTab('barkod')">
-            <div class="tab-btn-inner">
-                <div class="tab-btn-icon icon-barcode">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <path d="M3 5v14"></path>
-                        <path d="M8 5v14"></path>
-                        <path d="M12 5v14"></path>
-                        <path d="M17 5v14"></path>
-                        <path d="M21 5v14"></path>
-                    </svg>
-                </div>
-                <div class="tab-btn-text">
-                    <span class="tab-btn-title">Toplu Barkod & Kargo Etiketi</span>
-                    <span class="tab-btn-sub">Müşteri + Takip Barkodu + Ürün Adı</span>
-                </div>
-                <span class="tab-badge-pill pill-accent">10x10cm Termal</span>
-            </div>
-        </button>
-    </nav>
+    
 
     <!-- SEKME 1: SİPARİŞ & ÜRÜN TOPLAMA GÖRÜNÜMÜ -->
     <div id="view-siparis" class="app-view-panel active">
@@ -1730,6 +2096,230 @@
         </main>
     
     </div>
+
+        <!-- 3. GÖRÜNÜM: OLİZ KAMPANYA & İNDİRİM ANALİZİ -->
+        <div id="view-oliz" class="app-view-panel" style="display: none;">
+            
+
+  <div class="container">
+    <!-- HEADER BAR -->
+    <header class="header-bar">
+      <div class="brand-wrapper">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <h1>OLİZ <span class="highlight">KAMPANYA</span> ANALİZ</h1>
+          <p>Beko & Arçelik 1, 2, 3, 4 Ürünlü Kampanya, Paket ve İndirim Çözümleme Sistemi</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <span class="badge badge-info" id="active-file-badge">
+          📁 {{ stats.file_info.filename or '1-15 EKİM.xlsx' }}
+        </span>
+        <button class="btn btn-secondary" id="open-upload-modal">
+          <span>📤</span> Excel Yükle / Güncelle
+        </button>
+        <button class="btn btn-primary" id="print-btn">
+          <span>🖨️</span> A4 Teklif Yazdır
+        </button>
+      </div>
+    </header>
+
+    <!-- STATS OVERVIEW CARDS -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon purple">🏷️</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-tekil">{{ stats.tekil_count }}</div>
+          <div class="stat-label">Tekil Kampanyalı Ürün</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon pink">🎁</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-paket">{{ stats.paket_count }}</div>
+          <div class="stat-label">Paket & Kombinasyon Kampanyası</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon cyan">🎟️</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-toptan">{{ stats.toptan_count }}</div>
+          <div class="stat-label">Toptan Kupon Tanımlı Ürün</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon emerald">📦</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-total">{{ stats.total_products }}</div>
+          <div class="stat-label">Toplam Tanımlı Ürün Havuzu</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALCULATOR & SLOTS (1, 2, 3, 4 ÜRÜN GİRİŞİ) -->
+    <main class="calculator-section">
+      <div class="section-title-bar">
+        <div class="section-title">
+          <span>🎯</span> Ürün Kodlarını Girin (1, 2, 3, 4 Ayrı Ayrı ve Paket Analizi)
+        </div>
+
+        <div class="chips-container">
+          <span style="font-size: 12px; color: var(--text-dim);">Hızlı Denemeler:</span>
+          <button class="chip-btn" id="chip-ankastre-4">💎 4'lü Ankastre Set + Kurutucu (17.000 TL)</button>
+          <button class="chip-btn" id="chip-tekil-buzdolabi">🔥 25.000 TL Tekil Soğutucu</button>
+          <button class="chip-btn" id="chip-camasir-utu">👕 Çamaşır + Ütü (3.500 TL)</button>
+          <button class="chip-btn" id="chip-tv-kea">📺 TV + KEA (6.279 TL)</button>
+        </div>
+      </div>
+
+      <!-- 4 SLOTS GRID -->
+      <div class="slots-grid">
+        <!-- SLOT 1 -->
+        <div class="slot-box slot-1">
+          <div class="slot-header">
+            <span class="slot-badge">1. ÜRÜN</span>
+            <button class="slot-clear-btn" id="clear-slot-1" title="Temizle">✕</button>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="slot-input" id="slot-input-1" placeholder="SKU veya Model Adı..." autocomplete="off">
+            <div class="autocomplete-dropdown" id="autocomplete-1"></div>
+          </div>
+          <div class="slot-preview" id="preview-1">
+            <div class="slot-preview-name" id="preview-name-1"></div>
+          </div>
+        </div>
+
+        <!-- SLOT 2 -->
+        <div class="slot-box slot-2">
+          <div class="slot-header">
+            <span class="slot-badge">2. ÜRÜN</span>
+            <button class="slot-clear-btn" id="clear-slot-2" title="Temizle">✕</button>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="slot-input" id="slot-input-2" placeholder="SKU veya Model Adı..." autocomplete="off">
+            <div class="autocomplete-dropdown" id="autocomplete-2"></div>
+          </div>
+          <div class="slot-preview" id="preview-2">
+            <div class="slot-preview-name" id="preview-name-2"></div>
+          </div>
+        </div>
+
+        <!-- SLOT 3 -->
+        <div class="slot-box slot-3">
+          <div class="slot-header">
+            <span class="slot-badge">3. ÜRÜN</span>
+            <button class="slot-clear-btn" id="clear-slot-3" title="Temizle">✕</button>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="slot-input" id="slot-input-3" placeholder="SKU veya Model Adı..." autocomplete="off">
+            <div class="autocomplete-dropdown" id="autocomplete-3"></div>
+          </div>
+          <div class="slot-preview" id="preview-3">
+            <div class="slot-preview-name" id="preview-name-3"></div>
+          </div>
+        </div>
+
+        <!-- SLOT 4 -->
+        <div class="slot-box slot-4">
+          <div class="slot-header">
+            <span class="slot-badge">4. ÜRÜN</span>
+            <button class="slot-clear-btn" id="clear-slot-4" title="Temizle">✕</button>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" class="slot-input" id="slot-input-4" placeholder="SKU veya Model Adı..." autocomplete="off">
+            <div class="autocomplete-dropdown" id="autocomplete-4"></div>
+          </div>
+          <div class="slot-preview" id="preview-4">
+            <div class="slot-preview-name" id="preview-name-4"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTION BAR -->
+      <div class="slots-action-bar">
+        <div style="font-size: 13px; color: var(--text-muted);">
+          💡 1'den 4'e kadar istediğiniz sayıda ürün girebilirsiniz; sistem her ürünün <strong>kendi tekil indirimini</strong> ve birlikte oluşturdukları <strong>paket kampanyalarını</strong> eş zamanlı analiz eder.
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-secondary btn-danger" id="clear-all-btn">Tümünü Temizle</button>
+          <button class="btn btn-primary" id="analyze-btn">⚡ Kampanyaları Analiz Et</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- LIVE ANALYSIS RESULTS (1, 2, 3, 4 AYRI HESAP & PAKET KAMPANYASI) -->
+    <section class="results-container" id="results-container">
+      
+      <!-- BÖLÜM 1: 1, 2, 3, 4 AYRI AYRI HESAP KARTLARI -->
+      <div class="section-title" style="margin-bottom: 16px;">
+        <span>📊</span> 1, 2, 3, 4 Ürün Ayrı Ayrı Analiz Kartları
+      </div>
+      <div class="individual-results-grid" id="individual-results-grid"></div>
+
+      <!-- BÖLÜM 2: YAKALANAN PAKET KAMPANYALARI -->
+      <div class="section-title" style="margin-bottom: 16px;">
+        <span>🎁</span> Birlikte Alım Paket Kampanyası Eşleşmeleri
+      </div>
+      <div id="matched-packages-container"></div>
+
+      <!-- BÖLÜM 3: FİNANSAL KIYASLAMA & EN AVANTAJLI STRATEJİ -->
+      <div class="summary-comparison-grid">
+        <div class="comparison-card">
+          <div class="section-title" style="font-size: 16px;">
+            <span>⚖️</span> İndirim Senaryoları Kıyaslaması
+          </div>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Senaryo Yöntemi</th>
+                <th>Kapsam</th>
+                <th>Toplam İndirim</th>
+                <th>Arçelik Katkısı</th>
+                <th>Bayi Maliyet Payı</th>
+              </tr>
+            </thead>
+            <tbody id="comparison-table-body"></tbody>
+          </table>
+        </div>
+
+        <div class="recommendation-box" id="recommendation-box-content"></div>
+      </div>
+
+    </section>
+
+    <!-- CATALOG EXPLORER (TEKİL, PAKET, TOPTAN SEKMELERİ) -->
+    <section class="catalog-section">
+      <div class="section-title-bar">
+        <div class="section-title">
+          <span>📚</span> Tüm Kampanya Kataloğunu Keşfet
+        </div>
+      </div>
+
+      <nav class="catalog-nav">
+        <button class="nav-tab active" data-type="tekil">🏷️ Tekil Kampanyalar ({{ stats.tekil_count }})</button>
+        <button class="nav-tab" data-type="paket">🎁 Paket Kampanyaları ({{ stats.paket_count }})</button>
+        <button class="nav-tab" data-type="toptan">🎟️ Toptan Kuponlar ({{ stats.toptan_count }})</button>
+      </nav>
+
+      <div class="catalog-search-bar">
+        <input type="text" class="slot-input" id="catalog-search-input" placeholder="Katalog içinde model adı, SKU, grup veya kampanya ara...">
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead id="catalog-thead"></thead>
+          <tbody id="catalog-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- EXCEL UPLOAD MODAL -->
+  
+        </div>
+
 </div>
 
 <!-- Toast Messages Container -->
@@ -1835,55 +2425,106 @@
 
     <script src="/static/js/app.js?v=1.2"></script>
 
+
+<div class="modal-overlay" id="upload-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📤 Kampanya Excel Dosyası Yükle</h3>
+        <button class="modal-close-btn" id="close-modal-btn">✕</button>
+      </div>
+
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">
+        Beko / Arçelik tarafından iletilen yeni dönem kampanya Excel dosyasını (.xlsx / .xls) sisteme yükleyin. Sistem tekil kampanyaları, toptan kuponları ve çoklu paket sayfalarını otomatik olarak güncelleyecektir.
+      </p>
+
+      <div class="dropzone" id="file-dropzone">
+        <div class="dropzone-icon">📊</div>
+        <div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">Excel Dosyasını Buraya Sürükleyin</div>
+        <div style="font-size: 12px; color: var(--text-dim);">veya bilgisayarınızdan seçmek için tıklayın</div>
+        <input type="file" id="oliz-file-input" accept=".xlsx,.xls" style="display: none;">
+      </div>
+
+      <div id="upload-status" style="font-size: 13px; text-align: center; margin-top: 10px;"></div>
+    </div>
+  </div>
+
+  <script src="/static/js/main.js"></script>
+
 <script>
+    
     // ==============================================================
-    // ANA SEKME GEÇİŞ YÖNETİCİSİ (SİPARİŞ TOPLAMA <-> TOPLU BARKOD)
+    // SOL MENÜ 3 SAYFA GEÇİŞ YÖNETİCİSİ (SİPARİŞ <-> BARKOD <-> OLİZ)
     // ==============================================================
     function switchMainTab(tab) {
-        const tabSiparis = document.getElementById('tab-nav-siparis');
-        const tabBarkod = document.getElementById('tab-nav-barkod');
+        const sideSiparis = document.getElementById('side-nav-siparis');
+        const sideBarkod = document.getElementById('side-nav-barkod');
+        const sideOliz = document.getElementById('side-nav-oliz');
+
         const viewSiparis = document.getElementById('view-siparis');
         const viewBarkod = document.getElementById('view-barkod');
+        const viewOliz = document.getElementById('view-oliz');
 
-        if (!tabSiparis || !tabBarkod || !viewSiparis || !viewBarkod) return;
+        // Reset all buttons
+        [sideSiparis, sideBarkod, sideOliz].forEach(el => { if (el) el.classList.remove('active'); });
+
+        // Reset all views
+        [viewSiparis, viewBarkod, viewOliz].forEach(el => {
+            if (el) {
+                el.style.display = 'none';
+                el.classList.remove('active');
+            }
+        });
+
+        // Reset body print classes
+        document.body.classList.remove('active-tab-siparis', 'active-tab-barkod', 'active-tab-oliz');
 
         if (tab === 'barkod') {
-            tabSiparis.classList.remove('active');
-            tabBarkod.classList.add('active');
-            viewSiparis.style.display = 'none';
-            viewSiparis.classList.remove('active');
-            viewBarkod.style.display = 'block';
-            viewBarkod.classList.add('active');
-            document.body.classList.remove('active-tab-siparis');
+            if (sideBarkod) sideBarkod.classList.add('active');
+            if (viewBarkod) { viewBarkod.style.display = 'block'; viewBarkod.classList.add('active'); }
             document.body.classList.add('active-tab-barkod');
             try { history.replaceState(null, null, '#barkod'); } catch (e) {}
 
-            // Toplu Barkod etiketlerini yeniden render et
             if (window.barcodeAppState && typeof renderLabels === 'function' && window.barcodeAppState.items && window.barcodeAppState.items.length > 0) {
                 renderLabels();
             }
+        } else if (tab === 'oliz') {
+            if (sideOliz) sideOliz.classList.add('active');
+            if (viewOliz) { viewOliz.style.display = 'block'; viewOliz.classList.add('active'); }
+            document.body.classList.add('active-tab-oliz');
+            try { history.replaceState(null, null, '#oliz'); } catch (e) {}
+
+            // Oliz verilerini tazele
+            if (typeof loadStats === 'function') {
+                loadStats();
+            }
         } else {
-            tabBarkod.classList.remove('active');
-            tabSiparis.classList.add('active');
-            viewBarkod.style.display = 'none';
-            viewBarkod.classList.remove('active');
-            viewSiparis.style.display = 'block';
-            viewSiparis.classList.add('active');
-            document.body.classList.remove('active-tab-barkod');
+            if (sideSiparis) sideSiparis.classList.add('active');
+            if (viewSiparis) { viewSiparis.style.display = 'block'; viewSiparis.classList.add('active'); }
             document.body.classList.add('active-tab-siparis');
             try { history.replaceState(null, null, '#siparis'); } catch (e) {}
         }
     }
 
-    // Hash kontrolü ile ilk sekme belirleme
+    // Hash kontrolü & Tarih Başlatma
     window.addEventListener('DOMContentLoaded', () => {
         const hash = window.location.hash;
-        if (hash === '#barkod') {
+        const initialTab = "{{ initial_tab|default('') }}";
+        if (hash === '#barkod' || initialTab === 'barkod') {
             switchMainTab('barkod');
+        } else if (hash === '#oliz' || initialTab === 'oliz') {
+            switchMainTab('oliz');
         } else {
-            document.body.classList.add('active-tab-siparis');
+            switchMainTab('siparis');
+        }
+
+        // Sidebar Tarih
+        const sideDate = document.getElementById('sidebar-date-display');
+        if (sideDate) {
+            const now = new Date();
+            sideDate.innerText = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
         }
     });
+
 
     let currentResultData = null;
     let activeTabKey = 'all';

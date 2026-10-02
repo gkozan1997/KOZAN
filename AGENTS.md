@@ -177,15 +177,8 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 
 ---
 
-## 11. Toplu Barkod & Kargo Etiketi Modülü Entegrasyonu (Sekmeli Çatı Standardı)
+## 11. Toplu Barkod & Kargo Etiketi Modülü Entegrasyonu
 
-* **Birleşik Mimari (Proje 1 & Proje 3 Birleşimi):**
-  - Proje 1 (`projem`) ana başlık altına üst düzey **Sekme Çubuğu (`.main-tabs-nav`)** eklenmiştir:
-    - **1. Sekme (`#tab-nav-siparis`):** `📦 Sipariş & Ürün Toplama` (Ana Toplama Listesi, Beko/Grundig/Lenovo ayrımı, A4 dikey baskı).
-    - **2. Sekme (`#tab-nav-barkod`):** `🏷️ Toplu Barkod & Kargo Etiketi` (10cm x 10cm Termal Rulo Baskı formatı).
-* **Sekme Yönetimi ve URL Hash (`switchMainTab`):**
-  - Sekme geçişleri sayfa yenilenmeden dinamik olarak gerçekleşir (`switchMainTab('siparis')` / `switchMainTab('barkod')`).
-  - URL hash `#siparis` ve `#barkod` senkronize edilir; `/barkod` rotası doğrudan barkod sekmesini açar.
 * **Toplu Barkod Çekirdeği (`core_barcode.py`):**
   - Excel/CSV otomatik sütun algılama (Alıcı, Adres, İlçe, İl, Telefon, Barkod/Takip No, Ürün Adı, Adet).
   - Manuel dinamik sütun eşleştirme çubuğu (`#mapping-bar`).
@@ -194,6 +187,23 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 * **İzole Çift Baskı Standardı (`@media print`):**
   - Sipariş Toplama sekmesinde iken standart A4 dikey baskı kuralları çalışır.
   - Barkod sekmesinde iken `body.active-tab-barkod` devreye girerek `@page { size: 100mm 100mm; margin: 0; }` termal yazıcı formatında sayfa sayfa baskı verir. İki baskı sistemi asla birbirine karışmaz.
+
+---
+
+## 12. Sol Menü Dashboard Mimarisi & 3 Sayfa Entegrasyonu (Sol Menü Standardı)
+
+* **Sol Menü (Sidebar) Navigasyon Paneli (`aside.app-sidebar`):**
+  - Tüm platformun sol tarafında sabit (sticky), modern cam efektli (`rgba(11, 16, 28, 0.96)`) dikey sidebar yer alır.
+  - Sol tarafta sıralanan **3 Ana Modül Sayfası:**
+    1. **`📦 Sipariş & Toplama` (`#side-nav-siparis`):** Pazaryeri sipariş konsolidasyonu, Beko/Grundig/Lenovo 2. sayfa standardı, özel not ve tam A4 dikey baskı.
+    2. **`🏷️ Toplu Barkod & Kargo` (`#side-nav-barkod`):** 10x10cm termal rulo etiket, otomatik sütun eşleme, SVG barkod ve ReportLab PDF.
+    3. **`🎁 Oliz Kampanya` (`#side-nav-oliz`):** Beko & Arçelik 1, 2, 3, 4 ürünlü sepet analizi, paket fırsatları, toptan kuponlar ve katılım payları.
+* **Dinamik Geçiş ve URL Senkronizasyonu (`switchMainTab`):**
+  - Sayfa yenilenmeden tek tıkla sekmeler arası geçiş yapılır.
+  - URL hash `#siparis`, `#barkod`, `#oliz` otomatik güncellenir.
+  - Bağımsız rotalar: `/barkod` ve `/oliz` doğrudan ilgili sayfayı açar.
+* **Baskı İzolasyonu:** `@media print` sırasında sol menü gizlenir (`display: none !important`), baskı alanı sayfa genişliğini tam doldurur.
+
 
 
 
