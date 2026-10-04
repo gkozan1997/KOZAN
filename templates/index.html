@@ -1463,23 +1463,29 @@
         }
 
         /* ==============================================================
-           MOBİL UYUMLULUK VE RESPONSİVE SİSTEM (MOBILE FIRST DOCK & TOP BAR)
+           MASAÜSTÜ GÖRÜNÜM STANDARDI (> 768px): MOBİL ÖGELERİ GİZLE
            ============================================================== */
-        .mobile-top-bar,
-        .mobile-bottom-nav,
-        header.mobile-top-bar,
-        nav.mobile-bottom-nav {
-            display: none !important;
+        @media screen and (min-width: 769px) {
+            .mobile-top-bar,
+            .mobile-bottom-nav,
+            .mobile-tabs-container,
+            header.mobile-top-bar,
+            nav.mobile-bottom-nav,
+            nav.mobile-tabs-container {
+                display: none !important;
+            }
         }
 
         @media screen and (max-width: 768px) {
             /* Masaüstü Sidebar'ını gizle */
-            .app-sidebar {
+            .app-sidebar,
+            aside.app-sidebar {
                 display: none !important;
             }
 
             /* Mobil Üst Çubuk (Sticky Header) */
-            .mobile-top-bar {
+            .mobile-top-bar,
+            header.mobile-top-bar {
                 display: flex !important;
                 align-items: center;
                 justify-content: space-between;
@@ -1555,8 +1561,180 @@
                 white-space: nowrap;
             }
 
+            /* Mobil Sekmeler (3 Modül Kart Switcher) */
+            .mobile-tabs-container,
+            nav.mobile-tabs-container {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                margin-bottom: 18px;
+                width: 100%;
+                user-select: none;
+            }
+
+            .mobile-tab-card {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 6px;
+                padding: 10px 10px;
+                background: rgba(15, 23, 42, 0.75);
+                border: 1px solid var(--border-subtle);
+                border-radius: var(--radius-md);
+                color: var(--text-muted);
+                text-align: left;
+                cursor: pointer;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                width: 100%;
+                outline: none;
+                -webkit-tap-highlight-color: transparent;
+                position: relative;
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+                min-height: 82px;
+            }
+
+            .mobile-tab-card:hover, .mobile-tab-card:active {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: rgba(255, 255, 255, 0.15);
+            }
+
+            .mobile-tab-card.active {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+                transform: translateY(-1px);
+            }
+
+            .mobile-tab-card#mobtab-siparis.active {
+                border-color: rgba(56, 189, 248, 0.5);
+                background: linear-gradient(145deg, rgba(2, 132, 199, 0.22), rgba(15, 23, 42, 0.9));
+                box-shadow: 0 4px 18px rgba(2, 132, 199, 0.25);
+            }
+            .mobile-tab-card#mobtab-siparis.active .mobtab-title {
+                color: var(--accent-cyan);
+            }
+
+            .mobile-tab-card#mobtab-barkod.active {
+                border-color: rgba(16, 185, 129, 0.5);
+                background: linear-gradient(145deg, rgba(16, 185, 129, 0.22), rgba(15, 23, 42, 0.9));
+                box-shadow: 0 4px 18px rgba(16, 185, 129, 0.25);
+            }
+            .mobile-tab-card#mobtab-barkod.active .mobtab-title {
+                color: var(--accent-emerald);
+            }
+
+            .mobile-tab-card#mobtab-oliz.active {
+                border-color: rgba(245, 158, 11, 0.5);
+                background: linear-gradient(145deg, rgba(245, 158, 11, 0.22), rgba(15, 23, 42, 0.9));
+                box-shadow: 0 4px 18px rgba(245, 158, 11, 0.25);
+            }
+            .mobile-tab-card#mobtab-oliz.active .mobtab-title {
+                color: var(--accent-amber);
+            }
+
+            .mobtab-header-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                gap: 4px;
+            }
+
+            .mobtab-icon {
+                width: 30px;
+                height: 30px;
+                border-radius: 7px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                transition: transform 0.2s ease;
+            }
+
+            .mobtab-icon.icon-siparis {
+                background: linear-gradient(135deg, #0284c7, #2563eb);
+                color: #ffffff;
+                box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+            }
+
+            .mobtab-icon.icon-barkod {
+                background: linear-gradient(135deg, #059669, #10b981);
+                color: #ffffff;
+                box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+            }
+
+            .mobtab-icon.icon-oliz {
+                background: linear-gradient(135deg, #d97706, #f59e0b);
+                color: #ffffff;
+                box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+            }
+
+            .mobile-tab-card.active .mobtab-icon {
+                transform: scale(1.06);
+            }
+
+            .mobtab-body {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                width: 100%;
+            }
+
+            .mobtab-title {
+                font-size: 12px;
+                font-weight: 800;
+                color: #ffffff;
+                letter-spacing: -0.01em;
+                line-height: 1.2;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .mobtab-desc {
+                font-size: 9.5px;
+                color: var(--text-sub);
+                font-weight: 500;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                line-height: 1.2;
+            }
+
+            .mobtab-pill {
+                padding: 2px 5px;
+                border-radius: 999px;
+                font-size: 8.5px;
+                font-weight: 700;
+                letter-spacing: 0.03em;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            @media screen and (max-width: 360px) {
+                .mobile-tab-card {
+                    padding: 8px 5px;
+                    min-height: 70px;
+                }
+                .mobtab-title {
+                    font-size: 10.5px;
+                }
+                .mobtab-desc {
+                    display: none;
+                }
+                .mobtab-icon {
+                    width: 24px;
+                    height: 24px;
+                }
+                .mobtab-icon svg {
+                    width: 14px;
+                    height: 14px;
+                }
+            }
+
             /* Mobil Sabit Alt Navigasyon (Bottom Dock) */
-            .mobile-bottom-nav {
+            .mobile-bottom-nav,
+            nav.mobile-bottom-nav {
                 display: flex !important;
                 justify-content: space-around;
                 align-items: center;
@@ -2069,11 +2247,14 @@
         @media print {
             .mobile-top-bar,
             .mobile-bottom-nav,
+            .mobile-tabs-container,
             #mobile-top-bar,
             #mobile-bottom-nav,
+            #mobile-tabs-container,
             .app-sidebar,
             aside.app-sidebar,
             nav.mobile-bottom-nav,
+            nav.mobile-tabs-container,
             header.mobile-top-bar,
             .no-print {
                 display: none !important;
@@ -2210,6 +2391,60 @@
     <!-- SAĞ TARAF: ANA GÖRÜNÜM ALANI (MAIN CONTENT VIEWPORT) -->
     <div class="app-main-viewport">
 
+    <!-- MOBİL 3 MODÜL SEKME KARTLARI (MOBİLDE EKRANIN ÜSTÜNDE GÖRÜNEN SEKMELER) -->
+    <nav class="mobile-tabs-container no-print" id="mobile-tabs-container" aria-label="Modül Sekmeleri">
+        <!-- 1. Sekme -->
+        <button class="mobile-tab-card active" id="mobtab-siparis" onclick="switchMainTab('siparis')" type="button">
+            <div class="mobtab-header-row">
+                <div class="mobtab-icon icon-siparis">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <span class="mobtab-pill pill-cyan">A4</span>
+            </div>
+            <div class="mobtab-body">
+                <span class="mobtab-title">Sipariş & Toplama</span>
+                <span class="mobtab-desc">Pazaryeri & A4 Dikey</span>
+            </div>
+        </button>
+
+        <!-- 2. Sekme -->
+        <button class="mobile-tab-card" id="mobtab-barkod" onclick="switchMainTab('barkod')" type="button">
+            <div class="mobtab-header-row">
+                <div class="mobtab-icon icon-barkod">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M3 5v14"></path>
+                        <path d="M8 5v14"></path>
+                        <path d="M12 5v14"></path>
+                        <path d="M17 5v14"></path>
+                        <path d="M21 5v14"></path>
+                    </svg>
+                </div>
+                <span class="mobtab-pill pill-emerald">10x10</span>
+            </div>
+            <div class="mobtab-body">
+                <span class="mobtab-title">Toplu Barkod</span>
+                <span class="mobtab-desc">10x10cm Termal Etiket</span>
+            </div>
+        </button>
+
+        <!-- 3. Sekme -->
+        <button class="mobile-tab-card" id="mobtab-oliz" onclick="switchMainTab('oliz')" type="button">
+            <div class="mobtab-header-row">
+                <div class="mobtab-icon icon-oliz">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                </div>
+                <span class="mobtab-pill pill-amber">Fırsat</span>
+            </div>
+            <div class="mobtab-body">
+                <span class="mobtab-title">Oliz Kampanya</span>
+                <span class="mobtab-desc">Beko & Arçelik Paket</span>
+            </div>
+        </button>
+    </nav>
 
     <!-- 1. GÖRÜNÜM: SİPARİŞ & ÜRÜN TOPLAMA -->
     <div id="view-siparis" class="app-view-panel active">
@@ -3077,7 +3312,12 @@
         const sideBarkod = document.getElementById('side-nav-barkod');
         const sideOliz = document.getElementById('side-nav-oliz');
 
-        // Mobil Alt Menü Butonları
+        // Mobil Üst Sekme Kartları (Mobil)
+        const mobtabSiparis = document.getElementById('mobtab-siparis');
+        const mobtabBarkod = document.getElementById('mobtab-barkod');
+        const mobtabOliz = document.getElementById('mobtab-oliz');
+
+        // Mobil Alt Menü Butonları (Mobil Dock)
         const mobSiparis = document.getElementById('mobile-nav-siparis');
         const mobBarkod = document.getElementById('mobile-nav-barkod');
         const mobOliz = document.getElementById('mobile-nav-oliz');
@@ -3089,7 +3329,9 @@
         const viewOliz = document.getElementById('view-oliz');
 
         // Tüm butonların active sınıfını temizle
-        [sideSiparis, sideBarkod, sideOliz, mobSiparis, mobBarkod, mobOliz].forEach(el => {
+        [sideSiparis, sideBarkod, sideOliz, 
+         mobtabSiparis, mobtabBarkod, mobtabOliz, 
+         mobSiparis, mobBarkod, mobOliz].forEach(el => {
             if (el) el.classList.remove('active');
         });
 
@@ -3109,6 +3351,7 @@
 
         if (tab === 'barkod') {
             if (sideBarkod) sideBarkod.classList.add('active');
+            if (mobtabBarkod) mobtabBarkod.classList.add('active');
             if (mobBarkod) mobBarkod.classList.add('active');
             if (mobBadge) {
                 mobBadge.textContent = '🏷️ Toplu Barkod';
@@ -3123,6 +3366,7 @@
             }
         } else if (tab === 'oliz') {
             if (sideOliz) sideOliz.classList.add('active');
+            if (mobtabOliz) mobtabOliz.classList.add('active');
             if (mobOliz) mobOliz.classList.add('active');
             if (mobBadge) {
                 mobBadge.textContent = '🎁 Oliz Kampanya';
@@ -3138,6 +3382,7 @@
             }
         } else {
             if (sideSiparis) sideSiparis.classList.add('active');
+            if (mobtabSiparis) mobtabSiparis.classList.add('active');
             if (mobSiparis) mobSiparis.classList.add('active');
             if (mobBadge) {
                 mobBadge.textContent = '📦 Sipariş & Toplama';

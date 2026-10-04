@@ -217,8 +217,9 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 * **Mobil Navigasyon Mimarisi (`<= 768px`):**
   - **Masaüstü Sidebar İzolasyonu:** Geniş sol menü (`.app-sidebar`) mobil ekranlarda gizlenir (`display: none !important;`) ve ekranda dikey yer işgal etmesi önlenir.
   - **Kompakt Mobil Üst Çubuk (`.mobile-top-bar`):** Ekranın en üstünde yapışkan (sticky), modern cam efektli logo, çevrimiçi göstergesi ve anlık aktif modülü belirten dinamik rozet (`#mobile-module-badge`) yer alır.
-  - **Mobil Sabit Alt Menü Dok'u (`.mobile-bottom-nav`):** Ekranın en altında sabit (fixed), başparmakla tek dokunuşla erişilebilir 3 ana modül butonu (`Sipariş`, `Barkod`, `Oliz`) konumlanır.
-  - **İki Yönlü Durum Senkronizasyonu (`switchMainTab`):** Sekme geçişlerinde hem masaüstü sol menü, hem mobil alt menü, hem de URL hash'i eş zamanlı aktifleşir.
+  - **Mobil Üst Sekme Kartları (`.mobile-tabs-container`):** Ekranın üst kısmında ana görünümün hemen başında 3 ana modülü (Sipariş & Toplama [A4], Toplu Barkod [10x10], Oliz Kampanya [Fırsat]) gösteren, renk vurgulu, dokunmatik 3'lü kart switcher konumlanır.
+  - **Mobil Sabit Alt Menü Dok'u (`.mobile-bottom-nav`):** Ekranın en altında sabit (fixed), başparmakla tek dokunuşla erişilebilir 3 ana modül butonu (`Sipariş`, `Barkod`, `Oliz`) konumlanır. CSS özgüllük (specificity) çakışması önlenerek masaüstü (`min-width: 769px`) ve mobil (`max-width: 768px`) kuralları tam izole edilmiştir.
+  - **Çok Yönlü Durum Senkronizasyonu (`switchMainTab`):** Sekme geçişlerinde masaüstü sol menü, mobil üst sekme kartları, mobil alt dock ve URL hash'i eş zamanlı aktifleşir.
   - **Güvenli Alan (Safe Area Inset):** iPhone çentiği ve alt ev çubuğu için `viewport-fit=cover` ve `padding-bottom: max(4px, env(safe-area-inset-bottom))` tam uyumludur.
 * **Modül Bazlı Mobil Uyarlamalar:**
   - **Sipariş & Toplama Modülü (Mobil Tablo Standardı):**
