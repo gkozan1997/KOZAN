@@ -896,10 +896,8 @@
 
         /* Print View styles - A4 Portrait Optimized (Mobile Chrome, iOS Safari & Desktop WebKit) */
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 6mm 8mm 6mm 8mm;
-            }
+            /* NOT: @page kuralı CSS'te kapsanamaz (body.active-tab-* görünemez).
+               Bu yüzden tek @page tanımı JS ile dinamik enjekte edilir: applyPrintPageSize() */
             html, body {
                 width: 100% !important;
                 height: auto !important;
@@ -3036,6 +3034,43 @@
     // ==============================================================
     // 3 SAYFA GEÇİŞ YÖNETİCİSİ (SOL KENAR MENÜSÜ & MOBİL ALT BAR DASHBOARD)
     // ==============================================================
+    // ==============================================================
+    // DİNAMİK @page YÖNETİCİSİ (H-01 / H-09)
+    // CSS'te @page kuralı seçiciyle kapsanamaz; kaynakta en son yazan kazanır.
+    // Bu yüzden proje genelinde TEK bir @page vardır ve aktif sekmeye göre
+    // JS ile enjekte edilir.
+    //   siparis → A4 portrait, 8mm 10mm (AGENTS.md §5 standardı)
+    //   oliz    → A4 portrait, 8mm 10mm
+    //   barkod  → 100mm x 100mm termal, margin 0
+    // ==============================================================
+    const PRINT_PAGE_RULES = {
+        siparis: '@page { size: A4 portrait; margin: 8mm 10mm; }',
+        oliz: '@page { size: A4 portrait; margin: 8mm 10mm; }',
+        barkod: '@page { size: 100mm 100mm; margin: 0; }'
+    };
+
+    function applyPrintPageSize(tab) {
+        const rule = PRINT_PAGE_RULES[tab] || PRINT_PAGE_RULES.siparis;
+        let styleEl = document.getElementById('dynamic-page-rule');
+        if (!styleEl) {
+            styleEl = document.createElement('style');
+            styleEl.id = 'dynamic-page-rule';
+            document.head.appendChild(styleEl);
+        }
+        if (styleEl.textContent !== rule) {
+            styleEl.textContent = rule;
+        }
+    }
+    window.applyPrintPageSize = applyPrintPageSize;
+
+    // Yazdırma anında aktif sekmeye göre sayfa boyutunu güvenceye al
+    window.addEventListener('beforeprint', () => {
+        const cls = document.body.className || '';
+        const tab = cls.indexOf('active-tab-barkod') !== -1 ? 'barkod'
+            : (cls.indexOf('active-tab-oliz') !== -1 ? 'oliz' : 'siparis');
+        applyPrintPageSize(tab);
+    });
+
     function switchMainTab(tab) {
         // Sol Menü Butonları (Masaüstü)
         const sideSiparis = document.getElementById('side-nav-siparis');
@@ -3068,6 +3103,9 @@
 
         // Body print sınıflarını temizle
         document.body.classList.remove('active-tab-siparis', 'active-tab-barkod', 'active-tab-oliz');
+
+        // Aktif sekmeye göre sayfa boyutunu (A4 / 100x100mm termal) güncelle
+        applyPrintPageSize(tab);
 
         if (tab === 'barkod') {
             if (sideBarkod) sideBarkod.classList.add('active');

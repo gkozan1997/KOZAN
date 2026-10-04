@@ -9,6 +9,7 @@ import os
 import glob
 import re
 import sys
+import secrets
 import tempfile
 import unicodedata
 
@@ -207,6 +208,29 @@ def is_excluded_product(name, brand=''):
         return False
     return is_major_appliance_or_warranty(name)
 
+def safe_sheet_title(title, used_titles=None):
+    """
+    Excel sekme adını geçerli ve benzersiz hale getirir.
+    Excel '[]:*?/\\' karakterlerini sessizce reddeder, 31 karakter sınırı koyar.
+    Aksi halde openpyxl ValueError fırlatır ve tüm yükleme HTTP 500 döner (H-03).
+    """
+    used_titles = used_titles if used_titles is not None else set()
+    clean = re.sub(r'[\[\]:\*\?/\\]', '', str(title or '')).strip()
+    clean = re.sub(r'\s+', ' ', clean)
+    clean = clean.strip("'")
+    if not clean:
+        clean = 'Diger'
+    base = clean[:31]
+    candidate = base
+    suffix = 2
+    while candidate.lower() in used_titles:
+        tail = f'_{suffix}'
+        candidate = base[:31 - len(tail)] + tail
+        suffix += 1
+    used_titles.add(candidate.lower())
+    return candidate
+
+
 def find_column_index(headers, possible_names):
     norm_headers = [normalize_text(h) for h in headers]
     for name in possible_names:
@@ -270,7 +294,14 @@ def detect_brand(full_name, store='', brand_col=''):
     if 'BEKO' in canonical_key(store):
         return 'BEKO'
 
-    return first_word_norm or 'DİĞER'
+    # 7. Yedek marka: ilk kelime gerçekten bir marka adına benziyor mu?
+    # Model/seri numarası içeren ilk kelimeler (örn. "6715de", "X1450", "CM5964")
+    # marka sanılırsa sahte bir Excel sekmesi ve sahte web sekmesi üretirdi (H-05).
+    if (first_word_norm
+            and len(first_word_norm) >= 3
+            and not re.search(r'\d', first_word_norm)):
+        return first_word_norm
+    return 'DİĞER'
 
 def get_base_dirs():
     """Returns dynamic base dirs that work on ANY computer."""
@@ -332,6 +363,23 @@ def save_workbook_safely(wb, target_path):
                 continue
         raise PermissionError(f"Dosya Excel'de açık ve kaydedilemedi: {target_path}")
 
+HEADER_HINTS = ['ürün', 'urun', 'stok', 'barkod', 'adet', 'miktar', 'sipariş', 'siparis']
+
+
+def detect_header_row(row_values_list):
+    """
+    Verilen satır listesinden gerçek başlık satırını bulur (yasal uyarı olsa dahil).
+    Sonda 'ürün/stok/adet/sipariş' ipuçlarından biri geçen ilk satır başlıktır.
+    """
+    for idx, row_vals in enumerate(row_values_list):
+        row_str = ' '.join(str(v or '').strip() for v in row_vals).lower()
+        if any(k in row_str for k in HEADER_HINTS):
+            return idx, [str(v or '').strip() for v in row_vals]
+    if row_values_list:
+        return 0, [str(v or '').strip() for v in row_values_list[0]]
+    return 0, []
+
+
 def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
     """
     Parses a single file (filepath, bytes, or Flask FileStorage) and returns (raw_rows, filename).
@@ -348,7 +396,11 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
 
         temp_dir = temp_dir or os.getcwd()
         os.makedirs(temp_dir, exist_ok=True)
-        file_path = os.path.join(temp_dir, filename)
+        # Aynı adlı iki dosya (örn. Hepsiburada/Siparis.xlsx + Trendyol/Siparis.xlsx)
+        # aynı geçici yola yazılırsa biri diğerini sessizce ezerdi (H-02).
+        # Bu yüzden geçici dosya adına benzersiz bir ön ek eklenir.
+        unique_name = f"{secrets.token_hex(4)}_{filename}"
+        file_path = os.path.join(temp_dir, unique_name)
 
         # Save securely
         if hasattr(file_item, 'save'):
@@ -367,19 +419,10 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
     if is_xls:
         wb_in = xlrd.open_workbook(file_path)
         sh = wb_in.sheet_by_index(0)
-        
-        # Smart header detection: check first 5 rows
-        header_row_idx = 0
-        headers = []
-        for r in range(min(5, sh.nrows)):
-            row_vals = [str(sh.cell_value(r, c)).strip() for c in range(sh.ncols)]
-            row_str = ' '.join(row_vals).lower()
-            if any(k in row_str for k in ['ürün', 'urun', 'stok', 'barkod', 'adet', 'miktar', 'sipariş', 'siparis']):
-                header_row_idx = r
-                headers = row_vals
-                break
-        if not headers and sh.nrows > 0:
-            headers = [str(sh.cell_value(0, c)).strip() for c in range(sh.ncols)]
+
+        # Smart header detection: ilk 5 satir taranir
+        preview = [[sh.cell_value(r, c) for c in range(sh.ncols)] for r in range(min(5, sh.nrows))]
+        header_row_idx, headers = detect_header_row(preview)
         
         idx_name = find_column_index(headers, ['ürün adı', 'ürün', 'urun adi', 'urun', 'ürün ismi', 'product name'])
         idx_variant = find_column_index(headers, ['varyant', 'variant', 'seçenek', 'özellik'])
@@ -390,7 +433,7 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
         idx_cust = find_column_index(headers, ['üye adı soyadı', 'fatura - müşteri', 'müşteri', 'musteri', 'alıcı', 'alici', 'ad soyad', 'pazaryeri kullanıcı'])
         idx_magaza = find_column_index(headers, ['mağaza', 'magaza', 'satıcı', 'store'])
         idx_marka = find_column_index(headers, ['marka', 'brand'])
-        idx_pazar = find_column_index(headers, ['pazaryeri', 'pazar yeri', 'platform'])
+        idx_pazar = find_column_index(headers, ['pazaryeri', 'pazar yeri', 'platform', 'marketplace'])
 
         for r in range(header_row_idx + 1, sh.nrows):
             name_val = str(sh.cell_value(r, idx_name)).strip() if idx_name != -1 else ''
@@ -440,19 +483,14 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
     else:
         wb_in = openpyxl.load_workbook(file_path, data_only=True)
         sh = wb_in.active
-        
-        # Smart header detection: check first 5 rows
-        header_row_idx = 1
-        headers = []
-        for r in range(1, min(6, sh.max_row + 1)):
-            row_vals = [str(sh.cell(r, c).value or '').strip() for c in range(1, sh.max_column + 1)]
-            row_str = ' '.join(row_vals).lower()
-            if any(k in row_str for k in ['ürün', 'urun', 'stok', 'barkod', 'adet', 'miktar', 'sipariş', 'siparis']):
-                header_row_idx = r
-                headers = row_vals
-                break
-        if not headers and sh.max_row > 0:
-            headers = [str(sh.cell(1, c).value or '').strip() for c in range(1, sh.max_column + 1)]
+
+        # Smart header detection: ilk 5 satir taranir (1. satır yasal uyarı olabilir)
+        preview = [
+            [sh.cell(r, c).value for c in range(1, sh.max_column + 1)]
+            for r in range(1, min(6, sh.max_row + 1))
+        ]
+        header_row_idx, headers = detect_header_row(preview)
+        header_row_idx += 1  # openpyxl satirlari 1 tabanlidir
         
         idx_name = find_column_index(headers, ['ürün adı', 'ürün', 'urun adi', 'urun', 'ürün ismi', 'product name'])
         idx_variant = find_column_index(headers, ['varyant', 'variant', 'seçenek', 'özellik'])
@@ -460,10 +498,10 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
         idx_qty = find_column_index(headers, ['adet', 'miktar', 'miktar (adet)', 'sipariş adedi', 'quantity', 'qty'])
         idx_ord = find_column_index(headers, ['sipariş no', 'sipariş numarası', 'siparis no', 'paket no', 'order no'])
         idx_bar = find_column_index(headers, ['gtin (barkod)', 'barkod', 'gtin', 'barcode', 'ean'])
-        idx_cust = find_column_index(headers, ['fatura - müşteri', 'üye adı soyadı', 'müşteri', 'musteri', 'alıcı', 'alici', 'ad soyad', 'pazaryeri kullanıcı'])
+        idx_cust = find_column_index(headers, ['üye adı soyadı', 'fatura - müşteri', 'müşteri', 'musteri', 'alıcı', 'alici', 'ad soyad', 'pazaryeri kullanıcı'])
         idx_magaza = find_column_index(headers, ['mağaza', 'magaza', 'satıcı', 'store'])
         idx_marka = find_column_index(headers, ['marka', 'brand'])
-        idx_pazar = find_column_index(headers, ['pazaryeri', 'pazar yeri', 'platform'])
+        idx_pazar = find_column_index(headers, ['pazaryeri', 'pazar yeri', 'platform', 'marketplace'])
 
         for r in range(header_row_idx + 1, sh.max_row + 1):
             name_val = str(sh.cell(r, idx_name + 1).value or '').strip() if idx_name != -1 else ''
@@ -798,11 +836,6 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     if not filter_beko:
         grouped_items.extend(beko_grundig_orders)
 
-    font_header = Font(name='Segoe UI', size=11, bold=True, color='FFFFFF')
-    font_regular = Font(name='Segoe UI', size=10)
-    font_qty = Font(name='Segoe UI', size=11, bold=True)
-    font_code = Font(name='Segoe UI', size=10, bold=True, color='1E293B')
-
     fill_header = PatternFill(start_color='1E293B', end_color='1E293B', fill_type='solid')
     fill_zebra = PatternFill(start_color='F1F5F9', end_color='F1F5F9', fill_type='solid')
 
@@ -841,7 +874,9 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         ws.page_margins.footer = 0.2 if is_dense else 0.25
 
         ws.print_options.horizontalCentered = True
-        ws.print_options.gridLines = True
+        # Hücrelere zaten kenarlık çizildiği için ızgara çizgileri basılırsa
+        # tablo dışı boş alanlara da çizgi basılır (H-11).
+        ws.print_options.gridLines = False
 
         f_header = Font(name='Segoe UI', size=10 if is_dense else 11, bold=True, color='FFFFFF')
         f_regular = Font(name='Segoe UI', size=9.5 if is_dense else 10)
@@ -931,8 +966,9 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         setup_a4_sheet(ws_bg, "BEKO, GRUNDIG & LENOVO", beko_grundig_orders)
 
     # Sheet 3+: Diger Marka Sekmeleri (Tefal, Babyliss, Philips vb.)
+    used_sheet_titles = set()
     for brand in sorted_other_keys:
-        sheet_title = brand[:30]
+        sheet_title = safe_sheet_title(brand, used_sheet_titles)
         ws_b = wb_main.create_sheet(title=sheet_title)
         setup_a4_sheet(ws_b, sheet_title, brand_orders[brand])
 
@@ -959,6 +995,11 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
 
     excluded_rows = [item for item in all_raw_rows if is_item_excluded(item)]
 
+    # "Diğer Markalar" KPI'ları SADECE 1. sayfadaki kalemlerden hesaplanır.
+    # grouped_items, filter_beko=False iken Beko/Grundig/Lenovo kalemlerini de
+    # içerdiği için tamamının toplamı kullanılırsa Beko adedi iki kez sayılırdı (H-04).
+    other_page_items = grouped_items[:other_items_count]
+
     summary_filename = source_filenames[0] if len(source_filenames) == 1 else f"{len(source_filenames)} Dosya Birleştirildi"
 
     return {
@@ -968,8 +1009,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         'total_orders': len(all_raw_rows),
         'excluded_rows': len(excluded_rows),
         'excluded_qty': sum(x['qty'] for x in excluded_rows),
-        'non_beko_count': len(grouped_items),
-        'non_beko_qty': sum(x['qty'] for x in grouped_items),
+        'non_beko_count': len(other_page_items),
+        'non_beko_qty': sum(x['qty'] for x in other_page_items),
         'other_items_count': other_items_count,
         'beko_count': len(beko_orders),
         'beko_qty': sum(x['qty'] for x in beko_orders),

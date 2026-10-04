@@ -1145,10 +1145,8 @@
    PRINT STYLES (@media print - A4 ÇIKTI)
    ========================================================================== */
 @media print {
-  @page {
-    size: A4 portrait;
-    margin: 12mm 15mm;
-  }
+  /* NOT: @page kuralı burada tanımlanmaz; tek @page kuralı JS ile
+     dinamik enjekte edilir (applyPrintPageSize) → A4 portrait, 8mm 10mm */
 
   .oliz-view-scope {
     background: #FFFFFF !important;

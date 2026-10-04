@@ -728,15 +728,12 @@
 /* ==============================================================
    YAZDIRMA STANDARDI (@media print)
    10cm x 10cm (100mm x 100mm) Termal Rulo Kağıt
+   ------------------------------------------------------------
+   NOT: @page kuralı CSS'te hiçbir seçiciyle kapsanamaz ve kaynakta
+   en son yazan kural kazanır. Bu yüzden BURADA @page tanımı YOKTUR.
+   Tek ve doğru @page kuralı, aktif sekmeye göre JS tarafından
+   dinamik <style> enjeksiyonu ile uygulanır (applyPrintPageSize()).
    ============================================================== */
-@page {
-    size: 100mm 100mm;
-    margin: 0;
-}
-
-
-
-
 
 /* ==============================================================
    TERMAL BARKOD YAZDIRMA (100mm x 100mm)
@@ -754,7 +751,6 @@
     }
 
     body.active-tab-barkod .container,
-    body.active-tab-barkod .main-tabs-nav,
     body.active-tab-barkod header,
     body.active-tab-barkod #view-siparis,
     body.active-tab-barkod .app-layout,

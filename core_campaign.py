@@ -423,7 +423,6 @@ class CampaignEngine:
 
         # PAKET KAMPANYASI TESPİTİ
         matched_packages = []
-        valid_skus = [it["product"]["sku"] for it in parsed_items if it.get("product")]
 
         # Ankastre 4'lü paket kontrolü (Fırın + Ocak + Davlumbaz + Kurutucu)
         for sheet_name, roles in self.package_members.items():

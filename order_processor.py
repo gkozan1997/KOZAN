@@ -1,7 +1,5 @@
 import sys
-import os
-import unicodedata
-from core_engine import parse_and_process_file, get_base_dirs, get_latest_download_file
+from core_engine import parse_and_process_file, get_latest_download_file
 
 try:
     sys.stdout.reconfigure(encoding='utf-8')

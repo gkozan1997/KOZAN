@@ -27,6 +27,7 @@ Bu doküman, projenin mimari yapısını, pazaryeri sipariş formatlarını, iş
   * **Akıllı İsim Temizleme (`clean_product_name`):** Köşeli parantezli pazar yeri varyant etiketleri temizlenir.
   * **En Uygun Başlık Seçimi (`pick_best_name`):** Farklı platformlardan gelen varyasyonlar arasından marka adını içeren, anlamsız sistem kodları taşımayan en temiz ve okunaklı ürün başlığı seçilir.
   * **Stok Kodu Olmayanlar:** Temizlenmiş ve normalize edilmiş ürün adı üzerinden birleştirilir.
+* **Geçici Dosya Çakışması Koruması:** Yüklenen her dosya geçici klasöre **benzersiz ön ekli** adla yazılır (`{secrets.token_hex(4)}_{filename}` — `core_engine.py`, `app.py` oliz rotaları). Böylece farklı pazaryerlerden gelen **aynı adlı** dosyalar (örn. iki adet `Siparis.xlsx`) birbirini sessizce ezmez.
 
 ---
 
@@ -76,7 +77,8 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * `DELONGHI`, `THOR`, `TEFAL`, `BABYLISS`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ`, `NESPRESSO`, `KRUPS`, `MELITTA`, `SAGE`, `SIMFER`, `KUMTEL`, `LUXELL`, `SINBO`, `KARCHER`, `ROWENTA` vb.
   * Delonghi, Thor ve benzeri tüm markalar doğrudan **1. Sayfaya** basılır. Asla 2. Sayfaya (Beko, Grundig & Lenovo) kaymaz.
   * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
-* **Büyük Beyaz Eşya, TV ve Garanti Filtrelemesi (`is_excluded_product`):**
+* **Büyük Beyaz Eşya, TV ve Garanti Filtrelemesi (`is_major_appliance_or_warranty` + `is_conditional_appliance`):**
+  * Gerçek filtreleme `consolidate_and_build` (`core_engine.py`) içindeki `is_item_excluded()` ile yapılır; `is_major_appliance_or_warranty` her satır için, `is_conditional_appliance` ise **aynı sipariş numarası / müşteriye ait büyük beyaz eşya varsa** uygulanır.
   * Bu filtreleme **YALNIZCA BEKO markalı ürünlere** uygulanır. Diğer tüm markalar (Lenovo, Tefal, Babyliss, Philips, Braun, Teka, Bissell, Laurastar, WMF, Kenwood vb.) doğrudan listelenir.
   * **Beko İçin Filtrelenen Ürünler (Listeden Hariç Tutulanlar):**
     - Çamaşır Kurutma Makinesi, Kurutma Makinesi
@@ -111,7 +113,8 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - `ws.print_title_rows = '1:1'` ile her sayfada başlık satırı tekrarlanır.
   * **Tek Sayfalık Sekmeler (2+ Sekmeler ve Beko Dosyası):** `fitToWidth=1`, `fitToHeight=1` ile her marka sekmesi tam 1 sayfaya sığdırılır.
   * **Dinamik Satır ve Font Optimizasyonu:** Sayfa başına düşen kalem > 35 ise satır yüksekliği 20pt, Segoe UI 9.5pt font ve kompakt kenar boşlukları (0.35/0.4 inç) kullanılır; <= 35 kalem için 24pt satır yüksekliği ve 10pt font kullanılır.
-  * **Web A4 Yazdır Standardı (`@media print`):** `@page { size: A4 portrait; margin: 8mm 10mm; }`, `thead { display: table-header-group; }` ve `tr.print-page-break { break-before: page; }` kuralları ile tarayıcıdan A4 yazdırıldığında da 1. sayfa diğer markaları, 2. sayfa Beko, Grundig & Lenovo ürünlerini tam 2 A4 sayfasına sığdırır.
+  * **Web A4 Yazdır Standardı (`@media print`):** `thead { display: table-header-group; }` ve `tr.print-page-break { break-before: page; }` kuralları ile tarayıcıdan A4 yazdırıldığında da 1. sayfa diğer markaları, 2. sayfa Beko, Grundig & Lenovo ürünlerini tam 2 A4 sayfasına sığdırır.
+  * **TEK `@page` Kuralı (Zorunlu):** Proje genelinde **yalnızca bir** `@page` tanımı vardır ve bu **JS tarafından dinamik olarak** `<style id="dynamic-page-rule">` içine yazılır: `applyPrintPageSize(tab)` (`templates/index.html`). Sebep: CSS'te `@page` hiçbir seçiciyle **kapsanamaz** (`body.active-tab-barkod` görünemez) ve aynı özgüllükte yazan kurallardan **kaynakta en son yazan kazanır**. Bu yüzden `index.html`, `barcode_style.css` ve `oliz_style.css` içinde `@page` yazmak **yasaktır**. Değerler: `siparis`/`oliz` → `A4 portrait, 8mm 10mm`; `barkod` → `100mm 100mm, margin 0`.
 * **İçeriğe Göre Otomatik Sütun Genişliği & Hafif Gri Zebra:**
   1. `Miktar` (İçeriğe göre dinamik genişlik, ortalı, kalın font)
   2. `Ürün Adı` (Kalan genişliğin tamamı, sola dayalı, kelime kaydırma aktif)
@@ -186,7 +189,10 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   - ReportLab ile 100mm x 100mm yüksek kaliteli PDF üretimi (`/api/barcode/generate-pdf`).
 * **İzole Çift Baskı Standardı (`@media print`):**
   - Sipariş Toplama sekmesinde iken standart A4 dikey baskı kuralları çalışır.
-  - Barkod sekmesinde iken `body.active-tab-barkod` devreye girerek `@page { size: 100mm 100mm; margin: 0; }` termal yazıcı formatında sayfa sayfa baskı verir. İki baskı sistemi asla birbirine karışmaz.
+  - Barkod sekmesinde iken `body.active-tab-barkod` devreye girerek `@page { size: 100mm 100mm; margin: 0; }` termal yazıcı formatında sayfa sayfa baskı verir. İki baskı sistemi asla birbirine karışmaz. (Bu `@page` kuralı da §5'teki tek dinamik kuraldan enjekte edilir.)
+* **Oturum Bazlı Veri Önbelleği (`_barcode_cache_get/set`):**
+  - Yüklenen kargo dosyasının başlık/satır/eşleme verisi **global dict yerine** `barcode_sid` çereziyle oturuma bağlı `BARCODE_SESSION_CACHE` sözlüğünde tutulur (TTL 1 saat, en fazla 20 oturum).
+  - Amaç: Bulutta eşzamanlı iki kullanıcının birbirinin müşteri/adres/telefon verisini görmesini engellemek. `/api/barcode/generate-pdf` yalnızca **kendi oturumunun** önbelleğine düşebilir.
 
 ---
 
@@ -235,6 +241,63 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 * **Masaüstü ve Baskı Koruma Garantisi:**
   - Masaüstü görünüm (`> 768px` ve laptop ekranları dahil): `.app-sidebar` her zaman sol tarafta dikey (sticky, 260px genişlik) olarak kalır, asla yatay çubuğa dönüşmez. `.mobile-top-bar` ve `.mobile-bottom-nav` masaüstünde daima gizlidir (`display: none !important;`).
   - A4 / 100x100mm termal baskı kuralları (`@media print`) bu geliştirmelerden bağımsız olarak %100 korunmaktadır.
+
+---
+
+## 14. KOD & GÖRSEL DENETİM RAPORU VE DÜZELTMELERİ (2026-10-03 / 2026-10-04)
+
+Statik + canlı denetimde tespit edilen **19 doğrulanmış hata** bulunmuş, tamamı 2026-10-04 tarihinde düzeltilmiş ve regresyon testleriyle kanıtlanmıştır. **Tüm maddeler "açık hata" olmaktan çıkarılmıştır.** Aşağıda her maddenin kök nedeni ve uygulanan çözüm sabitlenmiştir; **bu çözümler geri alınmamalıdır.**
+
+### 14.1 KRİTİK
+
+| # | Hata | Kök Neden | Çözüm |
+|---|------|-----------|--------|
+| H-01 | Termal barkod baskısı bozuk (`@page` kaskad çakışması) | `index.html`, `barcode_style.css` ve `oliz_style.css` üçünde de **kapsamsız** `@page` vardı; `body.active-tab-*` ile kapsanamayacağı için kaynakta en son yazan (`oliz` → A4) kazanıyordu | **Tek** `@page` kuralı JS ile dinamik enjekte edildi: `PRINT_PAGE_RULES` + `applyPrintPageSize(tab)` → `<style id="dynamic-page-rule">`. Üç CSS/HTML kaynağından `@page` **tamamen kaldırıldı**. `switchMainTab` ve `beforeprint` yöneticisine bağlandı. (bkz. §5) |
+| H-02 | Aynı adlı iki dosyada sessiz veri kaybı | Geçici dosya yolu `os.path.join(temp_dir, filename)` idi; iki `Siparis.xlsx` birbirini eziyordu | `parse_single_file_rows` geçici adı `{secrets.token_hex(4)}_{filename}` yapıyor; `oliz_upload_endpoint` da aynı ön eki aldı (bkz. §2) |
+| H-03 | Geçersiz marka adı Excel'i çökertiyor (HTTP 500) | `ws.create_sheet(title=brand[:30])`; `ARCELIK*`, `BEKO/ARCELIK`, `BEKO: 5` geçersiz karakter/şema hatası veriyordu | Yeni `safe_sheet_title(title, used_titles)`: `[]:*?/\` temizliği + 31 karakter kısaltma + `_2`, `_3` benzersizlik sırası |
+| H-04 | KPI çift sayımı | `filter_beko=False` iken `grouped_items` Beko/Grundig/Lenovo'yu da içeriyor, `non_beko_*` tüm listeyi sayıyordu | `other_page_items = grouped_items[:other_items_count]` üzerinden hesaplanıyor; `non_beko_count == other_items_count` garantisi test edildi |
+
+### 14.2 ORTA
+
+| # | Hata | Çözüm |
+|---|------|--------|
+| H-05 | Sahte marka = model numarası (`6715DE` sekmesi) | `detect_brand` yedeği artık **rakam içermeyen, ≥3 harfli** ilk kelimeyi kabul eder; aksi halde `DİĞER` döner |
+| H-06 | `.xls` / `.xlsx` müşteri sütunu sırası farklıydı | İki dal **tek ve aynı** `['üye adı soyadı', 'fatura - müşteri', …]` listesini kullanır (`Üye Adı Soyadı` öncelikli) |
+| H-07 | `Marketplace` başlığı algılanmıyordu | `platform` listesine `marketplace` eklendi (her iki dal) |
+| H-08 | `/api/oliz/autocomplete?limit=abc` → 500 | `try/except` ile güvenli `int()` + `1..100` aralığa kırpma (`/api/autocomplete` alias'ı dahil) |
+| H-09 | A4 kenar boşluğu dokümanla çelişiyordu | Tek dinamik kural §5'teki standarda sabitlendi: `A4 portrait, 8mm 10mm` |
+| H-10 | Barkod önbelleği global → bulutta veri sızıntısı | `BARCODE_SESSION_CACHE` artık `barcode_sid` çerezine bağlı **oturum sözlüğü** (`_barcode_sid`, `_barcode_cache_get/set`, `@app.after_request`). TTL 1 saat, en fazla 20 oturum (bkz. §11) |
+| H-11 | Excel çıktısında gridlines basılıyordu | `ws.print_options.gridLines = False` (hücre kenarlıkları zaten çizili) |
+| H-12 | `/api/open-folder` yol doğrulaması yoktu | `os.path.isdir` + `_is_allowed_local_path()` kontrolü; geçersiz yol `BASE_DIR`'e düşer |
+
+### 14.3 DÜŞÜK — Ölü Kod / Tutarsızlık
+
+| # | Madde | Çözüm |
+|---|-------|--------|
+| H-13 | `is_excluded_product()` ölü koddu, §4 yanlış fonksiyonu gösteriyordu | §4 gerçek fonksiyonlara (`is_major_appliance_or_warranty` / `is_conditional_appliance` / `is_item_excluded`) güncellendi |
+| H-14 | Kullanılmayan `font_header/font_regular/font_qty/font_code` | `consolidate_and_build` içinden kaldırıldı (yerel `f_*` değişkenleri zaten var) |
+| H-15 | Başlık satırı taraması ikiye kopyalanmıştı | Tek `HEADER_HINTS` + `detect_header_row(rows)` yardımcısı; her iki biçim aynı mantığı kullanıyor |
+| H-16 | `secure_filename` ikinci kez import edilmişti | Yinelenen import satırı kaldırıldı |
+| H-17 | Kullanılmayan import/değişkenler | `core_barcode.datetime`, `except ... as e`, `core_campaign.valid_skus`, `order_processor.os/unicodedata/get_base_dirs`, `process_orders.os` temizlendi |
+| H-18 | `.main-tabs-nav` ölü CSS seçicisi | `barcode_style.css` baskı bloğundan kaldırıldı (HTML'de zaten yok) |
+| H-19 | Denetim raporu commit edilmemişti | Bu bölüm + tüm düzeltmeler tek commit ile `main` dalına gönderildi (§8) |
+
+### 14.4 Doğrulama Kanıtları (2026-10-04)
+
+* `python -m py_compile` tüm `.py` dosyalarında geçti; `python -m pyflakes` **sıfır** bulgu.
+* `_regression_test.py`: masaüstü ve bulut yolu çıktıları **birebir aynı** (11 örnek dosya → 553 sipariş, 45 ana kalem, 34 Beko kalemi, 13 marka).
+* Düzeltme doğrulama paketi (25/25 geçti): aynı adlı çift yükleme, geçersiz sekme adları, KPI toplamları, sahte marka engeli, `Marketplace` algılama, gridlines kapalılığı, Beko'ya özel filtreleme.
+* API & baskı doğrulama paketi (24/24 geçti): `limit=abc/-5/99999` → 200, açık klasör yol sızıntısı engeli, **çok kullanıcılı barkod oturum izolasyonu** (B oturumu A'nın verisini göremiyor, PDF üretemiyor), tek `@page` kuralı, `/` `/barkod` `/oliz` → 200.
+* `_api_test.py` (canlı sunucu): `/api/upload` 200, disk çıktısı yazıldı, yol sızma denemesi 404.
+
+### 14.5 Denetimde DOĞRU ÇIKAN Noktalar (regresyon koruması)
+
+* Beko büyük eşya filtresi **yalnızca BEKO'ya** uygulanıyor: `Grundig 40 Klasik LED TV` ve `Lenovo 1 Yıl Garanti Uzatma Paketi` listede **korunuyor** (§4 ile uyumlu).
+* Aynı siparişteki `Beko B 710 Bulaşık Makinesi` + `Beko P 38 Aspiratör` doğru elendi (`excluded_qty=2`).
+* Renk varyantı gruplama (`CM 5964 R` / `CM 5964 B` alt alta) çalışıyor; ölçü birimleri (`W`, `V`, `Kg`) renk kodundan ayrılıyor.
+* Excel sayfa sonu kırılımı doğru: `Break(id=…)`, `fitToHeight=2`, `print_title_rows='$1:$1'`.
+* `templates/index.html`: tekrar eden `id` yok; `<style>`/`<script>` bloklarında süslü parantez dengesi tam.
+* Font dosyaları Vercel'e gönderiliyor (`fonts/arial.ttf` + `arialbd.ttf`) → bulutta Türkçe karakter kaybı yok.
 
 
 

@@ -7,7 +7,6 @@ import os
 import io
 import re
 import csv
-from datetime import datetime
 import openpyxl
 import xlrd
 from reportlab.lib.pagesizes import mm
@@ -468,7 +467,7 @@ def generate_labels_pdf(items, options=None):
                 else:
                     bc.hAlign = 'CENTER'
                     label_elements.append(bc)
-            except Exception as e:
+            except Exception:
                 err_p = Paragraph(f"Barkod: {barcode_val}", cust_style)
                 label_elements.append(err_p)
         else:

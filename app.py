@@ -10,7 +10,7 @@ import webbrowser
 from collections import OrderedDict
 from werkzeug.utils import secure_filename
 
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, g
 
 from core_engine import (
     IS_CLOUD,
@@ -205,7 +205,8 @@ def open_folder():
 
     data = request.get_json(silent=True) or {}
     folder_path = data.get('folder_path')
-    if not folder_path or not os.path.exists(folder_path):
+    # Guvenlik: yol yalnizca proje klasorleri / Indirilenler icinde olabilir.
+    if not folder_path or not os.path.isdir(folder_path) or not _is_allowed_local_path(folder_path):
         folder_path = BASE_DIR
     try:
         os.startfile(folder_path)
@@ -264,7 +265,6 @@ def download_file():
 # TOPLU BARKOD & 10x10cm TERMAL KARGO ETIKET MODULU (PROJE 3 ENTEGRASYONU)
 # ---------------------------------------------------------------------------
 import glob
-from werkzeug.utils import secure_filename
 from core_barcode import (
     read_excel_or_csv as barcode_read_excel_or_csv,
     extract_items as barcode_extract_items,
@@ -285,12 +285,85 @@ try:
 except Exception:
     pass
 
-BARCODE_SESSION_CACHE = {
-    'headers': [],
-    'data_rows': [],
-    'mapping': {},
-    'items': []
-}
+# Kargo dosyasi (basliklar/satirlar/eslesme) tarayici oturumuna gore ayrilir.
+# Once tek bir modul seviyesi dict kullaniliyordu; bulutta eszamanli iki kullanicinin
+# musteri/adres/telefon verilerini birbirine gormesine yol aciyordu (H-10).
+BARCODE_COOKIE_NAME = 'barcode_sid'
+BARCODE_CACHE_TTL_SECONDS = 60 * 60
+BARCODE_CACHE_MAX = 20
+BARCODE_SESSION_CACHE = {}
+_barcode_cache_lock = threading.Lock()
+
+
+def _empty_barcode_cache():
+    return {'headers': [], 'data_rows': [], 'mapping': {}, 'items': []}
+
+
+def _valid_barcode_sid(sid):
+    return (
+        isinstance(sid, str)
+        and 16 <= len(sid) <= 64
+        and all(ch.isalnum() or ch in '-_' for ch in sid)
+    )
+
+
+def _barcode_sid():
+    """Istek/oturum bazli benzersiz anahtar. Gerekirse yeni bir tane uretir."""
+    sid = request.cookies.get(BARCODE_COOKIE_NAME)
+    if _valid_barcode_sid(sid):
+        g.barcode_sid = sid
+        g.barcode_sid_is_new = False
+    else:
+        g.barcode_sid = secrets.token_urlsafe(16)
+        g.barcode_sid_is_new = True
+    return g.barcode_sid
+
+
+@app.after_request
+def _persist_barcode_sid(response):
+    if getattr(g, 'barcode_sid_is_new', False) and getattr(g, 'barcode_sid', None):
+        response.set_cookie(
+            BARCODE_COOKIE_NAME,
+            g.barcode_sid,
+            max_age=BARCODE_CACHE_TTL_SECONDS,
+            httponly=True,
+            samesite='Lax',
+            secure=IS_CLOUD,
+            path='/',
+        )
+    return response
+
+
+def _barcode_cache_get():
+    sid = _barcode_sid()
+    with _barcode_cache_lock:
+        entry = BARCODE_SESSION_CACHE.get(sid)
+        if not entry:
+            return _empty_barcode_cache()
+        if time.time() - entry['ts'] > BARCODE_CACHE_TTL_SECONDS:
+            BARCODE_SESSION_CACHE.pop(sid, None)
+            return _empty_barcode_cache()
+        return entry['data']
+
+
+def _barcode_cache_set(headers, data_rows, mapping, items):
+    sid = _barcode_sid()
+    with _barcode_cache_lock:
+        now = time.time()
+        for key in [k for k, v in BARCODE_SESSION_CACHE.items() if now - v['ts'] > BARCODE_CACHE_TTL_SECONDS]:
+            BARCODE_SESSION_CACHE.pop(key, None)
+        while len(BARCODE_SESSION_CACHE) >= BARCODE_CACHE_MAX:
+            oldest = min(BARCODE_SESSION_CACHE, key=lambda k: BARCODE_SESSION_CACHE[k]['ts'])
+            BARCODE_SESSION_CACHE.pop(oldest, None)
+        BARCODE_SESSION_CACHE[sid] = {
+            'ts': now,
+            'data': {
+                'headers': headers,
+                'data_rows': data_rows,
+                'mapping': mapping,
+                'items': items,
+            },
+        }
 
 
 @app.route('/barkod')
@@ -322,10 +395,7 @@ def barcode_upload_file():
 
         items = barcode_extract_items(headers, data_rows, mapping)
 
-        BARCODE_SESSION_CACHE['headers'] = headers
-        BARCODE_SESSION_CACHE['data_rows'] = data_rows
-        BARCODE_SESSION_CACHE['mapping'] = mapping
-        BARCODE_SESSION_CACHE['items'] = items
+        _barcode_cache_set(headers, data_rows, mapping, items)
 
         total_labels = sum(item.get('quantity', 1) for item in items)
 
@@ -351,8 +421,9 @@ def barcode_upload_file():
 @app.route('/api/barcode/remap', methods=['POST'])
 def barcode_remap_columns():
     data = request.get_json(silent=True) or {}
-    headers = BARCODE_SESSION_CACHE.get('headers', [])
-    data_rows = BARCODE_SESSION_CACHE.get('data_rows', [])
+    cache = _barcode_cache_get()
+    headers = cache['headers']
+    data_rows = cache['data_rows']
 
     if not headers or not data_rows:
         return jsonify({'success': False, 'message': 'Aktif kargo dosyası bulunamadı.'}), 400
@@ -373,8 +444,7 @@ def barcode_remap_columns():
     }
 
     items = barcode_extract_items(headers, data_rows, mapping)
-    BARCODE_SESSION_CACHE['mapping'] = mapping
-    BARCODE_SESSION_CACHE['items'] = items
+    _barcode_cache_set(headers, data_rows, mapping, items)
 
     total_labels = sum(item.get('quantity', 1) for item in items)
     return jsonify({
@@ -397,10 +467,7 @@ def barcode_load_sample_data():
         headers, data_rows, mapping = barcode_read_excel_or_csv(sample_path)
         items = barcode_extract_items(headers, data_rows, mapping)
 
-        BARCODE_SESSION_CACHE['headers'] = headers
-        BARCODE_SESSION_CACHE['data_rows'] = data_rows
-        BARCODE_SESSION_CACHE['mapping'] = mapping
-        BARCODE_SESSION_CACHE['items'] = items
+        _barcode_cache_set(headers, data_rows, mapping, items)
 
         total_labels = sum(item.get('quantity', 1) for item in items)
         return jsonify({
@@ -458,10 +525,7 @@ def barcode_load_recent_downloads():
             return jsonify({'success': False, 'message': f'{filename} dosyasında geçerli veri bulunamadı.'}), 400
 
         items = barcode_extract_items(headers, data_rows, mapping)
-        BARCODE_SESSION_CACHE['headers'] = headers
-        BARCODE_SESSION_CACHE['data_rows'] = data_rows
-        BARCODE_SESSION_CACHE['mapping'] = mapping
-        BARCODE_SESSION_CACHE['items'] = items
+        _barcode_cache_set(headers, data_rows, mapping, items)
 
         total_labels = sum(item.get('quantity', 1) for item in items)
         return jsonify({
@@ -484,7 +548,8 @@ def barcode_generate_pdf_endpoint():
     options = data.get('options', {})
 
     if not items:
-        items = BARCODE_SESSION_CACHE.get('items', [])
+        # Yalnizca ayni tarayici oturumunun kargo dosyasindan tamamlanir.
+        items = _barcode_cache_get()['items']
 
     if not items:
         return jsonify({'success': False, 'message': 'PDF üretilecek sipariş listesi bulunamadı.'}), 400
@@ -568,7 +633,11 @@ def oliz_stats_endpoint():
 @app.route('/api/autocomplete', methods=['GET'])
 def oliz_autocomplete_endpoint():
     q = request.args.get('q', '').strip()
-    limit = int(request.args.get('limit', 15))
+    try:
+        limit = int(request.args.get('limit', 15))
+    except (TypeError, ValueError):
+        limit = 15
+    limit = max(1, min(limit, 100))
     results = campaign_engine.search_products(q, limit=limit)
     return jsonify({
         'success': True,
@@ -637,7 +706,8 @@ def oliz_upload_endpoint():
         return jsonify({'success': False, 'message': 'Lütfen geçerli bir Excel (.xlsx / .xls) dosyası yükleyin.'}), 400
 
     filename = secure_filename(file.filename) or 'kampanya.xlsx'
-    dest_path = os.path.join(OLIZ_UPLOAD_DIR, filename)
+    # Ayni adi tasiyan iki yukleme birbirini ezmesin diye benzersiz onek (H-02).
+    dest_path = os.path.join(OLIZ_UPLOAD_DIR, f"kampanya_{secrets.token_hex(4)}_{filename}")
     file.save(dest_path)
     try:
         campaign_engine.load_from_excel(dest_path)
