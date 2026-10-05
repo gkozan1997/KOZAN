@@ -132,6 +132,11 @@ EXCLUDE_PRODUCT_KEYWORDS = [
     'ankastre firin',
     'mini firin',
     'derin dondurucu',
+    'davlumbaz',
+    'aspirator',
+    'ocak',
+    'ocaklar',
+    'ocakli',
     'klima',
     'ek garanti',
     'garanti uzatma',
@@ -149,11 +154,8 @@ EXCLUDE_PRODUCT_KEYWORDS = [
 ]
 
 def is_conditional_appliance(name):
-    norm = normalize_tr(name)
-    if 'aspirator' in norm or 'ocak' in norm or 'davlumbaz' in norm:
-        return True
-    if re.search(r'\b(adp\s*\d+[a-z0-9]*|bde\s*\d+[a-z0-9]*|ade\s*\d+[a-z0-9]*|hde\s*\d+[a-z0-9]*|cde\s*\d+[a-z0-9]*|bocd\s*[a-z0-9]+|p\s*38|p\s*27)\b', norm):
-        return True
+    # Kullanıcı talebi: Davlumbaz, Ankastre Ocak ve Aspiratör büyük eşya kabul edilerek
+    # toplama listesinden tamamen ve doğrudan hariç tutulmaktadır.
     return False
 
 def is_major_appliance_or_warranty(name):
@@ -184,19 +186,25 @@ def is_major_appliance_or_warranty(name):
     if 'ankastre firin' in norm or 'mini firin' in norm or 'buhar destekli firin' in norm or 'solo firin' in norm or ' firin' in norm or norm.endswith('firin'):
         return True
 
-    # 5. Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS vb.)
+    # 5. Davlumbaz, Ankastre Ocak ve Aspiratör (Büyük Eşyalar - Kullanıcı talebiyle listeden tamamen çıkartılır)
+    if 'davlumbaz' in norm or 'aspirator' in norm or 'ocak' in norm:
+        return True
+    if re.search(r'\b(adp\s*\d+[a-z0-9]*|bde\s*\d+[a-z0-9]*|ade\s*\d+[a-z0-9]*|hde\s*\d+[a-z0-9]*|cde\s*\d+[a-z0-9]*|bocd\s*[a-z0-9]*|bomd\s*[a-z0-9]*|bsomd\s*[a-z0-9]*|boi\s*\d+[a-z0-9]*|hocd\s*[a-z0-9]*|p\s*38|p\s*41|p\s*27)\b', norm):
+        return True
+
+    # 6. Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS vb.)
     if 'yazarkasa' in norm or 'yazar kasa' in norm or 'pos cihazi' in norm or 'odeme kaydedici' in norm or 'okc' in cleaned_words:
         return True
     if 'pos' in cleaned_words and ('yazar' in norm or 'kasa' in norm or 'x30' in norm or '300 tr' in norm or '220' in norm or '400' in norm or 'mobil' in norm or 'cihaz' in norm or 'eft' in norm):
         return True
 
-    # 6. Termosifon, şofben, kombi, boyler ve ani su ısıtıcıları (Büyük su ısıtma ve ısıtma cihazları)
+    # 7. Termosifon, şofben, kombi, boyler ve ani su ısıtıcıları (Büyük su ısıtma ve ısıtma cihazları)
     if 'termosifon' in norm or 'sofben' in norm or 'boyler' in norm or 'ani su isitici' in norm or 'ani su isiticisi' in norm:
         return True
     if re.search(r'\bkombi\b', norm):
         return True
 
-    # 7. Diğer beyaz eşya & garanti listesi
+    # 8. Diğer beyaz eşya & garanti listesi
     for kw in EXCLUDE_PRODUCT_KEYWORDS:
         if kw in norm:
             return True

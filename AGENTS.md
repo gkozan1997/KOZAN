@@ -78,10 +78,13 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * `DELONGHI`, `THOR`, `TEFAL`, `BABYLISS`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ`, `NESPRESSO`, `KRUPS`, `MELITTA`, `SAGE`, `SIMFER`, `KUMTEL`, `LUXELL`, `SINBO`, `KARCHER`, `ROWENTA` vb.
   * Delonghi, Thor ve benzeri tüm markalar doğrudan **1. Sayfaya** basılır. Asla 2. Sayfaya (Beko, Grundig, Lenovo & Sony) kaymaz.
   * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
-* **Büyük Beyaz Eşya, TV ve Garanti Filtrelemesi (`is_major_appliance_or_warranty` + `is_conditional_appliance`):**
-  * Gerçek filtreleme `consolidate_and_build` (`core_engine.py`) içindeki `is_item_excluded()` ile yapılır; `is_major_appliance_or_warranty` her satır için, `is_conditional_appliance` ise **aynı sipariş numarası / müşteriye ait büyük beyaz eşya varsa** uygulanır.
+* **Büyük Beyaz Eşya, Ankastre, TV ve Garanti Filtrelemesi (`is_major_appliance_or_warranty`):**
+  * Gerçek filtreleme `consolidate_and_build` (`core_engine.py`) içindeki `is_item_excluded()` ile yapılır; `is_major_appliance_or_warranty` her satır için uygulanır.
   * Bu filtreleme **YALNIZCA BEKO markalı ürünlere** uygulanır. Diğer tüm markalar (Lenovo, Tefal, Babyliss, Philips, Braun, Teka, Bissell, Laurastar, WMF, Kenwood vb.) doğrudan listelenir.
   * **Beko İçin Filtrelenen Ürünler (Listeden Hariç Tutulanlar):**
+    - Davlumbaz / Duvar Tipi Davlumbaz (Beko ADE 62540 B, BDE 6062 G, ADP vb.)
+    - Ankastre Ocak / Ocaklar (Beko BOCD, BOMD, BOI, Cam Tablalı Ocak, Gazlı Ocak vb.)
+    - Aspiratör / Ankastre Sürgülü Aspiratör (Beko P 38, P 41, P 27 vb.)
     - Çamaşır Kurutma Makinesi, Kurutma Makinesi
     - Bulaşık Makinesi
     - Buzdolabı (Mini Buzdolabı dahil)
@@ -96,9 +99,6 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
     - Lenovo Garanti ve Bilgisayarlar (Lenovo 1 Yıl Garanti Uzatma Paketi, IdeaPad vb.)
     - Mikrodalga Fırın (Beko BMD vb.)
-    - Davlumbaz / Duvar Tipi Davlumbaz (Beko ADP61420B vb. - Tek başına alındıysa toplanır; Çamaşır, Kurutma, Bulaşık, Buzdolabı, Fırın, TV, Dondurucu, Klima veya Termosifon gibi büyük beyaz eşyalarla birlikte alındıysa hariç tutulur)
-    - Ankastre Ocak / Ocaklar (Beko BOCD, BOI vb. - Tek başına alındıysa toplanır; Çamaşır, Kurutma, Bulaşık, Buzdolabı, Fırın, TV, Dondurucu, Klima veya Termosifon ile alındıysa hariç tutulur)
-    - Aspiratör / Ankastre Sürgülü Aspiratör (Beko P 38 vb. - Tek başına alındıysa toplanır; büyük beyaz eşyalarla birlikte alındıysa hariç tutulur)
     - Su Isıtıcı / Su Isıtıcısı (Kettle - Mutfak tipi tezgah üstü kettle cihazları küçük ev aletidir, listede toplanmaya devam eder)
     - Saç Kurutma Makinesi (BaByliss, Grundig vb.)
     - Tüm Küçük Ev Aletleri (Kahve/Çay Makinesi, Blender, Ütü, Fritöz, Süpürge, Tost Makinesi vb.), Telefon ve Bilgisayarlar.
