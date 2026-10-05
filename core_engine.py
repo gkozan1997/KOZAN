@@ -273,6 +273,10 @@ def detect_brand(full_name, store='', brand_col=''):
     if 'PLAYSTATION' in u_upper or 'PLAYSTATION' in first_word or re.search(r'\bPS[45]\b', u_upper):
         return 'SONY'
 
+    # 0.2 Kärcher model kodları (SC 1-5, WV 1-6, WD 1-6, SE 3-6, K 2-7, FC 3-7, VC 2-7 vb.)
+    if re.search(r'\b(SC\s*[1-5]|WV\s*[1-6]|WD\s*[1-6]|SE\s*[3-6]|K\s*[2-7]|FC\s*[3-7]|VC\s*[2-7])\b', u_upper) and any(kw in u_upper for kw in ['EASYFIX', 'BUHARLI', 'YIKAMA', 'SUPURGE', 'TEMIZLEME', 'BASINCLI']):
+        return 'KARCHER'
+
     # 1. Başlangıç veya ilk kelime bilinen marka mı? (Delonghi, Thor, Philips, Tefal, vb.)
     for kb in sorted(KNOWN_BRANDS, key=len, reverse=True):
         if kb == first_word_norm or first_word.startswith(kb) or u_upper.startswith(kb):

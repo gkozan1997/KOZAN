@@ -936,6 +936,14 @@
             footer,
             .section-top,
             .screen-beko-divider,
+            body:not(.active-tab-barkod) #view-barkod,
+            body:not(.active-tab-oliz) #view-oliz,
+            body.active-tab-siparis #view-barkod,
+            body.active-tab-siparis #view-oliz,
+            body.active-tab-barkod #view-siparis,
+            body.active-tab-barkod #view-oliz,
+            body.active-tab-oliz #view-siparis,
+            body.active-tab-oliz #view-barkod,
             .no-print {
                 display: none !important;
                 visibility: hidden !important;
@@ -951,6 +959,7 @@
             }
             .app-layout-wrapper,
             .app-main-viewport,
+            #view-siparis,
             .container,
             .results-section,
             .table-responsive {
@@ -969,6 +978,9 @@
                 border: none !important;
                 box-shadow: none !important;
                 background: transparent !important;
+                transform: none !important;
+                -webkit-transform: none !important;
+                animation: none !important;
             }
             .results-header {
                 display: none !important;
@@ -2245,6 +2257,14 @@
            NIHAI BASKI IZOLASYONU (MOBIL DOCK & HEADER YAZDIRMADA ASLA CIKMAZ)
            ============================================================== */
         @media print {
+            body:not(.active-tab-barkod) #view-barkod,
+            body:not(.active-tab-oliz) #view-oliz,
+            body.active-tab-siparis #view-barkod,
+            body.active-tab-siparis #view-oliz,
+            body.active-tab-barkod #view-siparis,
+            body.active-tab-barkod #view-oliz,
+            body.active-tab-oliz #view-siparis,
+            body.active-tab-oliz #view-barkod,
             .mobile-top-bar,
             .mobile-bottom-nav,
             .mobile-tabs-container,
@@ -3304,6 +3324,21 @@
         const tab = cls.indexOf('active-tab-barkod') !== -1 ? 'barkod'
             : (cls.indexOf('active-tab-oliz') !== -1 ? 'oliz' : 'siparis');
         applyPrintPageSize(tab);
+
+        // Sipariş yazdırma öncesinde tüm listeyi ve aramayı garantiye al
+        if (tab === 'siparis' && currentResultData && currentResultData.grouped_items && currentResultData.grouped_items.length > 0) {
+            if (activeTabKey !== 'all') {
+                activeTabKey = 'all';
+                const searchInput = document.getElementById('table-search');
+                if (searchInput && searchInput.value) searchInput.value = '';
+                const allTabBtn = document.querySelector('#brand-tabs .tab-btn');
+                if (allTabBtn) {
+                    document.querySelectorAll('#brand-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+                    allTabBtn.classList.add('active');
+                }
+                renderTableRows();
+            }
+        }
     });
 
     function switchMainTab(tab) {
@@ -3696,9 +3731,10 @@
         const tabsContainer = document.getElementById('brand-tabs');
         tabsContainer.innerHTML = '';
 
+        const totalQty = (result.grouped_items || []).reduce((acc, it) => acc + (it.qty || 1), 0);
         const allTab = document.createElement('button');
         allTab.className = 'tab-btn active';
-        allTab.innerText = `Tümü (Ana Liste - ${result.non_beko_qty} Adet)`;
+        allTab.innerText = `Tümü (Ana Liste - ${totalQty} Adet)`;
         allTab.onclick = () => switchTab('all', allTab);
         tabsContainer.appendChild(allTab);
 
@@ -3848,6 +3884,20 @@
         if (document.activeElement && typeof document.activeElement.blur === 'function') {
             document.activeElement.blur();
         }
+
+        // Yazdırma öncesinde her zaman "Tümü (Ana Liste)" sekmesine dön ve aramayı temizle
+        // Böylece 1. sayfadaki tüm markalar (Kärcher vb.) ve 2. sayfadaki Beko/Grundig/Lenovo/Sony eksiksiz yazdırılır.
+        const searchInput = document.getElementById('table-search');
+        if (searchInput && searchInput.value) {
+            searchInput.value = '';
+        }
+        activeTabKey = 'all';
+        const allTabBtn = document.querySelector('#brand-tabs .tab-btn');
+        if (allTabBtn) {
+            document.querySelectorAll('#brand-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+            allTabBtn.classList.add('active');
+        }
+        renderTableRows();
 
         // iOS Safari ve mobil tarayıcılar için render motorunun A4 düzenini hazırlamasına zaman ver
         setTimeout(() => {
