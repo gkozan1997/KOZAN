@@ -744,8 +744,9 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     Mükerrer ürünleri konsolide eder ve A4 formatlı Excel dosyalarını BELLEKTE üretir.
     Bu fonksiyon hiçbir disk yazma işlemi yapmaz; hem masaüstü hem bulut yolu bunu kullanır.
     """
+    now = datetime.datetime.now()
     if target_date is None:
-        target_date = datetime.date.today().strftime('%Y-%m-%d')
+        target_date = now.strftime('%Y-%m-%d')
     try:
         parts = str(target_date).split('-')
         if len(parts) == 3:
@@ -753,7 +754,10 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         else:
             display_date = str(target_date)
     except Exception:
-        display_date = datetime.date.today().strftime('%d.%m.%Y')
+        display_date = now.strftime('%d.%m.%Y')
+
+    time_str = now.strftime('%H:%M')
+    display_datetime = f"{display_date} - {time_str}"
 
     # Group by brand & CONSOLIDATE duplicate products across ALL files
     brand_consolidated = defaultdict(dict)
@@ -956,8 +960,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         ws.page_margins.header = 0.2 if is_dense else 0.25
         ws.page_margins.footer = 0.2 if is_dense else 0.25
 
-        # Sayfa üst başlığı: Liste oluşturulma tarihi (A4 sol üst)
-        ws.oddHeader.left.text = display_date
+        # Sayfa üst başlığı: Liste oluşturulma tarihi ve saati (A4 sol üst)
+        ws.oddHeader.left.text = display_datetime
         ws.oddHeader.left.size = 9
         ws.oddHeader.left.font = "Segoe UI"
 
@@ -1095,7 +1099,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         'source_files': source_filenames,
         'total_files': len(source_filenames),
         'total_orders': len(all_raw_rows),
-        'created_date': display_date,
+        'created_date': display_datetime,
+        'created_time': time_str,
         'date': target_date,
         'excluded_rows': len(excluded_rows),
         'excluded_qty': sum(x['qty'] for x in excluded_rows),
