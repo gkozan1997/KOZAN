@@ -87,6 +87,7 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Çamaşır Kurutma Makinesi, Kurutma Makinesi
     - Bulaşık Makinesi
     - Buzdolabı (Mini Buzdolabı dahil)
+    - Minibar / BEKO 7723 Ms Siyah 33 Litre Minibar (ve tüm Beko minibar modelleri: doğrudan listeden hariç tutulur, siparişleri toplama listesine eklenmez)
     - Ankastre Fırın, Mini Fırın, Solo Fırın, Buhar Destekli Fırın, Ocaklı Fırın
     - Çamaşır Makinesi
     - Ek Garanti, Garanti Uzatma Paketleri (Beko vb. ek garantiler - Lenovo Garanti hariç)

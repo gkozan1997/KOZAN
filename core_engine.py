@@ -91,11 +91,11 @@ BEKO_START_MODELS = [
     'KMX', '7053', 'CM ', 'CMX', 'B 600', 'B 710', 'B600', 'B710',
     'BKK', 'BK RHC', 'BK ', 'BFC', 'BDE', 'TKM', 'BEU', 'KMB', 
     '9704', '9705', '31825', '74826', 'FR 8374', 'FRA ', 'FRA', 
-    'RHB', 'CFM', 'FK 81', 'FK81', 'ADP', 'ADE', 'BOCD'
+    'RHB', 'CFM', 'FK 81', 'FK81', 'ADP', 'ADE', 'BOCD', '7723'
 ]
 
 BEKO_INLINE_REGEX = re.compile(
-    r'\b(7053MB|BKK\s*\d+|TKM\s*\d+|BEU\s*\d+|BFC\s*\d+|BDE\s*\d+[A-Z0-9]*|ADP\s*\d+[A-Z0-9]*|ADE\s*\d+[A-Z0-9]*|BOCD\s*[A-Z0-9]+|KMX\s*\d+|CMX\s*\d+|FRA\s*\d+|RHB\s*\d+|CFM\s*\d+|CM\s*\d{3,4}|BK\s*(?:RHC|\d{3,4}))\b',
+    r'\b(7723\s*MS|7723|7053MB|BKK\s*\d+|TKM\s*\d+|BEU\s*\d+|BFC\s*\d+|BDE\s*\d+[A-Z0-9]*|ADP\s*\d+[A-Z0-9]*|ADE\s*\d+[A-Z0-9]*|BOCD\s*[A-Z0-9]+|KMX\s*\d+|CMX\s*\d+|FRA\s*\d+|RHB\s*\d+|CFM\s*\d+|CM\s*\d{3,4}|BK\s*(?:RHC|\d{3,4}))\b',
     re.IGNORECASE
 )
 
@@ -138,6 +138,7 @@ EXCLUDE_PRODUCT_KEYWORDS = [
     'camasir makinesi',
     'bulasik makinesi',
     'buzdolabi',
+    'minibar',
     'ankastre firin',
     'mini firin',
     'ocakli firin',
@@ -178,6 +179,18 @@ def is_beko_ocak(name):
         return True
     if re.search(r'\b(bocd\s*[a-z0-9]*|bomd\s*[a-z0-9]*|bsomd\s*[a-z0-9]*|boi\s*\d+[a-z0-9]*|hocd\s*[a-z0-9]*)\b', norm):
         return True
+    return False
+
+def is_beko_7723_minibar(name):
+    norm = normalize_tr(name)
+    if not norm:
+        return False
+    # Kullanıcı talebi: BEKO 7723 Ms Siyah 33 Litre Minibar sadece bu üründen gelen siparişleri listeye ekleme
+    if '7723' in norm:
+        if any(w in norm for w in ['minibar', 'ms', 'litre', 'lt', '33', 'siyah', 'buzdolabi']):
+            return True
+        if re.search(r'\b7723\b', norm):
+            return True
     return False
 
 def is_conditional_appliance(name):
@@ -233,6 +246,10 @@ def is_major_appliance_or_warranty(name):
     if 'termosifon' in norm or 'sofben' in norm or 'boyler' in norm or 'ani su isitici' in norm or 'ani su isiticisi' in norm:
         return True
     if re.search(r'\bkombi\b', norm):
+        return True
+
+    # 7.1 Minibar kontrolü: Beko 7723 MS Siyah 33 Litre Minibar
+    if is_beko_7723_minibar(norm):
         return True
 
     # 8. Diğer beyaz eşya & garanti listesi
@@ -784,13 +801,13 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         if i_brand in KNOWN_BRANDS and i_brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'):
             is_beko = False
         else:
-            is_beko = (i_brand == 'BEKO' or ('BEKO' in canonical_key(item['name']) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'))))
+            is_beko = (i_brand == 'BEKO' or (('BEKO' in canonical_key(item['name']) or is_beko_7723_minibar(item['name']) or is_beko_7723_minibar(item.get('stok', ''))) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'))))
         if is_beko:
             ord_no = item.get('order_no', '')
             cust_key = canonical_key(item.get('customer', ''))
             is_valid_cust = bool(cust_key and len(cust_key) >= 3 and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'))
 
-            if is_major_appliance_or_warranty(item['name']):
+            if is_major_appliance_or_warranty(item['name']) or is_beko_7723_minibar(item.get('stok', '')):
                 if ord_no: orders_with_beko_major.add(ord_no)
                 if is_valid_cust: orders_with_beko_major.add(cust_key)
             if is_beko_ocak(item['name']):
@@ -804,13 +821,14 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         i_brand = item.get('brand', '')
         if i_brand in KNOWN_BRANDS and i_brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'):
             return False
-        is_beko = (i_brand == 'BEKO' or ('BEKO' in canonical_key(item['name']) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'))))
+        is_beko = (i_brand == 'BEKO' or (('BEKO' in canonical_key(item['name']) or is_beko_7723_minibar(item['name']) or is_beko_7723_minibar(item.get('stok', ''))) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'))))
         # Sadece BEKO markasına uygulanır, diğer markalar asla elenmez
         if not is_beko:
             return False
 
         name = item['name']
-        if is_major_appliance_or_warranty(name):
+        stok = (item.get('stok') or '').strip()
+        if is_major_appliance_or_warranty(name) or is_beko_7723_minibar(stok):
             return True
 
         ord_no = item.get('order_no', '')
