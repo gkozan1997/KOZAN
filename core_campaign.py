@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Oliz Kampanya & İndirim Analiz Motoru
 Beko & Arçelik Oliz Kampanya Excel Dosyalarını Çözümleme ve 1, 2, 3, 4 Ürünlü Analiz Sistemi
@@ -7,7 +7,8 @@ Beko & Arçelik Oliz Kampanya Excel Dosyalarını Çözümleme ve 1, 2, 3, 4 Ür
 import os
 import re
 import openpyxl
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+TZ_ISTANBUL = timezone(timedelta(hours=3))
 
 class CampaignEngine:
     def __init__(self, excel_path=None):
@@ -74,7 +75,7 @@ class CampaignEngine:
         self.file_info = {
             "filename": os.path.basename(file_path),
             "sheets": wb.sheetnames,
-            "load_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "load_time": datetime.now(TZ_ISTANBUL).strftime("%Y-%m-%d %H:%M:%S")
         }
 
         # 1. TEKİL KAMPANYALAR

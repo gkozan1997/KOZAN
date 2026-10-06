@@ -17,6 +17,15 @@ import unicodedata
 # Yerel masaüstü sürümü bu bayrağı False görür ve eski davranışını sürdürür.
 IS_CLOUD = bool(os.environ.get('VERCEL'))
 
+# Türkiye / İstanbul Saat Dilimi (UTC+03:00)
+TZ_ISTANBUL = datetime.timezone(datetime.timedelta(hours=3))
+
+def now_istanbul():
+    return datetime.datetime.now(TZ_ISTANBUL)
+
+def today_istanbul_str():
+    return now_istanbul().strftime('%Y-%m-%d')
+
 # Geçici dosya dizini. Vercel'de TMPDIR=/tmp verir; yerelde işletim sisteminin
 # geçici dizinine düşer (sabit /tmp yolu Windows'ta C:\tmp yaratırdı).
 CLOUD_TMP_DIR = os.environ.get('TMPDIR') or tempfile.gettempdir()
@@ -744,9 +753,9 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     Mükerrer ürünleri konsolide eder ve A4 formatlı Excel dosyalarını BELLEKTE üretir.
     Bu fonksiyon hiçbir disk yazma işlemi yapmaz; hem masaüstü hem bulut yolu bunu kullanır.
     """
-    now = datetime.datetime.now()
+    now = now_istanbul()
     if target_date is None:
-        target_date = now.strftime('%Y-%m-%d')
+        target_date = today_istanbul_str()
     try:
         parts = str(target_date).split('-')
         if len(parts) == 3:
@@ -1138,7 +1147,7 @@ def parse_and_process_multiple_files(files_or_paths, filter_beko=False, target_d
     tarih klasörlerine diske yazar. Davranış eskisiyle birebir aynıdır.
     """
     if target_date is None:
-        target_date = datetime.date.today().strftime('%Y-%m-%d')
+        target_date = today_istanbul_str()
 
     base_dirs = get_base_dirs()
 
@@ -1204,7 +1213,7 @@ def process_in_memory(files_or_paths, filter_beko=False, custom_note=""):
     main_bytes, beko_bytes = workbooks_to_bytes(wb_main, wb_beko)
 
     result.update({
-        'date': datetime.date.today().strftime('%Y-%m-%d'),
+        'date': today_istanbul_str(),
         'main_excel_path': None,
         'beko_excel_path': None,
         'folder_path': None,

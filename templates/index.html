@@ -3502,23 +3502,31 @@
             switchMainTab('siparis');
         }
 
-        // Sidebar Tarih
+        // Sidebar Tarih (İstanbul Saat Dilimi UTC+03:00)
         const sideDate = document.getElementById('sidebar-date-display');
         if (sideDate) {
             const now = new Date();
-            sideDate.innerText = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+            sideDate.innerText = now.toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul', day: 'numeric', month: 'long', year: 'numeric' });
         }
     });
 
+    // Türkiye / İstanbul Saat Dilimi (UTC+03:00) Yardımcısı
+    function getIstanbulDateTime() {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul', day: '2-digit', month: '2-digit', year: 'numeric' });
+        const timeStr = now.toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit', hour12: false });
+        const parts = dateStr.split('.');
+        const isoDate = (parts.length === 3) ? `${parts[2]}-${parts[1]}-${parts[0]}` : dateStr;
+        return { dateStr, timeStr, isoDate };
+    }
 
     let currentResultData = null;
     let activeTabKey = 'all';
     let IS_CLOUD = false;
 
-    // Set today's date
-    const today = new Date();
-    const dateFormatted = today.toISOString().split('T')[0];
-    document.getElementById('current-date-text').innerText = `Günün Tarihi: ${dateFormatted}`;
+    // Set today's date (UTC+03:00 İstanbul)
+    const istInitial = getIstanbulDateTime();
+    document.getElementById('current-date-text').innerText = `Günün Tarihi: ${istInitial.isoDate}`;
 
     // Note Input Handlers (Daima Ekranda Görünür & Senkronize)
     function getPage1Note() {
@@ -3836,17 +3844,11 @@
             } else if (currentResultData.date) {
                 const parts = String(currentResultData.date).split('-');
                 const dStr = (parts.length === 3) ? `${parts[2]}.${parts[1]}.${parts[0]}` : currentResultData.date;
-                const now = new Date();
-                const hh = String(now.getHours()).padStart(2, '0');
-                const min = String(now.getMinutes()).padStart(2, '0');
-                displayDate = `${dStr} - ${hh}:${min} - ${MOTTO}`;
+                const ist = getIstanbulDateTime();
+                displayDate = `${dStr} - ${ist.timeStr} - ${MOTTO}`;
             } else {
-                const d = new Date();
-                const dd = String(d.getDate()).padStart(2, '0');
-                const mm = String(d.getMonth() + 1).padStart(2, '0');
-                const hh = String(d.getHours()).padStart(2, '0');
-                const min = String(d.getMinutes()).padStart(2, '0');
-                displayDate = `${dd}.${mm}.${d.getFullYear()} - ${hh}:${min} - ${MOTTO}`;
+                const ist = getIstanbulDateTime();
+                displayDate = `${ist.dateStr} - ${ist.timeStr} - ${MOTTO}`;
             }
         }
         if (dateEl1) dateEl1.innerText = displayDate;
