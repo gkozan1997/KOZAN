@@ -151,10 +151,13 @@ EXCLUDE_PRODUCT_KEYWORDS = [
     'ani su isiticisi',
 ]
 
-def is_conditional_appliance(name):
-    # Kullanıcı talebi: Beko ocak siparişlerinde müşteri tek aldıysa listeye ekle,
-    # yanında büyük eşyalar (çamaşır, kurutma, bulaşık, buzdolabı, fırın, davlumbaz,
-    # aspiratör, TV, dondurucu, klima, termosifon vb.) varsa listeye ekleme.
+def is_beko_adp61420(name):
+    norm = normalize_tr(name)
+    if not norm:
+        return False
+    return bool(re.search(r'\badp[\s\-]*61420[a-z0-9]*\b', norm))
+
+def is_beko_ocak(name):
     norm = normalize_tr(name)
     if not norm:
         return False
@@ -168,6 +171,12 @@ def is_conditional_appliance(name):
         return True
     return False
 
+def is_conditional_appliance(name):
+    # Kullanıcı talebi:
+    # 1. Beko ocak siparişlerinde müşteri tek aldıysa listeye ekle, yanında büyük eşyalar varsa listeye ekleme.
+    # 2. Beko ADP61420S duvar tipi davlumbaz ve diğer renklerinde müşteri tek başına aldıysa listeye ekle, yanında büyük ürün varsa ekleme.
+    return is_beko_ocak(name) or is_beko_adp61420(name)
+
 def is_major_appliance_or_warranty(name):
     norm = normalize_tr(name)
     if not norm:
@@ -179,6 +188,9 @@ def is_major_appliance_or_warranty(name):
     if 'sac kurutma' in norm:
         return False
     if 'mikrodalga' in norm:
+        return False
+    # Beko ADP 61420 davlumbaz ve renkleri koşullu üründür (tek başına alınınca korunur, büyük ürünle elenir)
+    if is_beko_adp61420(norm):
         return False
 
     # 2. TV / Televizyon kontrolü
@@ -196,7 +208,7 @@ def is_major_appliance_or_warranty(name):
     if 'ankastre firin' in norm or 'mini firin' in norm or 'buhar destekli firin' in norm or 'solo firin' in norm or ' firin' in norm or norm.endswith('firin'):
         return True
 
-    # 5. Davlumbaz ve Aspiratör (Büyük Eşyalar - Doğrudan hariç tutulur; Ocak ise tek başına alınınca listeye eklenir)
+    # 5. Davlumbaz ve Aspiratör (Büyük Eşyalar - Doğrudan hariç tutulur; Ocak ve ADP 61420 tek başına alınınca listeye eklenir)
     if 'davlumbaz' in norm or 'aspirator' in norm:
         return True
     if re.search(r'\b(adp\s*\d+[a-z0-9]*|bde\s*\d+[a-z0-9]*|ade\s*\d+[a-z0-9]*|hde\s*\d+[a-z0-9]*|cde\s*\d+[a-z0-9]*|p\s*38|p\s*41|p\s*27)\b', norm):
@@ -739,19 +751,29 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     # Büyük beyaz eşya içeren sipariş/müşteri kümesi (SADECE BEKO İÇİN)
     # Kural: Bu filtreleme sadece Beko markası için uygulanır. Geriye kalan tüm markalar (Delonghi, Thor, Tefal, Philips, Teka vb.) doğrudan listelenir.
     orders_with_beko_major = set()
+    orders_with_beko_ocak = set()
+    orders_with_beko_adp = set()
+
     for item in all_raw_rows:
         i_brand = item.get('brand', '')
         if i_brand in KNOWN_BRANDS and i_brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'):
             is_beko = False
         else:
             is_beko = (i_brand == 'BEKO' or ('BEKO' in canonical_key(item['name']) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'))))
-        if is_beko and is_major_appliance_or_warranty(item['name']):
-            if item.get('order_no'):
-                orders_with_beko_major.add(item['order_no'])
-            if item.get('customer'):
-                cust_key = canonical_key(item['customer'])
-                if cust_key and len(cust_key) >= 3 and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'):
-                    orders_with_beko_major.add(cust_key)
+        if is_beko:
+            ord_no = item.get('order_no', '')
+            cust_key = canonical_key(item.get('customer', ''))
+            is_valid_cust = bool(cust_key and len(cust_key) >= 3 and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'))
+
+            if is_major_appliance_or_warranty(item['name']):
+                if ord_no: orders_with_beko_major.add(ord_no)
+                if is_valid_cust: orders_with_beko_major.add(cust_key)
+            if is_beko_ocak(item['name']):
+                if ord_no: orders_with_beko_ocak.add(ord_no)
+                if is_valid_cust: orders_with_beko_ocak.add(cust_key)
+            if is_beko_adp61420(item['name']):
+                if ord_no: orders_with_beko_adp.add(ord_no)
+                if is_valid_cust: orders_with_beko_adp.add(cust_key)
 
     def is_item_excluded(item):
         i_brand = item.get('brand', '')
@@ -765,13 +787,22 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         name = item['name']
         if is_major_appliance_or_warranty(name):
             return True
-        if is_conditional_appliance(name):
-            ord_no = item.get('order_no', '')
-            cust_raw = item.get('customer', '')
-            cust_key = canonical_key(cust_raw)
-            has_ord_major = bool(ord_no and ord_no in orders_with_beko_major)
-            has_cust_major = bool(cust_key and len(cust_key) >= 3 and cust_key in orders_with_beko_major and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'))
-            return has_ord_major or has_cust_major
+
+        ord_no = item.get('order_no', '')
+        cust_raw = item.get('customer', '')
+        cust_key = canonical_key(cust_raw)
+        is_valid_cust = bool(cust_key and len(cust_key) >= 3 and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'))
+
+        has_major = bool(ord_no and ord_no in orders_with_beko_major) or (is_valid_cust and cust_key in orders_with_beko_major)
+
+        if is_beko_ocak(name):
+            has_adp = bool(ord_no and ord_no in orders_with_beko_adp) or (is_valid_cust and cust_key in orders_with_beko_adp)
+            return has_major or has_adp
+
+        if is_beko_adp61420(name):
+            has_ocak = bool(ord_no and ord_no in orders_with_beko_ocak) or (is_valid_cust and cust_key in orders_with_beko_ocak)
+            return has_major or has_ocak
+
         return False
 
     for item in all_raw_rows:
