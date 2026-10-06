@@ -131,12 +131,10 @@ EXCLUDE_PRODUCT_KEYWORDS = [
     'buzdolabi',
     'ankastre firin',
     'mini firin',
+    'ocakli firin',
     'derin dondurucu',
     'davlumbaz',
     'aspirator',
-    'ocak',
-    'ocaklar',
-    'ocakli',
     'klima',
     'ek garanti',
     'garanti uzatma',
@@ -154,8 +152,20 @@ EXCLUDE_PRODUCT_KEYWORDS = [
 ]
 
 def is_conditional_appliance(name):
-    # Kullanıcı talebi: Davlumbaz, Ankastre Ocak ve Aspiratör büyük eşya kabul edilerek
-    # toplama listesinden tamamen ve doğrudan hariç tutulmaktadır.
+    # Kullanıcı talebi: Beko ocak siparişlerinde müşteri tek aldıysa listeye ekle,
+    # yanında büyük eşyalar (çamaşır, kurutma, bulaşık, buzdolabı, fırın, davlumbaz,
+    # aspiratör, TV, dondurucu, klima, termosifon vb.) varsa listeye ekleme.
+    norm = normalize_tr(name)
+    if not norm:
+        return False
+    if 'mikrodalga' in norm or 'sac kurutma' in norm:
+        return False
+    if 'ankastre firin' in norm or 'mini firin' in norm or 'solo firin' in norm or ' firin' in norm or norm.endswith('firin'):
+        return False
+    if 'ocak' in norm or 'ocaklar' in norm:
+        return True
+    if re.search(r'\b(bocd\s*[a-z0-9]*|bomd\s*[a-z0-9]*|bsomd\s*[a-z0-9]*|boi\s*\d+[a-z0-9]*|hocd\s*[a-z0-9]*)\b', norm):
+        return True
     return False
 
 def is_major_appliance_or_warranty(name):
@@ -186,10 +196,10 @@ def is_major_appliance_or_warranty(name):
     if 'ankastre firin' in norm or 'mini firin' in norm or 'buhar destekli firin' in norm or 'solo firin' in norm or ' firin' in norm or norm.endswith('firin'):
         return True
 
-    # 5. Davlumbaz, Ankastre Ocak ve Aspiratör (Büyük Eşyalar - Kullanıcı talebiyle listeden tamamen çıkartılır)
-    if 'davlumbaz' in norm or 'aspirator' in norm or 'ocak' in norm:
+    # 5. Davlumbaz ve Aspiratör (Büyük Eşyalar - Doğrudan hariç tutulur; Ocak ise tek başına alınınca listeye eklenir)
+    if 'davlumbaz' in norm or 'aspirator' in norm:
         return True
-    if re.search(r'\b(adp\s*\d+[a-z0-9]*|bde\s*\d+[a-z0-9]*|ade\s*\d+[a-z0-9]*|hde\s*\d+[a-z0-9]*|cde\s*\d+[a-z0-9]*|bocd\s*[a-z0-9]*|bomd\s*[a-z0-9]*|bsomd\s*[a-z0-9]*|boi\s*\d+[a-z0-9]*|hocd\s*[a-z0-9]*|p\s*38|p\s*41|p\s*27)\b', norm):
+    if re.search(r'\b(adp\s*\d+[a-z0-9]*|bde\s*\d+[a-z0-9]*|ade\s*\d+[a-z0-9]*|hde\s*\d+[a-z0-9]*|cde\s*\d+[a-z0-9]*|p\s*38|p\s*41|p\s*27)\b', norm):
         return True
 
     # 6. Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS vb.)
@@ -739,7 +749,9 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
             if item.get('order_no'):
                 orders_with_beko_major.add(item['order_no'])
             if item.get('customer'):
-                orders_with_beko_major.add(canonical_key(item['customer']))
+                cust_key = canonical_key(item['customer'])
+                if cust_key and len(cust_key) >= 3 and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'):
+                    orders_with_beko_major.add(cust_key)
 
     def is_item_excluded(item):
         i_brand = item.get('brand', '')
@@ -755,8 +767,11 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
             return True
         if is_conditional_appliance(name):
             ord_no = item.get('order_no', '')
-            cust = canonical_key(item.get('customer', ''))
-            return bool((ord_no and ord_no in orders_with_beko_major) or (cust and cust in orders_with_beko_major))
+            cust_raw = item.get('customer', '')
+            cust_key = canonical_key(cust_raw)
+            has_ord_major = bool(ord_no and ord_no in orders_with_beko_major)
+            has_cust_major = bool(cust_key and len(cust_key) >= 3 and cust_key in orders_with_beko_major and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'))
+            return has_ord_major or has_cust_major
         return False
 
     for item in all_raw_rows:
