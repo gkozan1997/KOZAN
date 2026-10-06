@@ -894,6 +894,22 @@
             width: 100%;
         }
 
+        .print-page-date {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.03em;
+            padding: 0 0 4px 1px;
+            line-height: 1.2;
+            text-align: left;
+        }
+        .print-page-date:empty {
+            display: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
         /* Print View styles - A4 Portrait Optimized (Mobile Chrome, iOS Safari & Desktop WebKit) */
         @media print {
             /* NOT: @page kuralı CSS'te kapsanamaz (body.active-tab-* görünemez).
@@ -1015,6 +1031,23 @@
                 padding-top: 0 !important;
             }
             .print-page-2[style*="display: none"] {
+                display: none !important;
+            }
+            .print-page-date {
+                display: block !important;
+                visibility: visible !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+                font-size: 8.5pt !important;
+                font-weight: 700 !important;
+                color: #1e293b !important;
+                line-height: 1.1 !important;
+                margin: 0 0 2px 0 !important;
+                padding: 0 0 0 1px !important;
+                text-align: left !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .print-page-date:empty {
                 display: none !important;
             }
             table, table.data-table {
@@ -2691,6 +2724,7 @@
         <div class="table-responsive" id="table-container">
             <!-- 1. Sayfa Blok: Diğer Markalar -->
             <div class="print-page-block print-page-1" id="print-block-1">
+                <div class="print-page-date" id="print-page-date-1"></div>
                 <table class="data-table" id="table-page-1">
                     <thead>
                         <tr>
@@ -2712,6 +2746,7 @@
 
             <!-- 2. Sayfa Blok: Beko, Grundig, Lenovo & Sony -->
             <div class="print-page-block print-page-2" id="print-block-2" style="display: none;">
+                <div class="print-page-date" id="print-page-date-2"></div>
                 <table class="data-table" id="table-page-2">
                     <thead>
                         <tr>
@@ -3784,6 +3819,25 @@
         const block1 = document.getElementById('print-block-1');
         const block2 = document.getElementById('print-block-2');
         const divider = document.getElementById('screen-beko-divider');
+        const dateEl1 = document.getElementById('print-page-date-1');
+        const dateEl2 = document.getElementById('print-page-date-2');
+
+        let displayDate = '';
+        if (currentResultData) {
+            if (currentResultData.created_date) {
+                displayDate = currentResultData.created_date;
+            } else if (currentResultData.date) {
+                const parts = String(currentResultData.date).split('-');
+                displayDate = (parts.length === 3) ? `${parts[2]}.${parts[1]}.${parts[0]}` : currentResultData.date;
+            } else {
+                const d = new Date();
+                const dd = String(d.getDate()).padStart(2, '0');
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                displayDate = `${dd}.${mm}.${d.getFullYear()}`;
+            }
+        }
+        if (dateEl1) dateEl1.innerText = displayDate;
+        if (dateEl2) dateEl2.innerText = displayDate;
 
         if (!tbody1 || !tbody2) return;
         tbody1.innerHTML = '';

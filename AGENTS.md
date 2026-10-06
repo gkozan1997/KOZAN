@@ -303,6 +303,16 @@ Statik + canlı denetimde tespit edilen **19 doğrulanmış hata** bulunmuş, ta
 * Font dosyaları Vercel'e gönderiliyor (`fonts/arial.ttf` + `arialbd.ttf`) → bulutta Türkçe karakter kaybı yok.
 
 
+---
 
+## 15. Her Sayfada Liste Oluşturulma Tarihi Standardı (Sol Üst / Miktar Sütunu Üzeri)
 
-
+* **Konum ve Yerleşim:**
+  - Ana Toplama Listesinde (Sayfa 1: Diğer Markalar, Sayfa 2: Beko, Grundig, Lenovo & Sony) ve tekil marka sekmelerinde, tablonun sol üst köşesinde, doğrudan `Miktar` sütununun hemen üzerinde `.print-page-date` (`#print-page-date-1`, `#print-page-date-2`) yer alır.
+  - Ekranda modern ve sade fontla (`11.5px`, `var(--text-muted)`), boşken yer kaplamaz (`:empty { display: none !important; }`).
+  - `@media print` A4 dikey baskıda: `display: block !important; font-size: 8.5pt !important; font-weight: 700 !important; color: #1e293b; line-height: 1.1; margin-bottom: 2px;` kompakt yapısıyla A4 dikey 2 sayfa sığdırma düzenini asla bozmaz.
+  - Sayfa 2 blok kırılımında (`break-before: page`) 2. sayfanın da en başında otomatik olarak yer alır.
+* **Tarih Formatı:**
+  - Liste Excel'den aktarılıp oluşturulduğunda güncel tarih (`GG.AA.YYYY`, örn: `06.10.2026`) dinamik olarak basılır (`created_date`).
+* **Excel Çıktısı Entegrasyonu:**
+  - `core_engine.py` içindeki `setup_a4_sheet` fonksiyonunda `ws.oddHeader.left.text = display_date` olarak atanır; böylece Excel'den yazdırıldığında da sayfanın sol üst köşesinde liste tarihi görüntülenir ve 1. satır tablo başlığı (`Miktar`, `Ürün Adı`, `Stok Kodu`) yapısı korunur.

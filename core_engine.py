@@ -739,11 +739,22 @@ def sort_items_by_family_and_color(items):
     return result
 
 
-def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, custom_note=""):
+def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, custom_note="", target_date=None):
     """
     Mükerrer ürünleri konsolide eder ve A4 formatlı Excel dosyalarını BELLEKTE üretir.
     Bu fonksiyon hiçbir disk yazma işlemi yapmaz; hem masaüstü hem bulut yolu bunu kullanır.
     """
+    if target_date is None:
+        target_date = datetime.date.today().strftime('%Y-%m-%d')
+    try:
+        parts = str(target_date).split('-')
+        if len(parts) == 3:
+            display_date = f"{parts[2]}.{parts[1]}.{parts[0]}"
+        else:
+            display_date = str(target_date)
+    except Exception:
+        display_date = datetime.date.today().strftime('%d.%m.%Y')
+
     # Group by brand & CONSOLIDATE duplicate products across ALL files
     brand_consolidated = defaultdict(dict)
     beko_consolidated = dict()
@@ -945,6 +956,11 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         ws.page_margins.header = 0.2 if is_dense else 0.25
         ws.page_margins.footer = 0.2 if is_dense else 0.25
 
+        # Sayfa üst başlığı: Liste oluşturulma tarihi (A4 sol üst)
+        ws.oddHeader.left.text = display_date
+        ws.oddHeader.left.size = 9
+        ws.oddHeader.left.font = "Segoe UI"
+
         ws.print_options.horizontalCentered = True
         # Hücrelere zaten kenarlık çizildiği için ızgara çizgileri basılırsa
         # tablo dışı boş alanlara da çizgi basılır (H-11).
@@ -1079,6 +1095,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         'source_files': source_filenames,
         'total_files': len(source_filenames),
         'total_orders': len(all_raw_rows),
+        'created_date': display_date,
+        'date': target_date,
         'excluded_rows': len(excluded_rows),
         'excluded_qty': sum(x['qty'] for x in excluded_rows),
         'non_beko_count': len(other_page_items),
@@ -1126,7 +1144,7 @@ def parse_and_process_multiple_files(files_or_paths, filter_beko=False, target_d
 
     all_raw_rows, source_filenames = read_rows_from_files(files_or_paths, temp_dir=date_folders[0])
 
-    result = consolidate_and_build(all_raw_rows, source_filenames, filter_beko=filter_beko, custom_note=custom_note)
+    result = consolidate_and_build(all_raw_rows, source_filenames, filter_beko=filter_beko, custom_note=custom_note, target_date=target_date)
     wb_main = result.pop('_wb_main')
     wb_beko = result.pop('_wb_beko')
 
