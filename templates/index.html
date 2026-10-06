@@ -3822,6 +3822,7 @@
         const dateEl1 = document.getElementById('print-page-date-1');
         const dateEl2 = document.getElementById('print-page-date-2');
 
+        const MOTTO = '"Hiçbir başarı tesadüf değildir" Gökhan Kozan...';
         let displayDate = '';
         if (currentResultData) {
             if (currentResultData.created_date) {
@@ -3829,20 +3830,23 @@
                 if (currentResultData.created_time && !displayDate.includes(':')) {
                     displayDate += ` - ${currentResultData.created_time}`;
                 }
+                if (!displayDate.includes('tesadüf')) {
+                    displayDate += ` - ${MOTTO}`;
+                }
             } else if (currentResultData.date) {
                 const parts = String(currentResultData.date).split('-');
                 const dStr = (parts.length === 3) ? `${parts[2]}.${parts[1]}.${parts[0]}` : currentResultData.date;
                 const now = new Date();
                 const hh = String(now.getHours()).padStart(2, '0');
                 const min = String(now.getMinutes()).padStart(2, '0');
-                displayDate = `${dStr} - ${hh}:${min}`;
+                displayDate = `${dStr} - ${hh}:${min} - ${MOTTO}`;
             } else {
                 const d = new Date();
                 const dd = String(d.getDate()).padStart(2, '0');
                 const mm = String(d.getMonth() + 1).padStart(2, '0');
                 const hh = String(d.getHours()).padStart(2, '0');
                 const min = String(d.getMinutes()).padStart(2, '0');
-                displayDate = `${dd}.${mm}.${d.getFullYear()} - ${hh}:${min}`;
+                displayDate = `${dd}.${mm}.${d.getFullYear()} - ${hh}:${min} - ${MOTTO}`;
             }
         }
         if (dateEl1) dateEl1.innerText = displayDate;

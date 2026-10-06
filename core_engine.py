@@ -757,7 +757,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         display_date = now.strftime('%d.%m.%Y')
 
     time_str = now.strftime('%H:%M')
-    display_datetime = f"{display_date} - {time_str}"
+    motto = '"Hiçbir başarı tesadüf değildir" Gökhan Kozan...'
+    display_datetime = f"{display_date} - {time_str} - {motto}"
 
     # Group by brand & CONSOLIDATE duplicate products across ALL files
     brand_consolidated = defaultdict(dict)
@@ -960,9 +961,9 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         ws.page_margins.header = 0.2 if is_dense else 0.25
         ws.page_margins.footer = 0.2 if is_dense else 0.25
 
-        # Sayfa üst başlığı: Liste oluşturulma tarihi ve saati (A4 sol üst)
-        ws.oddHeader.left.text = display_datetime
-        ws.oddHeader.left.size = 9
+        # Sayfa üst başlığı: Liste oluşturulma tarihi, saati ve motto (A4 sol üst)
+        ws.oddHeader.left.text = f"{display_date} - {time_str} - “Hiçbir başarı tesadüf değildir” Gökhan Kozan..."
+        ws.oddHeader.left.size = 8.5
         ws.oddHeader.left.font = "Segoe UI"
 
         ws.print_options.horizontalCentered = True
