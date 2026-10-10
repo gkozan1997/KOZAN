@@ -79,7 +79,7 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * Delonghi, Thor ve benzeri tüm markalar doğrudan **1. Sayfaya** basılır. Asla 2. Sayfaya (Beko, Grundig, Lenovo & Sony) kaymaz.
   * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
 * **Büyük Beyaz Eşya, Ankastre, TV ve Garanti Filtrelemesi (`is_major_appliance_or_warranty` + `is_conditional_appliance`):**
-  * Gerçek filtreleme `consolidate_and_build` (`core_engine.py`) içindeki `is_item_excluded()` ile yapılır; `is_major_appliance_or_warranty` her satır için doğrudan uygulanır; `is_conditional_appliance` ise **Beko Ocaklar** ve **Beko ADP 61420 Davlumbaz serisi** için uygulanır.
+  * Gerçek filtreleme `consolidate_and_build` (`core_engine.py`) içindeki `is_item_excluded()` ile yapılır; `is_major_appliance_or_warranty` her satır için doğrudan uygulanır; `is_conditional_appliance` ise **Beko Ocaklar**, **Beko ADP 61420 Davlumbaz serisi** ve **Beko Ankastre Mikrodalgalar** (BMC, BMGB, BMM serisi) için uygulanır.
   * Bu filtreleme **YALNIZCA BEKO markalı ürünlere** uygulanır. Diğer tüm markalar (Lenovo, Tefal, Babyliss, Philips, Braun, Teka, Bissell, Laurastar, WMF, Kenwood vb.) doğrudan listelenir.
   * **Beko İçin Filtrelenen Ürünler (Listeden Hariç Tutulanlar):**
     - Davlumbaz / Duvar Tipi Davlumbaz (Beko ADE 62540 B, BDE 6062 G vb. - ADP 61420 tek başına alımları hariç)
@@ -96,14 +96,14 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Klima (Split, Inverter, Salon tipi vb.)
     - Termosifon, Şofben, Kombi, Boyler ve Ani Su Isıtıcıları (Beko BKT 500 E BS Dijital Termosifon vb. büyük su ısıtma ve ısıtma cihazları)
     - Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS, 300 TR vb. mali cihazlar)
-  * **Beko Ocaklar ve ADP 61420 Davlumbaz Kesin Kuralı:**
-    - **Tek Başına İse Listele:** Müşteri siparişte sadece Beko ocak (BOCD, BOMD, BOI vb.) veya tek başına Beko ADP 61420 serisi davlumbaz aldıysa toplama listesine eklenir.
-    - **Büyüğün Yanında İse Listeleme:** Aynı siparişte ocak veya ADP 61420 ile birlikte büyük eşya (çamaşır, kurutma, bulaşık, buzdolabı, fırın, davlumbaz ADE/BDE, aspiratör, klima, TV vb.) yer alıyorsa ocak veya ADP 61420 listelenmez (elenir).
-    - **Aynı Müşteri Ayrı Siparişleri Kontrolü:** Müşteri ocak veya ADP 61420 davlumbazı tek başına ayrı bir sipariş olarak vermiş olsa bile, aynı müşterinin (adı, alıcı bilgisi veya telefon numarası eşleşen) başka bir siparişinde büyük ürün varsa ocak veya ADP 61420 YİNE LİSTELENMEZ (elenir).
-    - **Ocak + ADP 61420 İkilisi:** Aynı sepette veya aynı müşterinin ayrı siparişlerinde ocak ile ADP 61420 birlikte alınmışsa ankastre set sayılarak her ikisi de listelenmez (elenir).
+  * **Beko Ocaklar, ADP 61420 Davlumbaz ve Ankastre Mikrodalga Kesin Kuralı:**
+    - **Tek Başına İse Listele:** Müşteri siparişte sadece Beko ocak (BOCD, BOMD, BOI vb.), tek başına Beko ADP 61420 serisi davlumbaz veya tek başına Beko Ankastre Mikrodalga (BMC, BMGB, BMM serisi) aldıysa toplama listesine eklenir.
+    - **Büyüğün Yanında İse Listeleme:** Aynı siparişte ocak, ADP 61420 veya ankastre mikrodalga ile birlikte büyük eşya (çamaşır, kurutma, bulaşık, buzdolabı, fırın, davlumbaz ADE/BDE, aspiratör, klima, TV vb.) yer alıyorsa listelenmez (elenir).
+    - **Aynı Müşteri Ayrı Siparişleri Kontrolü:** Müşteri ocak, ADP 61420 veya ankastre mikrodalgayı tek başına ayrı bir sipariş olarak vermiş olsa bile, aynı müşterinin (adı, alıcı bilgisi veya telefon numarası eşleşen) başka bir siparişinde büyük ürün varsa YİNE LİSTELENMEZ (elenir).
+    - **Ankastre Set Kombinasyonları:** Aynı sepette veya aynı müşterinin ayrı siparişlerinde Ocak, ADP 61420 veya Ankastre Mikrodalga ikilileri/üçlüleri birlikte alınmışsa ankastre set sayılarak elenir (listelenmez).
   * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
     - Lenovo Garanti ve Bilgisayarlar (Lenovo 1 Yıl Garanti Uzatma Paketi, IdeaPad vb.)
-    - Mikrodalga Fırın (Beko BMD vb.)
+    - Solo Mikrodalga Fırın (Beko BMD 200, BMD 240 vb. tezgah üstü solo mikrodalgalar küçük ev aletidir, toplanmaya devam eder)
     - Su Isıtıcı / Su Isıtıcısı (Kettle - Mutfak tipi tezgah üstü kettle cihazları küçük ev aletidir, listede toplanmaya devam eder)
     - Saç Kurutma Makinesi (BaByliss, Grundig vb.)
     - Tüm Küçük Ev Aletleri (Kahve/Çay Makinesi, Blender, Ütü, Fritöz, Süpürge, Tost Makinesi vb.), Telefon ve Bilgisayarlar.

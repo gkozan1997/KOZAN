@@ -167,6 +167,20 @@ def is_beko_adp61420(name):
         return False
     return bool(re.search(r'\badp[\s\-]*61420[a-z0-9]*\b', norm))
 
+def is_beko_ankastre_mikrodalga(name, stok=''):
+    norm = normalize_tr(name)
+    norm_stok = normalize_tr(stok) if stok else ''
+    combined = f"{norm} {norm_stok}".strip()
+    if not combined:
+        return False
+    # 1. Doğrudan 'ankastre' ve 'mikrodalga' birlikte geçiyorsa
+    if 'ankastre' in combined and 'mikrodalga' in combined:
+        return True
+    # 2. Beko ankastre mikrodalga model kodları: BMC, BMGB, BMM, BMG
+    if re.search(r'\b(bmc\s*\d+|bmgb\s*\d+|bmm\s*\d+|bmg\s*\d+)\b', combined):
+        return True
+    return False
+
 def is_beko_ocak(name):
     norm = normalize_tr(name)
     if not norm:
@@ -193,11 +207,12 @@ def is_beko_7723_minibar(name):
             return True
     return False
 
-def is_conditional_appliance(name):
+def is_conditional_appliance(name, stok=''):
     # Kullanıcı talebi:
     # 1. Beko ocak siparişlerinde müşteri tek aldıysa listeye ekle, yanında büyük eşyalar varsa listeye ekleme.
     # 2. Beko ADP61420S duvar tipi davlumbaz ve diğer renklerinde müşteri tek başına aldıysa listeye ekle, yanında büyük ürün varsa ekleme.
-    return is_beko_ocak(name) or is_beko_adp61420(name)
+    # 3. Beko Ankastre Mikrodalgalarda müşteri tek başına aldıysa listeye ekle, yanında büyük ürün varsa ekleme.
+    return is_beko_ocak(name) or is_beko_adp61420(name) or is_beko_ankastre_mikrodalga(name, stok)
 
 def is_major_appliance_or_warranty(name):
     norm = normalize_tr(name)
@@ -209,7 +224,8 @@ def is_major_appliance_or_warranty(name):
         return False
     if 'sac kurutma' in norm:
         return False
-    if 'mikrodalga' in norm:
+    # Mikrodalga kontrolü: Solo mikrodalgalar küçük ev aletidir ve korunur; ankastre mikrodalgalar ise koşullu üründür (tek başına alınınca korunur, büyük ürünle elenir)
+    if 'mikrodalga' in norm or is_beko_ankastre_mikrodalga(norm):
         return False
     # Beko ADP 61420 davlumbaz ve renkleri koşullu üründür (tek başına alınınca korunur, büyük ürünle elenir)
     if is_beko_adp61420(norm):
@@ -826,6 +842,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     customers_with_beko_ocak = set()
     orders_with_beko_adp = set()
     customers_with_beko_adp = set()
+    orders_with_beko_ankastre_md = set()
+    customers_with_beko_ankastre_md = set()
 
     for item in all_raw_rows:
         i_brand = item.get('brand', '')
@@ -852,6 +870,10 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
                 if ord_no: orders_with_beko_adp.add(ord_no)
                 if is_valid_cust: customers_with_beko_adp.add(cust_key)
                 if is_valid_phone: customers_with_beko_adp.add(ph[-10:])
+            if is_beko_ankastre_mikrodalga(item['name'], item.get('stok', '')):
+                if ord_no: orders_with_beko_ankastre_md.add(ord_no)
+                if is_valid_cust: customers_with_beko_ankastre_md.add(cust_key)
+                if is_valid_phone: customers_with_beko_ankastre_md.add(ph[-10:])
 
     def is_item_excluded(item):
         i_brand = item.get('brand', '')
@@ -878,21 +900,28 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         in_same_order_major = bool(ord_no and ord_no in orders_with_beko_major)
         cust_has_major = bool((is_valid_cust and cust_key in customers_with_beko_major) or (is_valid_phone and ph[-10:] in customers_with_beko_major))
 
-        # 2. Kullanıcı kuralı: Beko Ocaklar ve ADP 61420 Davlumbaz serisi
+        # 2. Kullanıcı kuralı: Beko Ocaklar, ADP 61420 Davlumbaz serisi ve Ankastre Mikrodalgalar
         # - Tek başına ise -> LİSTELE (return False)
         # - Büyüğün yanında ise veya AYNI MÜŞTERİ AYRI SİPARİŞLERİNDE BÜYÜK ÜRÜN VARSA -> LİSTELEME (return True)!
-        if is_beko_ocak(name) or is_beko_adp61420(name):
+        is_ocak = is_beko_ocak(name)
+        is_adp = is_beko_adp61420(name)
+        is_amd = is_beko_ankastre_mikrodalga(name, stok)
+
+        if is_ocak or is_adp or is_amd:
             has_adp = bool(ord_no and ord_no in orders_with_beko_adp) or (is_valid_cust and cust_key in customers_with_beko_adp) or (is_valid_phone and ph[-10:] in customers_with_beko_adp)
             has_ocak = bool(ord_no and ord_no in orders_with_beko_ocak) or (is_valid_cust and cust_key in customers_with_beko_ocak) or (is_valid_phone and ph[-10:] in customers_with_beko_ocak)
+            has_amd = bool(ord_no and ord_no in orders_with_beko_ankastre_md) or (is_valid_cust and cust_key in customers_with_beko_ankastre_md) or (is_valid_phone and ph[-10:] in customers_with_beko_ankastre_md)
             
             # Büyük eşyanın yanındaysa veya aynı müşterinin ayrı siparişinde büyük eşya varsa elenir
             if in_same_order_major or cust_has_major:
                 return True
             
-            # Ocak ile ADP 61420 aynı sepette veya aynı müşterinin ayrı siparişlerinde birlikte alınmışsa elenir
-            if is_beko_ocak(name) and has_adp:
+            # Ocak, ADP 61420 veya Ankastre Mikrodalga birlikte (set) alınmışsa elenir:
+            if is_ocak and (has_adp or has_amd):
                 return True
-            if is_beko_adp61420(name) and has_ocak:
+            if is_adp and (has_ocak or has_amd):
+                return True
+            if is_amd and (has_ocak or has_adp):
                 return True
 
             return False  # Tek başına alınmışsa listelenir
