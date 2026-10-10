@@ -696,6 +696,21 @@
             color: #cbd5e1;
         }
 
+        .badge-with-major {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(245, 158, 11, 0.18);
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            margin-left: 6px;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
         tbody tr.row-collected {
             background: rgba(16, 185, 129, 0.08) !important;
             opacity: 0.65;
@@ -1134,6 +1149,22 @@
                 padding: 0 !important;
                 font-family: inherit !important;
                 font-size: 7.5pt !important;
+            }
+            .badge-with-major {
+                display: inline !important;
+                background: transparent !important;
+                border: none !important;
+                color: #000000 !important;
+                font-weight: 700 !important;
+                padding: 0 !important;
+                font-size: inherit !important;
+                margin-left: 4px !important;
+            }
+            .badge-with-major::before {
+                content: "(";
+            }
+            .badge-with-major::after {
+                content: ")";
             }
             tbody tr.row-collected {
                 background: transparent !important;
@@ -3863,13 +3894,22 @@
             return u.includes('BEKO') || u.includes('GRUNDIG') || u.includes('LENOVO') || u.includes('IDEAPAD') || u.includes('SONY');
         };
 
-        const createRowHtml = (itm) => `
+        const createRowHtml = (itm) => {
+            const rawName = itm.name || '';
+            const isWithMajor = itm.is_with_major || rawName.includes('(Büyüğün Yanında)');
+            let displayNameHtml = escapeHtml(rawName);
+            if (isWithMajor) {
+                const baseClean = rawName.replace(/\(büyüğün yanında\)/gi, '').trim();
+                displayNameHtml = `${escapeHtml(baseClean)} <span class="badge-with-major">Büyüğün Yanında</span>`;
+            }
+            return `
             <tr onclick="toggleRowCollected(this)" title="Dokunarak toplandı olarak işaretleyin / geri alın" style="cursor: pointer;">
                 <td class="col-qty"><span class="qty-badge">${itm.qty}</span></td>
-                <td class="col-name">${escapeHtml(itm.name || '')}</td>
+                <td class="col-name">${displayNameHtml}</td>
                 <td class="col-code"><span class="code-badge">${escapeHtml(itm.stok || '-')}</span></td>
             </tr>
         `;
+        };
 
         const query = (document.getElementById('table-search').value || '').toLowerCase().trim();
         const matchesQuery = (x) => !query || (x.name && x.name.toLowerCase().includes(query)) || (x.stok && x.stok.toLowerCase().includes(query));

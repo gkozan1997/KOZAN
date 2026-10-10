@@ -700,26 +700,28 @@ def extract_product_sort_keys(name):
     """
     Ürün adından model gövdesini (base) ve renk/varyant kodunu (color_key) ayıklar.
     Böylece aynı modelin farklı renkleri (ör: CM 5964 R ve CM 5964 B) aynı base anahtarına sahip olur.
+    '(Büyüğün Yanında)' ibaresi taşınsa dahi aynı model ailesiyle alt alta gelmesi için temizlenir.
     """
-    norm = normalize_tr(name)
+    clean_sort_name = re.sub(r'\(büyüğün yanında\)', '', str(name or ''), flags=re.IGNORECASE).strip()
+    norm = normalize_tr(clean_sort_name)
     found_color = ""
     for c in COLOR_WORDS:
         if re.search(r'\b' + re.escape(c) + r'\b', norm):
             found_color = c
             break
 
-    m = MODEL_CODE_RE.search(name)
+    m = MODEL_CODE_RE.search(clean_sort_name)
     if m and m.group(2).upper() not in UNITS_OF_MEASURE:
         model_num = m.group(1).upper()
         suffix = m.group(2).upper()
-        clean_base = name[:m.start()] + model_num + name[m.end():]
+        clean_base = clean_sort_name[:m.start()] + model_num + clean_sort_name[m.end():]
         if found_color:
             clean_base = re.sub(r'\b' + re.escape(found_color) + r'\b', '', clean_base, flags=re.IGNORECASE)
         clean_base = re.sub(r'\s+', ' ', clean_base).strip()
         color_key = suffix + ("_" + found_color if found_color else "")
         return canonical_key(clean_base), color_key
     else:
-        clean_base = name
+        clean_base = clean_sort_name
         if found_color:
             clean_base = re.sub(r'\b' + re.escape(found_color) + r'\b', '', clean_base, flags=re.IGNORECASE)
         clean_base = re.sub(r'\s+', ' ', clean_base).strip()
@@ -730,12 +732,14 @@ def sort_items_by_family_and_color(items):
     """
     Aynı ürün/model ailesine ait farklı renk ve varyantları bir araya toplar (alt alta)
     ve kendi içinde renklerine göre sıralar.
+    Normal ürün ile 'Büyüğün Yanında' olan ürün aynı ailedeyse önce normal olan,
+    hemen altında 'Büyüğün Yanında' olan basılır.
     
     Örnek:
     - Beko CM 5964 B Floral Çay Makinesi
     - Beko CM 5964 R Floral Çay Makinesi
     - Beko TKM 2341 Keyf-i Bol Beyaz
-    - Beko TKM 2341 Keyf-i Bol Siyah
+    - Beko TKM 2341 Keyf-i Bol Beyaz (Büyüğün Yanında)
     """
     if not items:
         return []
@@ -746,10 +750,10 @@ def sort_items_by_family_and_color(items):
         base_key, color_key = extract_product_sort_keys(itm['name'])
         groups[base_key].append((color_key, itm))
 
-    # 2. Her aileyi kendi içinde renge ve miktara göre sırala
+    # 2. Her aileyi kendi içinde renge, 'Büyüğün Yanında' durumuna ve miktara göre sırala
     sorted_groups = []
     for base_key, member_list in groups.items():
-        member_list.sort(key=lambda x: (x[0], -x[1]['qty']))
+        member_list.sort(key=lambda x: (x[0], 1 if x[1].get('is_with_major') or '(büyüğün yanında)' in str(x[1].get('name', '')).lower() else 0, -x[1]['qty']))
         sorted_members = [m[1] for m in member_list]
         max_qty = max(m['qty'] for m in sorted_members)
         sorted_groups.append((max_qty, base_key, sorted_members))
@@ -828,24 +832,12 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
 
         name = item['name']
         stok = (item.get('stok') or '').strip()
+        # Büyük beyaz eşyalar (buzdolabı, çamaşır, bulaşık, kurutma, minibar, fırın, klima, tv, ADE/BDE davlumbaz vb.) ve garantiler doğrudan elenir
         if is_major_appliance_or_warranty(name) or is_beko_7723_minibar(stok):
             return True
 
-        ord_no = item.get('order_no', '')
-        cust_raw = item.get('customer', '')
-        cust_key = canonical_key(cust_raw)
-        is_valid_cust = bool(cust_key and len(cust_key) >= 3 and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'))
-
-        has_major = bool(ord_no and ord_no in orders_with_beko_major) or (is_valid_cust and cust_key in orders_with_beko_major)
-
-        if is_beko_ocak(name):
-            has_adp = bool(ord_no and ord_no in orders_with_beko_adp) or (is_valid_cust and cust_key in orders_with_beko_adp)
-            return has_major or has_adp
-
-        if is_beko_adp61420(name):
-            has_ocak = bool(ord_no and ord_no in orders_with_beko_ocak) or (is_valid_cust and cust_key in orders_with_beko_ocak)
-            return has_major or has_ocak
-
+        # Kullanıcı tercihi: Ocak ve ADP 61420 her zaman normal listelenir, elenmez.
+        # Büyük eşyaların yanında alınan küçük ev aletleri de elenmez, '(Büyüğün Yanında)' olarak listelenir.
         return False
 
     for item in all_raw_rows:
@@ -872,13 +864,28 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         if is_sony:
             brand = 'SONY'
 
+        # Büyüğün yanında tespiti (SADECE BEKO İÇİN)
+        ord_no = item.get('order_no', '')
+        cust_raw = item.get('customer', '')
+        cust_key = canonical_key(cust_raw)
+        is_valid_cust = bool(cust_key and len(cust_key) >= 3 and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'))
+
+        is_with_major = False
+        if is_beko:
+            has_major = bool(ord_no and ord_no in orders_with_beko_major) or (is_valid_cust and cust_key in orders_with_beko_major)
+            # Kullanıcı tercihi: Ocak ve ADP 61420 yanında alınsa dahi normal listelenir.
+            # Büyük ürünlerin yanında alınan küçük ev aletleri (blender, kahve/çay makinesi, ütü, tost makinesi vb.) ise '(Büyüğün Yanında)' olarak belirtilir.
+            is_ocak_or_adp = is_beko_ocak(item['name']) or is_beko_adp61420(item['name'])
+            if has_major and not is_ocak_or_adp:
+                is_with_major = True
+
         clean_name = clean_product_name(item['name'])
         is_valid_stok = bool(stok and len(stok) >= 3 and stok.lower() not in ('-', 'yok', '0', 'none', 'null'))
 
         if is_valid_stok:
-            merge_key = ('STOK', brand, stok)
+            merge_key = ('STOK', brand, stok, is_with_major)
         else:
-            merge_key = ('NAME', brand, canonical_key(clean_name))
+            merge_key = ('NAME', brand, canonical_key(clean_name), is_with_major)
 
         is_special_brand = (is_beko or brand in ('GRUNDIG', 'LENOVO', 'SONY'))
         target_dict = beko_consolidated if (filter_beko and is_special_brand) else brand_consolidated[brand]
@@ -888,7 +895,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
                 'names': [],
                 'stok': stok,
                 'qty': 0,
-                'brand': brand
+                'brand': brand,
+                'is_with_major': is_with_major
             }
         target_dict[merge_key]['names'].append(item['name'])
         if not target_dict[merge_key]['stok'] and stok:
@@ -900,11 +908,16 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         processed_list = []
         for merge_key, data in items_dict.items():
             best_name = pick_best_name(data['names'], brand=brand)
+            is_wm = data.get('is_with_major', False)
+            if is_wm:
+                if 'büyüğün yanında' not in best_name.lower():
+                    best_name = f"{best_name} (Büyüğün Yanında)"
             processed_list.append({
                 'name': best_name,
                 'stok': data['stok'],
                 'qty': data['qty'],
-                'brand': data['brand']
+                'brand': data['brand'],
+                'is_with_major': is_wm
             })
         brand_orders[brand] = sort_items_by_family_and_color(processed_list)
 
@@ -918,11 +931,16 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         processed_beko = []
         for merge_key, data in beko_consolidated.items():
             best_name = pick_best_name(data['names'], brand=data['brand'])
+            is_wm = data.get('is_with_major', False)
+            if is_wm:
+                if 'büyüğün yanında' not in best_name.lower():
+                    best_name = f"{best_name} (Büyüğün Yanında)"
             processed_beko.append({
                 'name': best_name,
                 'stok': data['stok'],
                 'qty': data['qty'],
-                'brand': data['brand']
+                'brand': data['brand'],
+                'is_with_major': is_wm
             })
         b_beko = [x for x in processed_beko if x['brand'] == 'BEKO']
         b_grundig = [x for x in processed_beko if x['brand'] == 'GRUNDIG']

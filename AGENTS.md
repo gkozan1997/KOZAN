@@ -78,11 +78,11 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * `DELONGHI`, `THOR`, `TEFAL`, `BABYLISS`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ`, `NESPRESSO`, `KRUPS`, `MELITTA`, `SAGE`, `SIMFER`, `KUMTEL`, `LUXELL`, `SINBO`, `KARCHER`, `ROWENTA` vb.
   * Delonghi, Thor ve benzeri tüm markalar doğrudan **1. Sayfaya** basılır. Asla 2. Sayfaya (Beko, Grundig, Lenovo & Sony) kaymaz.
   * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
-* **Büyük Beyaz Eşya, Ankastre, TV ve Garanti Filtrelemesi (`is_major_appliance_or_warranty` + `is_conditional_appliance`):**
-  * Gerçek filtreleme `consolidate_and_build` (`core_engine.py`) içindeki `is_item_excluded()` ile yapılır; `is_major_appliance_or_warranty` her satır için doğrudan uygulanır; `is_conditional_appliance` ise **Beko Ocaklar** ve **Beko ADP 61420 Davlumbaz serisi** için uygulanır (müşteri tek aldıysa listeye eklenir, yanında büyük eşya/ürün varsa elenir).
+* **Büyük Beyaz Eşya, Ankastre, TV ve Garanti Filtrelemesi (`is_major_appliance_or_warranty`):**
+  * Gerçek filtreleme `consolidate_and_build` (`core_engine.py`) içindeki `is_item_excluded()` ile yapılır; `is_major_appliance_or_warranty` büyük cihazlar için doğrudan uygulanır.
   * Bu filtreleme **YALNIZCA BEKO markalı ürünlere** uygulanır. Diğer tüm markalar (Lenovo, Tefal, Babyliss, Philips, Braun, Teka, Bissell, Laurastar, WMF, Kenwood vb.) doğrudan listelenir.
-  * **Beko İçin Filtrelenen Ürünler (Listeden Hariç Tutulanlar):**
-    - Davlumbaz / Duvar Tipi Davlumbaz (Beko ADE 62540 B, BDE 6062 G vb. - ADP 61420 tek başına alımları hariç)
+  * **Beko İçin Filtrelenen Büyük Ürünler (Listeden Hariç Tutulanlar):**
+    - Davlumbaz / Duvar Tipi Davlumbaz (Beko ADE 62540 B, BDE 6062 G vb. - ADP 61420 serisi hariç)
     - Aspiratör / Ankastre Sürgülü Aspiratör (Beko P 38, P 41, P 27 vb.)
     - Çamaşır Kurutma Makinesi, Kurutma Makinesi
     - Bulaşık Makinesi
@@ -96,12 +96,17 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Klima (Split, Inverter, Salon tipi vb.)
     - Termosifon, Şofben, Kombi, Boyler ve Ani Su Isıtıcıları (Beko BKT 500 E BS Dijital Termosifon vb. büyük su ısıtma ve ısıtma cihazları)
     - Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS, 300 TR vb. mali cihazlar)
-  * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
-    - Beko Ocaklar (Beko BOCD, BOMD, BOI, Cam Tablalı Ocak, Gazlı Ocak vb. - Müşteri siparişte tek başına aldıysa listeye eklenir; yanında büyük eşyalar varsa elenir)
-    - Beko ADP61420S Duvar Tipi Davlumbaz ve Diğer Renkleri (Beko ADP 61420 S / B / W / G vb. - Müşteri siparişte tek başına aldıysa listeye eklenir; yanında büyük ürünler varsa elenir)
+  * **Büyük Ürünün Yanında Alınan Küçük Ürünler Standardı (`(Büyüğün Yanında)`):**
+    - Müşteri büyük bir Beko ürününün (çamaşır, buzdolabı, bulaşık, kurutma, minibar, fırın, klima, TV vb.) yanında küçük bir Beko ürünü (kahve/çay makinesi, el blenderi, buharlı ütü, tost makinesi, süpürge, mikrodalga fırın vb.) aldığında, bu küçük ürün **aynı tabloda ayrı bir satır olarak** listeye eklenir ve adı/etiketi **`(Büyüğün Yanında)`** ibaresi ile belirtilir.
+    - Normal (tek başına) satılan aynı model ürünle adetleri birleştirilmez, ayrı bir satır olarak sunulur.
+    - Ürün ailesi sıralamasında (`sort_items_by_family_and_color`) aynı modelin normal satırının hemen altında listelenerek depoda raftan toplama kolaylığı sağlanır.
+    - Web arayüzünde şık altın/amber renkli `<span class="badge-with-major">Büyüğün Yanında</span>` rozetiyle gösterilir; A4 baskı ve Excel çıktısında doğrudan `(Büyüğün Yanında)` metni basılır.
+  * **Ocak ve ADP 61420 Normal Listeleme Standardı:**
+    - Beko Ocaklar (Beko BOCD, BOMD, BOI, Cam Tablalı Ocak, Gazlı Ocak vb.) ve Beko ADP 61420 Davlumbaz serisi (ADP 61420 S / B / W / G vb.), ister tek başına isterse büyük ürünlerin yanında alınsın **daima normal olarak** listelenir, elenmez.
+  * **Listede KORUNAN Diğer İstisnalar:**
     - Lenovo Garanti ve Bilgisayarlar (Lenovo 1 Yıl Garanti Uzatma Paketi, IdeaPad vb.)
     - Mikrodalga Fırın (Beko BMD vb.)
-    - Su Isıtıcı / Su Isıtıcısı (Kettle - Mutfak tipi tezgah üstü kettle cihazları küçük ev aletidir, listede toplanmaya devam eder)
+    - Su Isıtıcı / Su Isıtıcısı (Kettle)
     - Saç Kurutma Makinesi (BaByliss, Grundig vb.)
     - Tüm Küçük Ev Aletleri (Kahve/Çay Makinesi, Blender, Ütü, Fritöz, Süpürge, Tost Makinesi vb.), Telefon ve Bilgisayarlar.
 
