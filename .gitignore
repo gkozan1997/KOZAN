@@ -20,6 +20,7 @@ _tasarim_yedek/
 _YEDEKLER/
 *.zip
 GERI_YUKLE_*.bat
+KARARLI_SURUME_GERI_DON*.bat
 
 
 # Gecici test/deneme betikleri
