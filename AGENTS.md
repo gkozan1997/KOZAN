@@ -97,9 +97,10 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Termosifon, Şofben, Kombi, Boyler ve Ani Su Isıtıcıları (Beko BKT 500 E BS Dijital Termosifon vb. büyük su ısıtma ve ısıtma cihazları)
     - Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS, 300 TR vb. mali cihazlar)
   * **Beko Ocaklar ve ADP 61420 Davlumbaz Kesin Kuralı:**
-    - **Tek Başına İse Listele:** Müşteri siparişte sadece Beko ocak (BOCD, BOMD, BOI vb.) veya ADP 61420 davlumbaz aldıysa toplama listesine eklenir.
-    - **Büyüğün Yanında İse Listeleme:** Aynı siparişte ocak ile birlikte büyük eşya (çamaşır, kurutma, bulaşık, buzdolabı, fırın, davlumbaz ADE/BDE, aspiratör, klima, TV vb.) yer alıyorsa ocak listelenmez (elenir).
-    - **Aynı Müşteri Ayrı Siparişleri Kontrolü:** Müşteri ocağı tek başına ayrı bir sipariş olarak vermiş olsa bile, aynı müşterinin (adı, alıcı bilgisi veya telefon numarası eşleşen) başka bir siparişinde büyük ürün varsa ocak YİNE LİSTELENMEZ (elenir).
+    - **Tek Başına İse Listele:** Müşteri siparişte sadece Beko ocak (BOCD, BOMD, BOI vb.) veya tek başına Beko ADP 61420 serisi davlumbaz aldıysa toplama listesine eklenir.
+    - **Büyüğün Yanında İse Listeleme:** Aynı siparişte ocak veya ADP 61420 ile birlikte büyük eşya (çamaşır, kurutma, bulaşık, buzdolabı, fırın, davlumbaz ADE/BDE, aspiratör, klima, TV vb.) yer alıyorsa ocak veya ADP 61420 listelenmez (elenir).
+    - **Aynı Müşteri Ayrı Siparişleri Kontrolü:** Müşteri ocak veya ADP 61420 davlumbazı tek başına ayrı bir sipariş olarak vermiş olsa bile, aynı müşterinin (adı, alıcı bilgisi veya telefon numarası eşleşen) başka bir siparişinde büyük ürün varsa ocak veya ADP 61420 YİNE LİSTELENMEZ (elenir).
+    - **Ocak + ADP 61420 İkilisi:** Aynı sepette veya aynı müşterinin ayrı siparişlerinde ocak ile ADP 61420 birlikte alınmışsa ankastre set sayılarak her ikisi de listelenmez (elenir).
   * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
     - Lenovo Garanti ve Bilgisayarlar (Lenovo 1 Yıl Garanti Uzatma Paketi, IdeaPad vb.)
     - Mikrodalga Fırın (Beko BMD vb.)

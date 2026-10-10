@@ -823,7 +823,9 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     orders_with_beko_major = set()
     customers_with_beko_major = set()
     orders_with_beko_ocak = set()
+    customers_with_beko_ocak = set()
     orders_with_beko_adp = set()
+    customers_with_beko_adp = set()
 
     for item in all_raw_rows:
         i_brand = item.get('brand', '')
@@ -844,10 +846,12 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
                 if is_valid_phone: customers_with_beko_major.add(ph[-10:])
             if is_beko_ocak(item['name']):
                 if ord_no: orders_with_beko_ocak.add(ord_no)
-                if is_valid_cust: orders_with_beko_ocak.add(cust_key)
+                if is_valid_cust: customers_with_beko_ocak.add(cust_key)
+                if is_valid_phone: customers_with_beko_ocak.add(ph[-10:])
             if is_beko_adp61420(item['name']):
                 if ord_no: orders_with_beko_adp.add(ord_no)
-                if is_valid_cust: orders_with_beko_adp.add(cust_key)
+                if is_valid_cust: customers_with_beko_adp.add(cust_key)
+                if is_valid_phone: customers_with_beko_adp.add(ph[-10:])
 
     def is_item_excluded(item):
         i_brand = item.get('brand', '')
@@ -874,15 +878,24 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         in_same_order_major = bool(ord_no and ord_no in orders_with_beko_major)
         cust_has_major = bool((is_valid_cust and cust_key in customers_with_beko_major) or (is_valid_phone and ph[-10:] in customers_with_beko_major))
 
-        # 2. Kullanıcı kuralı: Beko Ocaklar (ve ADP 61420 Davlumbaz serisi)
+        # 2. Kullanıcı kuralı: Beko Ocaklar ve ADP 61420 Davlumbaz serisi
         # - Tek başına ise -> LİSTELE (return False)
         # - Büyüğün yanında ise veya AYNI MÜŞTERİ AYRI SİPARİŞLERİNDE BÜYÜK ÜRÜN VARSA -> LİSTELEME (return True)!
         if is_beko_ocak(name) or is_beko_adp61420(name):
-            has_adp = bool(ord_no and ord_no in orders_with_beko_adp) or (is_valid_cust and cust_key in orders_with_beko_adp)
-            has_ocak = bool(ord_no and ord_no in orders_with_beko_ocak) or (is_valid_cust and cust_key in orders_with_beko_ocak)
-            if in_same_order_major or cust_has_major or (is_beko_ocak(name) and has_adp) or (is_beko_adp61420(name) and has_ocak):
+            has_adp = bool(ord_no and ord_no in orders_with_beko_adp) or (is_valid_cust and cust_key in customers_with_beko_adp) or (is_valid_phone and ph[-10:] in customers_with_beko_adp)
+            has_ocak = bool(ord_no and ord_no in orders_with_beko_ocak) or (is_valid_cust and cust_key in customers_with_beko_ocak) or (is_valid_phone and ph[-10:] in customers_with_beko_ocak)
+            
+            # Büyük eşyanın yanındaysa veya aynı müşterinin ayrı siparişinde büyük eşya varsa elenir
+            if in_same_order_major or cust_has_major:
                 return True
-            return False
+            
+            # Ocak ile ADP 61420 aynı sepette veya aynı müşterinin ayrı siparişlerinde birlikte alınmışsa elenir
+            if is_beko_ocak(name) and has_adp:
+                return True
+            if is_beko_adp61420(name) and has_ocak:
+                return True
+
+            return False  # Tek başına alınmışsa listelenir
 
         return False
 
