@@ -497,7 +497,17 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
         idx_qty = find_column_index(headers, ['adet', 'miktar', 'miktar (adet)', 'sipariş adedi', 'quantity', 'qty'])
         idx_ord = find_column_index(headers, ['sipariş no', 'sipariş numarası', 'siparis no', 'paket no', 'order no'])
         idx_bar = find_column_index(headers, ['gtin (barkod)', 'barkod', 'gtin', 'barcode', 'ean'])
-        idx_cust = find_column_index(headers, ['üye adı soyadı', 'fatura - müşteri', 'müşteri', 'musteri', 'alıcı', 'alici', 'ad soyad', 'pazaryeri kullanıcı'])
+        idx_cust = find_column_index(headers, [
+            'sevk - müşteri', 'fatura - müşteri', 'müşteri', 'musteri', 
+            'üye adı soyadı', 'alıcı', 'alici', 'ad soyad', 'teslimat adı', 
+            'müşteri adı', 'musteri adi', 'alıcı adı', 'alici adi', 
+            'teslimat alıcısı', 'alıcı ad soyad', 'fatura adı', 'pazaryeri kullanıcı',
+            'müşteri no'
+        ])
+        idx_phone = find_column_index(headers, [
+            'teslimat telefonu', 'müşteri telefon', 'müşteri telefon no', 
+            'sevk - telefon', 'fatura - telefon', 'telefon', 'gsm', 'alıcı telefon'
+        ])
         idx_magaza = find_column_index(headers, ['mağaza', 'magaza', 'satıcı', 'store'])
         idx_marka = find_column_index(headers, ['marka', 'brand'])
         idx_pazar = find_column_index(headers, ['pazaryeri', 'pazar yeri', 'platform', 'marketplace'])
@@ -529,6 +539,9 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
             if ord_val.endswith('.0'): ord_val = ord_val[:-2]
 
             cust_val = str(sh.cell_value(r, idx_cust)).strip() if idx_cust != -1 else ''
+            phone_val = str(sh.cell_value(r, idx_phone)).strip() if idx_phone != -1 else ''
+            if phone_val.endswith('.0'): phone_val = phone_val[:-2]
+
             magaza_val = str(sh.cell_value(r, idx_magaza)).strip() if idx_magaza != -1 else ''
             marka_val = str(sh.cell_value(r, idx_marka)).strip() if idx_marka != -1 else ''
             pazar_val = str(sh.cell_value(r, idx_pazar)).strip() if idx_pazar != -1 else ''
@@ -542,6 +555,7 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
                 'qty': qty_val,
                 'order_no': ord_val,
                 'customer': cust_val,
+                'phone': phone_val,
                 'brand': brand,
                 'magaza': magaza_val,
                 'pazar': pazar_val,
@@ -565,7 +579,17 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
         idx_qty = find_column_index(headers, ['adet', 'miktar', 'miktar (adet)', 'sipariş adedi', 'quantity', 'qty'])
         idx_ord = find_column_index(headers, ['sipariş no', 'sipariş numarası', 'siparis no', 'paket no', 'order no'])
         idx_bar = find_column_index(headers, ['gtin (barkod)', 'barkod', 'gtin', 'barcode', 'ean'])
-        idx_cust = find_column_index(headers, ['üye adı soyadı', 'fatura - müşteri', 'müşteri', 'musteri', 'alıcı', 'alici', 'ad soyad', 'pazaryeri kullanıcı'])
+        idx_cust = find_column_index(headers, [
+            'sevk - müşteri', 'fatura - müşteri', 'müşteri', 'musteri', 
+            'üye adı soyadı', 'alıcı', 'alici', 'ad soyad', 'teslimat adı', 
+            'müşteri adı', 'musteri adi', 'alıcı adı', 'alici adi', 
+            'teslimat alıcısı', 'alıcı ad soyad', 'fatura adı', 'pazaryeri kullanıcı',
+            'müşteri no'
+        ])
+        idx_phone = find_column_index(headers, [
+            'teslimat telefonu', 'müşteri telefon', 'müşteri telefon no', 
+            'sevk - telefon', 'fatura - telefon', 'telefon', 'gsm', 'alıcı telefon'
+        ])
         idx_magaza = find_column_index(headers, ['mağaza', 'magaza', 'satıcı', 'store'])
         idx_marka = find_column_index(headers, ['marka', 'brand'])
         idx_pazar = find_column_index(headers, ['pazaryeri', 'pazar yeri', 'platform', 'marketplace'])
@@ -597,6 +621,9 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
             if ord_val.endswith('.0'): ord_val = ord_val[:-2]
 
             cust_val = str(sh.cell(r, idx_cust + 1).value or '').strip() if idx_cust != -1 else ''
+            phone_val = str(sh.cell(r, idx_phone + 1).value or '').strip() if idx_phone != -1 else ''
+            if phone_val.endswith('.0'): phone_val = phone_val[:-2]
+
             magaza_val = str(sh.cell(r, idx_magaza + 1).value or '').strip() if idx_magaza != -1 else ''
             marka_val = str(sh.cell(r, idx_marka + 1).value or '').strip() if idx_marka != -1 else ''
             pazar_val = str(sh.cell(r, idx_pazar + 1).value or '').strip() if idx_pazar != -1 else ''
@@ -610,6 +637,7 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
                 'qty': qty_val,
                 'order_no': ord_val,
                 'customer': cust_val,
+                'phone': phone_val,
                 'brand': brand,
                 'magaza': magaza_val,
                 'pazar': pazar_val,
@@ -793,6 +821,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     # Büyük beyaz eşya içeren sipariş/müşteri kümesi (SADECE BEKO İÇİN)
     # Kural: Bu filtreleme sadece Beko markası için uygulanır. Geriye kalan tüm markalar (Delonghi, Thor, Tefal, Philips, Teka vb.) doğrudan listelenir.
     orders_with_beko_major = set()
+    customers_with_beko_major = set()
     orders_with_beko_ocak = set()
     orders_with_beko_adp = set()
 
@@ -806,10 +835,13 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
             ord_no = item.get('order_no', '')
             cust_key = canonical_key(item.get('customer', ''))
             is_valid_cust = bool(cust_key and len(cust_key) >= 3 and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'))
+            ph = re.sub(r'\D', '', str(item.get('phone', '')))
+            is_valid_phone = len(ph) >= 10
 
             if is_major_appliance_or_warranty(item['name']) or is_beko_7723_minibar(item.get('stok', '')):
                 if ord_no: orders_with_beko_major.add(ord_no)
-                if is_valid_cust: orders_with_beko_major.add(cust_key)
+                if is_valid_cust: customers_with_beko_major.add(cust_key)
+                if is_valid_phone: customers_with_beko_major.add(ph[-10:])
             if is_beko_ocak(item['name']):
                 if ord_no: orders_with_beko_ocak.add(ord_no)
                 if is_valid_cust: orders_with_beko_ocak.add(cust_key)
@@ -828,6 +860,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
 
         name = item['name']
         stok = (item.get('stok') or '').strip()
+        # 1. Büyük beyaz eşyalar (buzdolabı, çamaşır, bulaşık, kurutma, minibar, fırın, klima, tv, ADE/BDE davlumbaz vb.) ve garantiler KESİNLİKLE elenir
         if is_major_appliance_or_warranty(name) or is_beko_7723_minibar(stok):
             return True
 
@@ -835,16 +868,21 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         cust_raw = item.get('customer', '')
         cust_key = canonical_key(cust_raw)
         is_valid_cust = bool(cust_key and len(cust_key) >= 3 and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'))
+        ph = re.sub(r'\D', '', str(item.get('phone', '')))
+        is_valid_phone = len(ph) >= 10
 
-        has_major = bool(ord_no and ord_no in orders_with_beko_major) or (is_valid_cust and cust_key in orders_with_beko_major)
+        in_same_order_major = bool(ord_no and ord_no in orders_with_beko_major)
+        cust_has_major = bool((is_valid_cust and cust_key in customers_with_beko_major) or (is_valid_phone and ph[-10:] in customers_with_beko_major))
 
-        if is_beko_ocak(name):
+        # 2. Kullanıcı kuralı: Beko Ocaklar (ve ADP 61420 Davlumbaz serisi)
+        # - Tek başına ise -> LİSTELE (return False)
+        # - Büyüğün yanında ise veya AYNI MÜŞTERİ AYRI SİPARİŞLERİNDE BÜYÜK ÜRÜN VARSA -> LİSTELEME (return True)!
+        if is_beko_ocak(name) or is_beko_adp61420(name):
             has_adp = bool(ord_no and ord_no in orders_with_beko_adp) or (is_valid_cust and cust_key in orders_with_beko_adp)
-            return has_major or has_adp
-
-        if is_beko_adp61420(name):
             has_ocak = bool(ord_no and ord_no in orders_with_beko_ocak) or (is_valid_cust and cust_key in orders_with_beko_ocak)
-            return has_major or has_ocak
+            if in_same_order_major or cust_has_major or (is_beko_ocak(name) and has_adp) or (is_beko_adp61420(name) and has_ocak):
+                return True
+            return False
 
         return False
 

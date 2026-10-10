@@ -79,7 +79,7 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * Delonghi, Thor ve benzeri tüm markalar doğrudan **1. Sayfaya** basılır. Asla 2. Sayfaya (Beko, Grundig, Lenovo & Sony) kaymaz.
   * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
 * **Büyük Beyaz Eşya, Ankastre, TV ve Garanti Filtrelemesi (`is_major_appliance_or_warranty` + `is_conditional_appliance`):**
-  * Gerçek filtreleme `consolidate_and_build` (`core_engine.py`) içindeki `is_item_excluded()` ile yapılır; `is_major_appliance_or_warranty` her satır için doğrudan uygulanır; `is_conditional_appliance` ise **Beko Ocaklar** ve **Beko ADP 61420 Davlumbaz serisi** için uygulanır (müşteri tek aldıysa listeye eklenir, yanında büyük eşya/ürün varsa elenir).
+  * Gerçek filtreleme `consolidate_and_build` (`core_engine.py`) içindeki `is_item_excluded()` ile yapılır; `is_major_appliance_or_warranty` her satır için doğrudan uygulanır; `is_conditional_appliance` ise **Beko Ocaklar** ve **Beko ADP 61420 Davlumbaz serisi** için uygulanır.
   * Bu filtreleme **YALNIZCA BEKO markalı ürünlere** uygulanır. Diğer tüm markalar (Lenovo, Tefal, Babyliss, Philips, Braun, Teka, Bissell, Laurastar, WMF, Kenwood vb.) doğrudan listelenir.
   * **Beko İçin Filtrelenen Ürünler (Listeden Hariç Tutulanlar):**
     - Davlumbaz / Duvar Tipi Davlumbaz (Beko ADE 62540 B, BDE 6062 G vb. - ADP 61420 tek başına alımları hariç)
@@ -96,9 +96,11 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Klima (Split, Inverter, Salon tipi vb.)
     - Termosifon, Şofben, Kombi, Boyler ve Ani Su Isıtıcıları (Beko BKT 500 E BS Dijital Termosifon vb. büyük su ısıtma ve ısıtma cihazları)
     - Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS, 300 TR vb. mali cihazlar)
+  * **Beko Ocaklar ve ADP 61420 Davlumbaz Kesin Kuralı:**
+    - **Tek Başına İse Listele:** Müşteri siparişte sadece Beko ocak (BOCD, BOMD, BOI vb.) veya ADP 61420 davlumbaz aldıysa toplama listesine eklenir.
+    - **Büyüğün Yanında İse Listeleme:** Aynı siparişte ocak ile birlikte büyük eşya (çamaşır, kurutma, bulaşık, buzdolabı, fırın, davlumbaz ADE/BDE, aspiratör, klima, TV vb.) yer alıyorsa ocak listelenmez (elenir).
+    - **Aynı Müşteri Ayrı Siparişleri Kontrolü:** Müşteri ocağı tek başına ayrı bir sipariş olarak vermiş olsa bile, aynı müşterinin (adı, alıcı bilgisi veya telefon numarası eşleşen) başka bir siparişinde büyük ürün varsa ocak YİNE LİSTELENMEZ (elenir).
   * **Listede KORUNAN (Hariç Tutulmayan) İstisnalar:**
-    - Beko Ocaklar (Beko BOCD, BOMD, BOI, Cam Tablalı Ocak, Gazlı Ocak vb. - Müşteri siparişte tek başına aldıysa listeye eklenir; yanında büyük eşyalar varsa elenir)
-    - Beko ADP61420S Duvar Tipi Davlumbaz ve Diğer Renkleri (Beko ADP 61420 S / B / W / G vb. - Müşteri siparişte tek başına aldıysa listeye eklenir; yanında büyük ürünler varsa elenir)
     - Lenovo Garanti ve Bilgisayarlar (Lenovo 1 Yıl Garanti Uzatma Paketi, IdeaPad vb.)
     - Mikrodalga Fırın (Beko BMD vb.)
     - Su Isıtıcı / Su Isıtıcısı (Kettle - Mutfak tipi tezgah üstü kettle cihazları küçük ev aletidir, listede toplanmaya devam eder)
