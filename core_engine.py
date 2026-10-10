@@ -778,6 +778,7 @@ def sort_items_by_family_and_color(items):
     Örnek:
     - Beko CM 5964 B Floral Çay Makinesi
     - Beko CM 5964 R Floral Çay Makinesi
+    - Beko CM 5964 R Floral Çay Makinesi (Büyüğün Yanında)
     - Beko TKM 2341 Keyf-i Bol Beyaz
     - Beko TKM 2341 Keyf-i Bol Siyah
     """
@@ -787,14 +788,19 @@ def sort_items_by_family_and_color(items):
     # 1. Ürün ailesine göre grupla
     groups = defaultdict(list)
     for itm in items:
-        base_key, color_key = extract_product_sort_keys(itm['name'])
-        groups[base_key].append((color_key, itm))
+        # '(Büyüğün Yanında)' ibaresini ayıklayarak model kökünü bul
+        clean_name = re.sub(r'\(büyüğün yanında\)', '', itm['name'], flags=re.IGNORECASE).strip()
+        clean_name = re.sub(r'\s+', ' ', clean_name).strip()
+        base_key, color_key = extract_product_sort_keys(clean_name)
+        is_major_order = 1 if (itm.get('is_with_major') or '(büyüğün yanında)' in itm['name'].lower()) else 0
+        groups[base_key].append((color_key, is_major_order, itm))
 
-    # 2. Her aileyi kendi içinde renge ve miktara göre sırala
+    # 2. Her aileyi kendi içinde renge, normal/büyüğün yanında durumuna ve miktara göre sırala
     sorted_groups = []
     for base_key, member_list in groups.items():
-        member_list.sort(key=lambda x: (x[0], -x[1]['qty']))
-        sorted_members = [m[1] for m in member_list]
+        # Önce varyant/renk (color_key), sonra normal ürün (0) önce, büyüğün yanında olan (1) hemen altında, sonra miktar azalan (-qty)
+        member_list.sort(key=lambda x: (x[0], x[1], -x[2]['qty']))
+        sorted_members = [m[2] for m in member_list]
         max_qty = max(m['qty'] for m in sorted_members)
         sorted_groups.append((max_qty, base_key, sorted_members))
 
@@ -952,13 +958,24 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         if is_sony:
             brand = 'SONY'
 
+        ord_no = item.get('order_no', '')
+        cust_raw = item.get('customer', '')
+        cust_key = canonical_key(cust_raw)
+        is_valid_cust = bool(cust_key and len(cust_key) >= 3 and cust_key not in ('yok', 'none', 'null', 'musteri', 'alici', 'bilinmiyor', 'trendyol musterisi', 'hepsiburada musterisi'))
+        ph = re.sub(r'\D', '', str(item.get('phone', '')))
+        is_valid_phone = len(ph) >= 10
+
+        in_same_order_major = bool(ord_no and ord_no in orders_with_beko_major)
+        cust_has_major = bool((is_valid_cust and cust_key in customers_with_beko_major) or (is_valid_phone and ph[-10:] in customers_with_beko_major))
+        is_with_major = bool(is_beko and (in_same_order_major or cust_has_major))
+
         clean_name = clean_product_name(item['name'])
         is_valid_stok = bool(stok and len(stok) >= 3 and stok.lower() not in ('-', 'yok', '0', 'none', 'null'))
 
         if is_valid_stok:
-            merge_key = ('STOK', brand, stok)
+            merge_key = ('STOK_MAJOR' if is_with_major else 'STOK', brand, stok)
         else:
-            merge_key = ('NAME', brand, canonical_key(clean_name))
+            merge_key = ('NAME_MAJOR' if is_with_major else 'NAME', brand, canonical_key(clean_name))
 
         is_special_brand = (is_beko or brand in ('GRUNDIG', 'LENOVO', 'SONY'))
         target_dict = beko_consolidated if (filter_beko and is_special_brand) else brand_consolidated[brand]
@@ -968,7 +985,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
                 'names': [],
                 'stok': stok,
                 'qty': 0,
-                'brand': brand
+                'brand': brand,
+                'is_with_major': is_with_major
             }
         target_dict[merge_key]['names'].append(item['name'])
         if not target_dict[merge_key]['stok'] and stok:
@@ -980,11 +998,15 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         processed_list = []
         for merge_key, data in items_dict.items():
             best_name = pick_best_name(data['names'], brand=brand)
+            is_wm = data.get('is_with_major', False)
+            if is_wm and '(Büyüğün Yanında)' not in best_name:
+                best_name = f"{best_name} (Büyüğün Yanında)"
             processed_list.append({
                 'name': best_name,
                 'stok': data['stok'],
                 'qty': data['qty'],
-                'brand': data['brand']
+                'brand': data['brand'],
+                'is_with_major': is_wm
             })
         brand_orders[brand] = sort_items_by_family_and_color(processed_list)
 
@@ -998,11 +1020,15 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         processed_beko = []
         for merge_key, data in beko_consolidated.items():
             best_name = pick_best_name(data['names'], brand=data['brand'])
+            is_wm = data.get('is_with_major', False)
+            if is_wm and '(Büyüğün Yanında)' not in best_name:
+                best_name = f"{best_name} (Büyüğün Yanında)"
             processed_beko.append({
                 'name': best_name,
                 'stok': data['stok'],
                 'qty': data['qty'],
-                'brand': data['brand']
+                'brand': data['brand'],
+                'is_with_major': is_wm
             })
         b_beko = [x for x in processed_beko if x['brand'] == 'BEKO']
         b_grundig = [x for x in processed_beko if x['brand'] == 'GRUNDIG']

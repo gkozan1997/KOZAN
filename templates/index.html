@@ -837,6 +837,19 @@
             margin-right: 6px !important;
             font-weight: 700 !important;
         }
+        .badge-with-major {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1.5px 7px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(249, 115, 22, 0.15);
+            color: #fb923c;
+            border: 1px solid rgba(249, 115, 22, 0.4);
+            border-radius: 4px;
+            vertical-align: middle;
+            letter-spacing: 0.2px;
+        }
 
         /* Toast Notifications */
         #toast-container {
@@ -1192,6 +1205,16 @@
                 font-weight: 800 !important;
                 color: #000000 !important;
                 margin-right: 4px !important;
+            }
+            .badge-with-major {
+                display: inline-block !important;
+                background: transparent !important;
+                color: #000000 !important;
+                border: none !important;
+                font-weight: 800 !important;
+                font-size: 8.5pt !important;
+                padding: 0 !important;
+                margin-left: 4px !important;
             }
 
             .print-only {
@@ -3863,10 +3886,19 @@
             return u.includes('BEKO') || u.includes('GRUNDIG') || u.includes('LENOVO') || u.includes('IDEAPAD') || u.includes('SONY');
         };
 
+        const formatProductName = (name) => {
+            if (!name) return '';
+            if (name.includes('(Büyüğün Yanında)')) {
+                const clean = name.replace('(Büyüğün Yanında)', '').trim();
+                return `${escapeHtml(clean)} <span class="badge-with-major">(Büyüğün Yanında)</span>`;
+            }
+            return escapeHtml(name);
+        };
+
         const createRowHtml = (itm) => `
             <tr onclick="toggleRowCollected(this)" title="Dokunarak toplandı olarak işaretleyin / geri alın" style="cursor: pointer;">
                 <td class="col-qty"><span class="qty-badge">${itm.qty}</span></td>
-                <td class="col-name">${escapeHtml(itm.name || '')}</td>
+                <td class="col-name">${formatProductName(itm.name || '')}</td>
                 <td class="col-code"><span class="code-badge">${escapeHtml(itm.stok || '-')}</span></td>
             </tr>
         `;
