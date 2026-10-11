@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 // OLİZ KAMPANYA & İNDİRİM ANALİZ SİSTEMİ - İNTERAKTİF JS MOTORU
 // ==========================================================================
 
@@ -401,7 +401,7 @@ function initChips() {
 // CATALOG EXPLORER (TEKİL, PAKET, TOPTAN)
 // ==========================================================================
 function initCatalogTabs() {
-    const tabs = document.querySelectorAll(".nav-tab");
+    const tabs = document.querySelectorAll(".catalog-nav .nav-tab");
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
             tabs.forEach(t => t.classList.remove("active"));

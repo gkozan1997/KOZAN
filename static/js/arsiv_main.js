@@ -1794,11 +1794,12 @@ async function refreshDashboardStats() {
 // ==============================================================
 window.switchArsivTab = function(targetId) {
     if (!targetId) return;
-    document.querySelectorAll('#view-arsiv .nav-tab').forEach(t => {
+    const root = document.getElementById('view-arsiv') || document;
+    root.querySelectorAll('.nav-tab').forEach(t => {
         if (t.dataset.tab === targetId) t.classList.add('active');
         else t.classList.remove('active');
     });
-    document.querySelectorAll('#view-arsiv .tab-pane').forEach(p => {
+    root.querySelectorAll('.tab-pane').forEach(p => {
         if (p.id === targetId) p.classList.add('active');
         else p.classList.remove('active');
     });
@@ -1819,7 +1820,16 @@ window.switchArsivTab = function(targetId) {
         if (inp) inp.focus();
     }
 };
-window.switchTab = window.switchArsivTab;
+
+// Global switchTab köprüsü: Sipariş toplama marka sekmeleri ile arşiv sekmelerini kusursuz ayırır
+window.switchTab = function(keyOrId, el) {
+    if (typeof window.switchBrandTab === 'function' && (el !== undefined || !String(keyOrId || '').startsWith('tab-'))) {
+        return window.switchBrandTab(keyOrId, el);
+    }
+    if (typeof window.switchArsivTab === 'function') {
+        return window.switchArsivTab(keyOrId);
+    }
+};
 
 
 window.handleFileInputChange = function(files) {

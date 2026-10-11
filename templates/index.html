@@ -3565,11 +3565,8 @@
 
         <!-- 2. ENTEGRE YEREL / ÇEVRİMDIŞI PANEL -->
         <div id="arsiv-local-container" style="display: none;">
-    <!-- 4. GÖRÜNÜM: BARKOD & SERİ NO ARŞİVLEME SİSTEMİ -->
-    <div id="view-arsiv" class="app-view-panel arsiv-view-scope" style="display: none;">
-<div class="bg-glow"></div>
-
-    <div class="app-layout">
+            <div class="bg-glow"></div>
+            <div class="app-layout">
         <!-- HEADER -->
         <header class="app-header">
             <div class="brand">
@@ -4127,12 +4124,8 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Scripts -->
-    </div> <!-- #view-arsiv -->
-
-        </div>
+    </div> <!-- .app-layout -->
+    </div> <!-- #arsiv-local-container -->
     </div> <!-- #view-arsiv -->
 
 
@@ -4696,7 +4689,7 @@
         const allTab = document.createElement('button');
         allTab.className = 'tab-btn active';
         allTab.innerText = `Tümü (Ana Liste - ${totalQty} Adet)`;
-        allTab.onclick = () => switchTab('all', allTab);
+        allTab.onclick = () => switchBrandTab('all', allTab);
         tabsContainer.appendChild(allTab);
 
         const isSpecialBrandName = (name) => {
@@ -4711,7 +4704,7 @@
             const isSpecial = isSpecialBrandName(b.brand);
             btn.className = 'tab-btn' + (isSpecial ? ' tab-beko' : '');
             btn.innerText = isSpecial ? `🛡️ ${b.brand} (${b.qty} Adet)` : `${b.brand} (${b.qty})`;
-            btn.onclick = () => switchTab(b.brand, btn);
+            btn.onclick = () => switchBrandTab(b.brand, btn);
             tabsContainer.appendChild(btn);
         });
 
@@ -4720,7 +4713,7 @@
             const bekoTab = document.createElement('button');
             bekoTab.className = 'tab-btn tab-beko';
             bekoTab.innerText = `🛡️ Beko, Grundig, Lenovo & Sony (${result.beko_qty} Adet)`;
-            bekoTab.onclick = () => switchTab('BEKO, GRUNDIG, LENOVO & SONY', bekoTab);
+            bekoTab.onclick = () => switchBrandTab('BEKO, GRUNDIG, LENOVO & SONY', bekoTab);
             tabsContainer.appendChild(bekoTab);
         }
 
@@ -4731,12 +4724,14 @@
         renderTableRows();
     }
 
-    function switchTab(key, tabEl) {
+    function switchBrandTab(key, tabEl) {
         activeTabKey = key;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        tabEl.classList.add('active');
+        document.querySelectorAll('#brand-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+        if (tabEl) tabEl.classList.add('active');
         renderTableRows();
     }
+    window.switchBrandTab = switchBrandTab;
+    window.switchTab = switchBrandTab;
 
     function renderTableRows() {
         if (!currentResultData) return;
