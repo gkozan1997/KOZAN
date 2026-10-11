@@ -484,7 +484,13 @@ def sync_db_with_cloud_archive():
     for cr in cloud_records:
         cr_id = cr.get('id')
         fp = (cr.get('kayit_tarihi'), str(cr.get('barkod_seri_no') or '').strip(), str(cr.get('kargo_barkodu') or '').strip())
-        if cr_id not in db_ids and fp not in db_fps:
+        should_add = False
+        if cr_id is not None:
+            should_add = (cr_id not in db_ids)
+        else:
+            should_add = (fp not in db_fps)
+
+        if should_add:
             cursor.execute('''
                 INSERT INTO barkod_kayitlari (
                     id, kargo_barkodu, siparis_no, musteri_adi, urun_adi, barkod_seri_no,
@@ -504,7 +510,7 @@ def sync_db_with_cloud_archive():
                 cr.get('notlar', ''),
                 cr.get('durum', 'Gecerli')
             ))
-            if cr_id:
+            if cr_id is not None:
                 db_ids.add(cr_id)
             db_fps.add(fp)
             added_to_db += 1
@@ -517,8 +523,19 @@ def sync_db_with_cloud_archive():
     current_db_rows = [dict(r) for r in cursor.fetchall()]
     conn.close()
 
+    cloud_ids = {r.get('id') for r in cloud_records if r.get('id') is not None}
     cloud_fps = {(r.get('kayit_tarihi'), str(r.get('barkod_seri_no') or '').strip(), str(r.get('kargo_barkodu') or '').strip()) for r in cloud_records}
-    missing_in_cloud = [r for r in current_db_rows if (r.get('kayit_tarihi'), str(r.get('barkod_seri_no') or '').strip(), str(r.get('kargo_barkodu') or '').strip()) not in cloud_fps]
+    missing_in_cloud = []
+    for r in current_db_rows:
+        rid = r.get('id')
+        if rid is not None:
+            if rid not in cloud_ids:
+                missing_in_cloud.append(r)
+        else:
+            fp = (r.get('kayit_tarihi'), str(r.get('barkod_seri_no') or '').strip(), str(r.get('kargo_barkodu') or '').strip())
+            if fp not in cloud_fps:
+                missing_in_cloud.append(r)
+
     if missing_in_cloud:
         cloud_records.extend(missing_in_cloud)
         save_archive_records_to_cloud(cloud_records)
