@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import sqlite3
 import json
 import tempfile
@@ -19,15 +20,6 @@ def _get_cloud_module():
         except ImportError:
             return None
 
-def _sync_cloud_async(target_func, *args, **kwargs):
-    def _worker():
-        try:
-            target_func(*args, **kwargs)
-        except Exception as e:
-            print(f"[CloudArchiveWorker] Hata: {e}")
-    t = threading.Thread(target=_worker, daemon=True)
-    t.start()
-
 TZ_ISTANBUL = timezone(timedelta(hours=3))
 
 IS_CLOUD = (
@@ -35,6 +27,48 @@ IS_CLOUD = (
     os.environ.get('AWS_LAMBDA_FUNCTION_NAME') is not None or
     os.environ.get('NOW_REGION') is not None
 )
+
+def _sync_cloud_record(target_func, *args, **kwargs):
+    # Vercel serverless ortaminda thread'ler response donunce donduruldugu icin dogrudan ve senkron kaydedilmeli!
+    if IS_CLOUD:
+        try:
+            target_func(*args, **kwargs)
+        except Exception as e:
+            print(f"[CloudArchiveSync] Senkron yazma hatasi: {e}")
+    else:
+        def _worker():
+            try:
+                target_func(*args, **kwargs)
+            except Exception as e:
+                print(f"[CloudArchiveWorker] Hata: {e}")
+        t = threading.Thread(target=_worker, daemon=True)
+        t.start()
+
+_LAST_CLOUD_SYNC_TS = 0
+
+def _ensure_cloud_synced():
+    global _LAST_CLOUD_SYNC_TS
+    now = time.time()
+    # Eger buluttaysak ve son 5 saniyede senkron yapilmadiysa buluttan verileri cek
+    if (IS_CLOUD or not _has_any_records()) and (now - _LAST_CLOUD_SYNC_TS > 5):
+        try:
+            cmod = _get_cloud_module()
+            if cmod and hasattr(cmod, 'sync_db_with_cloud_archive'):
+                cmod.sync_db_with_cloud_archive()
+                _LAST_CLOUD_SYNC_TS = now
+        except Exception as e:
+            print(f"[CloudAutoSync] Otomatik senkron hatasi: {e}")
+
+def _has_any_records():
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM barkod_kayitlari WHERE durum = 'Gecerli'")
+        row = cursor.fetchone()
+        conn.close()
+        return (row[0] > 0) if row else False
+    except Exception:
+        return False
 
 def get_now_istanbul():
     return datetime.now(TZ_ISTANBUL)
@@ -185,7 +219,7 @@ def add_barcode_record(kargo_barkodu='', siparis_no='', musteri_adi='', urun_adi
     try:
         cmod = _get_cloud_module()
         if cmod and hasattr(cmod, 'append_archive_record_to_cloud'):
-            _sync_cloud_async(cmod.append_archive_record_to_cloud, record_data)
+            _sync_cloud_record(cmod.append_archive_record_to_cloud, record_data)
     except Exception as e:
         print(f"[CloudArchive] Async append hatasi: {e}")
 
@@ -257,7 +291,7 @@ def delete_record_by_id(record_id):
         try:
             cmod = _get_cloud_module()
             if cmod and hasattr(cmod, 'delete_archive_record_from_cloud'):
-                _sync_cloud_async(cmod.delete_archive_record_from_cloud, record_id=record_id)
+                _sync_cloud_record(cmod.delete_archive_record_from_cloud, record_id=record_id)
         except Exception as e:
             print(f"[CloudArchive] Async delete hatasi: {e}")
         return True, "Kayıt başarıyla silindi"
@@ -294,7 +328,7 @@ def delete_record_by_barcode(barkod_seri_no, kargo_barkodu='', siparis_no=''):
             try:
                 cmod = _get_cloud_module()
                 if cmod and hasattr(cmod, 'delete_archive_record_from_cloud'):
-                    _sync_cloud_async(cmod.delete_archive_record_from_cloud, record_id=rec_id, barkod_seri_no=barkod_seri_no, kargo_barkodu=kargo_barkodu)
+                    _sync_cloud_record(cmod.delete_archive_record_from_cloud, record_id=rec_id, barkod_seri_no=barkod_seri_no, kargo_barkodu=kargo_barkodu)
             except Exception as e:
                 print(f"[CloudArchive] Async delete hatasi: {e}")
             return True, "Kayıt başarıyla silindi"
@@ -335,7 +369,7 @@ def update_record_by_id(record_id, fields):
         try:
             cmod = _get_cloud_module()
             if cmod and hasattr(cmod, 'update_archive_record_in_cloud'):
-                _sync_cloud_async(cmod.update_archive_record_in_cloud, record_id=record_id, fields=fields)
+                _sync_cloud_record(cmod.update_archive_record_in_cloud, record_id=record_id, fields=fields)
         except Exception as e:
             print(f"[CloudArchive] Async update hatasi: {e}")
         return True, "Kayıt başarıyla güncellendi"
@@ -372,7 +406,7 @@ def update_record_by_barcode(old_barcode, new_barcode, kargo_barkodu='', siparis
             try:
                 cmod = _get_cloud_module()
                 if cmod and hasattr(cmod, 'update_archive_record_in_cloud'):
-                    _sync_cloud_async(cmod.update_archive_record_in_cloud, record_id=rec_id, fields={'barkod_seri_no': clean_new})
+                    _sync_cloud_record(cmod.update_archive_record_in_cloud, record_id=rec_id, fields={'barkod_seri_no': clean_new})
             except Exception as e:
                 print(f"[CloudArchive] Async update hatasi: {e}")
             return True, "Barkod başarıyla güncellendi"
@@ -383,6 +417,7 @@ def update_record_by_barcode(old_barcode, new_barcode, kargo_barkodu='', siparis
         return False, str(e)
 
 def search_records(query='', start_date='', end_date='', limit=200):
+    _ensure_cloud_synced()
     conn = get_connection()
     cursor = conn.cursor()
     sql = "SELECT * FROM barkod_kayitlari WHERE durum = 'Gecerli'"
@@ -410,6 +445,7 @@ def search_records(query='', start_date='', end_date='', limit=200):
     return [dict(r) for r in rows]
 
 def get_stats():
+    _ensure_cloud_synced()
     now = get_now_istanbul()
     bugun_str = now.strftime('%Y-%m-%d')
 
@@ -446,6 +482,7 @@ def get_stats():
     }
 
 def get_record_by_id(record_id):
+    _ensure_cloud_synced()
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM barkod_kayitlari WHERE id = ?", (record_id,))

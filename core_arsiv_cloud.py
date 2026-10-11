@@ -394,14 +394,17 @@ def append_archive_record_to_cloud(record_data):
         # Mukerrer ayni kayit kontrolu
         exists = False
         for r in records:
-            if r_id and r.get('id') == r_id:
+            if sn and r.get('barkod_seri_no') == sn and kargo and r.get('kargo_barkodu') == kargo and r.get('kayit_tarihi') == tarih:
                 exists = True
                 break
-            if sn and r.get('barkod_seri_no') == sn and kargo and r.get('kargo_barkodu') == kargo and r.get('kayit_tarihi') == tarih:
+            if r_id and r.get('id') == r_id and r.get('kayit_tarihi') == tarih:
                 exists = True
                 break
 
         if not exists:
+            max_id = max([r.get('id', 0) for r in records], default=0)
+            if not r_id or any(r.get('id') == r_id for r in records):
+                record_data['id'] = max_id + 1
             records.append(record_data)
             return save_archive_records_to_cloud(records)
         return True
@@ -454,7 +457,7 @@ def update_archive_record_in_cloud(record_id, fields):
 def sync_db_with_cloud_archive():
     """
     SQLite veritabani ile buluttaki archive_records.json dosyasini cift yonlu esitler.
-    Vercel gibi gecici ortamlarda baslangicta tum gecmis kayitlari SQLite'a yukler.
+    Vercel gibi gecici ortamlarda baslangicta ve aramalarda tum gecmis kayitlari SQLite'a yukler.
     Masaustunde ve telefonda ayni kayitlarin gorunmesini saglar.
     """
     db_mod = _get_db_module()
@@ -465,11 +468,11 @@ def sync_db_with_cloud_archive():
     conn = db_mod.get_connection()
     cursor = conn.cursor()
 
-    # SQLite'taki tum kayitlari al
-    cursor.execute("SELECT * FROM barkod_kayitlari")
-    db_rows = [dict(r) for r in cursor.fetchall()]
-    db_ids = {r['id']: r for r in db_rows}
-    db_serials = {(str(r.get('barkod_seri_no', '')).strip(), str(r.get('kargo_barkodu', '')).strip()): r for r in db_rows}
+    # SQLite'taki tum kayitlari parmak iziyle al
+    cursor.execute("SELECT id, kayit_tarihi, barkod_seri_no, kargo_barkodu FROM barkod_kayitlari")
+    db_rows = cursor.fetchall()
+    db_ids = {r[0] for r in db_rows}
+    db_fps = {(r[1], str(r[2] or '').strip(), str(r[3] or '').strip()) for r in db_rows}
 
     # Buluttaki kayitlari al
     cloud_records = get_archive_records_from_cloud(force_refresh=True)
@@ -480,14 +483,15 @@ def sync_db_with_cloud_archive():
     # 1. Buluttaki eksikleri SQLite'a ekle
     for cr in cloud_records:
         cr_id = cr.get('id')
-        key = (str(cr.get('barkod_seri_no', '')).strip(), str(cr.get('kargo_barkodu', '')).strip())
-        if cr_id not in db_ids and key not in db_serials:
+        fp = (cr.get('kayit_tarihi'), str(cr.get('barkod_seri_no') or '').strip(), str(cr.get('kargo_barkodu') or '').strip())
+        if cr_id not in db_ids and fp not in db_fps:
             cursor.execute('''
                 INSERT INTO barkod_kayitlari (
-                    kargo_barkodu, siparis_no, musteri_adi, urun_adi, barkod_seri_no,
+                    id, kargo_barkodu, siparis_no, musteri_adi, urun_adi, barkod_seri_no,
                     pazaryeri, kayit_tarihi, kayit_gunu, okutma_yontemi, notlar, durum
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
+                cr_id,
                 cr.get('kargo_barkodu', ''),
                 cr.get('siparis_no', ''),
                 cr.get('musteri_adi', ''),
@@ -500,6 +504,9 @@ def sync_db_with_cloud_archive():
                 cr.get('notlar', ''),
                 cr.get('durum', 'Gecerli')
             ))
+            if cr_id:
+                db_ids.add(cr_id)
+            db_fps.add(fp)
             added_to_db += 1
 
     if added_to_db > 0:
@@ -510,9 +517,12 @@ def sync_db_with_cloud_archive():
     current_db_rows = [dict(r) for r in cursor.fetchall()]
     conn.close()
 
-    if len(current_db_rows) > len(cloud_records):
-        save_archive_records_to_cloud(current_db_rows)
-        added_to_cloud = len(current_db_rows) - len(cloud_records)
+    cloud_fps = {(r.get('kayit_tarihi'), str(r.get('barkod_seri_no') or '').strip(), str(r.get('kargo_barkodu') or '').strip()) for r in cloud_records}
+    missing_in_cloud = [r for r in current_db_rows if (r.get('kayit_tarihi'), str(r.get('barkod_seri_no') or '').strip(), str(r.get('kargo_barkodu') or '').strip()) not in cloud_fps]
+    if missing_in_cloud:
+        cloud_records.extend(missing_in_cloud)
+        save_archive_records_to_cloud(cloud_records)
+        added_to_cloud = len(missing_in_cloud)
 
     return {
         'status': 'success',

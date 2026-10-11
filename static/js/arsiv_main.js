@@ -452,6 +452,7 @@ function initTabs() {
             } else if (targetId === 'tab-arama') {
                 const searchInput = document.getElementById('archiveSearchInput');
                 if (searchInput) searchInput.focus();
+                if (typeof executeArchiveSearch === 'function') executeArchiveSearch();
             }
         });
     });
@@ -1293,7 +1294,13 @@ function initSearchAndArchive() {
     document.getElementById('btnPrintProof')?.addEventListener('click', () => {
         window.print();
     });
+
+    // Açılışta veya sekme yüklendiğinde mevcut arşivi otomatik getir
+    executeArchiveSearch();
 }
+
+window.executeArchiveSearch = executeArchiveSearch;
+window.performArchiveSearch = executeArchiveSearch;
 
 async function executeArchiveSearch() {
     const q = document.getElementById('archiveSearchInput')?.value.trim() || '';
@@ -1787,6 +1794,8 @@ async function refreshDashboardStats() {
         console.error('Stats refresh error:', e);
     }
 }
+window.refreshDashboardStats = refreshDashboardStats;
+window.loadStats = refreshDashboardStats;
 
 
 // ==============================================================
@@ -1818,6 +1827,9 @@ window.switchArsivTab = function(targetId) {
     } else if (targetId === 'tab-arama') {
         const inp = document.getElementById('archiveSearchInput');
         if (inp) inp.focus();
+        if (typeof executeArchiveSearch === 'function') {
+            executeArchiveSearch();
+        }
     }
 };
 
