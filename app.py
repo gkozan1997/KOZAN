@@ -621,6 +621,10 @@ from core_arsiv_db import (
     save_active_orders_file as save_arsiv_active_orders,
     get_active_orders_file as get_arsiv_active_orders,
     clear_active_orders_file as clear_arsiv_active_orders,
+    delete_record_by_id as delete_arsiv_record_by_id,
+    delete_record_by_barcode as delete_arsiv_record_by_barcode,
+    update_record_by_id as update_arsiv_record_by_id,
+    update_record_by_barcode as update_arsiv_record_by_barcode,
 )
 from core_arsiv_parser import parse_order_file as parse_arsiv_order_file
 from core_arsiv_cloud import (
@@ -628,6 +632,8 @@ from core_arsiv_cloud import (
     get_orders_from_cloud as get_arsiv_cloud,
     clear_orders_from_cloud as clear_arsiv_cloud,
     update_order_progress_cloud as update_arsiv_cloud,
+    remove_serial_from_cloud as remove_arsiv_serial_cloud,
+    update_serial_in_cloud as update_arsiv_serial_cloud,
 )
 
 try:
@@ -1013,6 +1019,89 @@ def arsiv_get_proof(record_id):
     if not record:
         return jsonify({'status': 'error', 'message': 'Kayıt bulunamadı'}), 404
     return jsonify({'status': 'success', 'record': record})
+
+
+@app.route('/api/arsiv/delete-record/<int:record_id>', methods=['POST', 'DELETE'])
+@app.route('/api/delete-record/<int:record_id>', methods=['POST', 'DELETE'])
+def arsiv_delete_record(record_id):
+    success, msg = delete_arsiv_record_by_id(record_id)
+    if not success:
+        return jsonify({'status': 'error', 'message': msg}), 400
+    stats = get_arsiv_stats()
+    return jsonify({
+        'status': 'success',
+        'message': 'Kayıt başarıyla silindi',
+        'stats': {
+            'toplam_kayit': stats['toplam_kayit'],
+            'bugun_kayit': stats['bugun_kayit']
+        }
+    })
+
+
+@app.route('/api/arsiv/delete-record-by-barcode', methods=['POST'])
+@app.route('/api/delete-record-by-barcode', methods=['POST'])
+@app.route('/api/arsiv/remove-barcode', methods=['POST'])
+@app.route('/api/remove-barcode', methods=['POST'])
+def arsiv_remove_barcode():
+    data = request.get_json() or {}
+    barkod_seri_no = data.get('barkod_seri_no', '').strip()
+    kargo_barkodu = data.get('kargo_barkodu', '').strip()
+    siparis_no = data.get('siparis_no', '').strip()
+
+    if not barkod_seri_no:
+        return jsonify({'status': 'error', 'message': 'Barkod / Seri No boş olamaz'}), 400
+
+    try:
+        remove_arsiv_serial_cloud(kargo_barkodu, barkod_seri_no)
+    except Exception:
+        pass
+
+    success, msg = delete_arsiv_record_by_barcode(barkod_seri_no, kargo_barkodu=kargo_barkodu, siparis_no=siparis_no)
+    stats = get_arsiv_stats()
+    return jsonify({
+        'status': 'success',
+        'message': msg,
+        'stats': {
+            'toplam_kayit': stats['toplam_kayit'],
+            'bugun_kayit': stats['bugun_kayit']
+        }
+    })
+
+
+@app.route('/api/arsiv/update-record/<int:record_id>', methods=['POST', 'PUT'])
+@app.route('/api/update-record/<int:record_id>', methods=['POST', 'PUT'])
+def arsiv_update_record(record_id):
+    data = request.get_json() or {}
+    success, msg = update_arsiv_record_by_id(record_id, data)
+    if not success:
+        return jsonify({'status': 'error', 'message': msg}), 400
+    rec = get_arsiv_record_by_id(record_id)
+    return jsonify({
+        'status': 'success',
+        'message': 'Kayıt güncellendi',
+        'record': rec
+    })
+
+
+@app.route('/api/arsiv/update-barcode', methods=['POST'])
+@app.route('/api/update-barcode', methods=['POST'])
+def arsiv_update_barcode():
+    data = request.get_json() or {}
+    old_sn = data.get('old_barkod_seri_no', '').strip()
+    new_sn = data.get('new_barkod_seri_no', '').strip()
+    kargo_barkodu = data.get('kargo_barkodu', '').strip()
+    siparis_no = data.get('siparis_no', '').strip()
+
+    if not old_sn or not new_sn:
+        return jsonify({'status': 'error', 'message': 'Eski ve yeni barkod belirtilmelidir'}), 400
+
+    try:
+        update_arsiv_serial_cloud(kargo_barkodu, old_sn, new_sn)
+    except Exception:
+        pass
+
+    success, msg = update_arsiv_record_by_barcode(old_sn, new_sn, kargo_barkodu=kargo_barkodu, siparis_no=siparis_no)
+    return jsonify({'status': 'success', 'message': msg})
 
 
 @app.route('/api/arsiv/get-current-orders', methods=['GET'])

@@ -204,3 +204,76 @@ def update_order_progress_cloud(kargo_barkodu, barcode_serial):
         return True
 
     return False
+
+def remove_serial_from_cloud(kargo_barkodu, barcode_serial):
+    """
+    Bir serino silindiğinde buluttaki aktif siparişlerden de kaldırır ve adedi 1 düşürür.
+    """
+    curr = get_orders_from_cloud()
+    if not curr or not curr.get('orders'):
+        return False
+
+    orders = curr.get('orders', [])
+    updated = False
+    clean_kargo = (kargo_barkodu or '').strip().lower()
+    clean_sn = str(barcode_serial or '').strip().lower()
+
+    for order in orders:
+        o_kargo = (order.get('kargo_barkodu') or '').strip().lower()
+        o_sip = (order.get('siparis_no') or '').strip().lower()
+        if (clean_kargo and (o_kargo == clean_kargo or o_sip == clean_kargo)) or not clean_kargo:
+            for item in order.get('urunler', []):
+                serials = item.get('seri_nolar', [])
+                for idx, sn in enumerate(serials):
+                    if str(sn).strip().lower() == clean_sn:
+                        serials.pop(idx)
+                        item['okunan_adet'] = max(0, len(serials))
+                        item['tamamlandi'] = False
+                        order['tamamlandi'] = False
+                        updated = True
+                        break
+                if updated:
+                    break
+        if updated:
+            break
+
+    if updated:
+        save_orders_to_cloud(curr.get('filename', 'Siparis_Listesi.xlsx'), orders)
+        return True
+    return False
+
+def update_serial_in_cloud(kargo_barkodu, old_serial, new_serial):
+    """
+    Bir serino düzeltildiğinde buluttaki aktif siparişlerde de günceller.
+    """
+    curr = get_orders_from_cloud()
+    if not curr or not curr.get('orders'):
+        return False
+
+    orders = curr.get('orders', [])
+    updated = False
+    clean_kargo = (kargo_barkodu or '').strip().lower()
+    clean_old = str(old_serial or '').strip().lower()
+    clean_new = str(new_serial or '').strip()
+
+    for order in orders:
+        o_kargo = (order.get('kargo_barkodu') or '').strip().lower()
+        o_sip = (order.get('siparis_no') or '').strip().lower()
+        if (clean_kargo and (o_kargo == clean_kargo or o_sip == clean_kargo)) or not clean_kargo:
+            for item in order.get('urunler', []):
+                serials = item.get('seri_nolar', [])
+                for idx, sn in enumerate(serials):
+                    if str(sn).strip().lower() == clean_old:
+                        serials[idx] = clean_new
+                        updated = True
+                        break
+                if updated:
+                    break
+        if updated:
+            break
+
+    if updated:
+        save_orders_to_cloud(curr.get('filename', 'Siparis_Listesi.xlsx'), orders)
+        return True
+    return False
+

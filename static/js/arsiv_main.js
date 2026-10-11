@@ -1048,7 +1048,13 @@ function renderActiveOrderItems() {
         });
 
         const serialsHtml = (item.seri_nolar && item.seri_nolar.length > 0)
-            ? item.seri_nolar.map(sn => `<span class="code-pill">${sn}</span>`).join(' ')
+            ? item.seri_nolar.map(sn => `
+                <span class="code-pill serial-item-pill" title="Seri No: ${sn}">
+                    <span class="sn-text">${sn}</span>
+                    <button type="button" class="sn-action-btn sn-edit" title="Seri Numarasını Düzelt" onclick="event.stopPropagation(); editScannedSerial(${itemIdx}, '${sn}')">✏️</button>
+                    <button type="button" class="sn-action-btn sn-delete" title="Yanlış Okunan Seri Numarasını Sil" onclick="event.stopPropagation(); deleteScannedSerial(${itemIdx}, '${sn}')">🗑️</button>
+                </span>
+            `).join(' ')
             : '<span class="text-muted">Okutulmadı</span>';
 
         let statusIcon = '⏳';
@@ -1271,8 +1277,10 @@ async function executeArchiveSearch() {
                     <td>${r.musteri_adi || '-'}</td>
                     <td>${r.urun_adi || '-'}</td>
                     <td><span class="market-tag">${r.pazaryeri}</span></td>
-                    <td>
-                        <button class="btn-secondary btn-sm" onclick="openProofModal(${r.id})">Kanıt Belgesi 📜</button>
+                    <td style="white-space: nowrap;">
+                        <button class="btn-secondary btn-sm" onclick="openProofModal(${r.id})" title="Kanıt Belgesi">Kanıt 📜</button>
+                        <button class="btn-secondary btn-sm" onclick="openEditRecordModal(${r.id})" style="margin-left: 4px; color: #38BDF8; border-color: rgba(56, 189, 248, 0.4);" title="Kaydı Düzenle">✏️</button>
+                        <button class="btn-secondary btn-sm" onclick="deleteArchiveRecord(${r.id}, '${r.barkod_seri_no}')" style="margin-left: 4px; color: #EF4444; border-color: rgba(239, 68, 68, 0.4);" title="Kaydı Sil">🗑️</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1815,3 +1823,201 @@ window.updateCameraUIForStep = updateCameraUIForStep;
 window.initArsivModule = function() {
     if (typeof initApp === 'function') initApp();
 };
+
+
+// --------------------------------------------------------------
+// YANLIŞ OKUTULAN BARKODU SİLME VE DÜZENLEME FONKSİYONLARI
+// --------------------------------------------------------------
+async function deleteScannedSerial(itemIdx, serial) {
+    if (activeOrderIndex === -1) return;
+    const order = loadedOrders[activeOrderIndex];
+    if (!order || !order.urunler || !order.urunler[itemIdx]) return;
+    const item = order.urunler[itemIdx];
+
+    const confirmed = confirm(`"${serial}" seri numarasını/barkodunu bu üründen silmek istiyor musunuz?\n\nSilindiğinde bu ürün için adedi yeniden okutmanız gerekecektir.`);
+    if (!confirmed) return;
+
+    try {
+        const response = await fetch('/api/arsiv/remove-barcode', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                kargo_barkodu: order.kargo_barkodu || '',
+                siparis_no: order.siparis_no || '',
+                barkod_seri_no: serial
+            })
+        });
+        const res = await response.json();
+
+        // Yerel durumdan seriyi çıkar
+        const snIndex = (item.seri_nolar || []).indexOf(serial);
+        if (snIndex !== -1) {
+            item.seri_nolar.splice(snIndex, 1);
+        }
+        item.okunan_adet = Math.max(0, (item.okunan_adet || 1) - 1);
+        item.tamamlandi = false;
+        order.tamamlandi = false;
+
+        // Hedef kalemi bu eksilen kaleme sabitle
+        activePendingItemIndex = itemIdx;
+
+        renderActiveOrderItems();
+        updateOrderProgress();
+        renderOrderCards();
+        if (res.stats) updateHeaderStats(res.stats);
+        saveOrdersToStorage(loadedFileName, loadedOrders);
+
+        setScanStep(2);
+
+        const alertBox = document.getElementById('orderScanAlert');
+        showAlert(alertBox, 'success', `🗑️ Seri No ("${serial}") başarıyla silindi! Sıradaki doğru seri numarasını okutabilirsiniz.`);
+        playSuccessBeep();
+    } catch (err) {
+        alert('Silme sırasında hata oluştu: ' + err.message);
+    }
+}
+
+async function editScannedSerial(itemIdx, serial) {
+    if (activeOrderIndex === -1) return;
+    const order = loadedOrders[activeOrderIndex];
+    if (!order || !order.urunler || !order.urunler[itemIdx]) return;
+    const item = order.urunler[itemIdx];
+
+    const newSerial = prompt(`"${item.urun_adi}" kalemi için yanlış okunan seri numarası:\n${serial}\n\nLütfen yeni / doğru seri numarasını girin veya okutun:`, serial);
+    if (!newSerial || newSerial.trim() === '' || newSerial.trim() === serial) return;
+
+    const cleanNew = newSerial.trim();
+
+    try {
+        const response = await fetch('/api/arsiv/update-barcode', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                kargo_barkodu: order.kargo_barkodu || '',
+                siparis_no: order.siparis_no || '',
+                old_barkod_seri_no: serial,
+                new_barkod_seri_no: cleanNew
+            })
+        });
+        const res = await response.json();
+
+        if (res.status === 'success') {
+            const snIndex = (item.seri_nolar || []).indexOf(serial);
+            if (snIndex !== -1) {
+                item.seri_nolar[snIndex] = cleanNew;
+            } else {
+                item.seri_nolar.push(cleanNew);
+            }
+
+            renderActiveOrderItems();
+            updateOrderProgress();
+            renderOrderCards();
+            saveOrdersToStorage(loadedFileName, loadedOrders);
+
+            const alertBox = document.getElementById('orderScanAlert');
+            showAlert(alertBox, 'success', `✏️ Seri No güncellendi: "${cleanNew}"`);
+            playSuccessBeep();
+        } else {
+            alert('Hata: ' + (res.message || 'Güncellenemedi'));
+        }
+    } catch (err) {
+        alert('Güncelleme hatası: ' + err.message);
+    }
+}
+
+async function deleteArchiveRecord(recordId, barcode) {
+    const confirmed = confirm(`#${recordId} numaralı kaydı ("${barcode}") arşivden tamamen silmek istiyor musunuz?`);
+    if (!confirmed) return;
+
+    try {
+        const response = await fetch(`/api/arsiv/delete-record/${recordId}`, { method: 'POST' });
+        const res = await response.json();
+        if (res.status === 'success') {
+            alert('Kayıt başarıyla silindi.');
+            if (res.stats) updateHeaderStats(res.stats);
+            if (typeof executeArchiveSearch === 'function') executeArchiveSearch();
+        } else {
+            alert('Hata: ' + (res.message || 'Silinemedi'));
+        }
+    } catch (err) {
+        alert('Bağlantı hatası: ' + err.message);
+    }
+}
+
+async function openEditRecordModal(recordId) {
+    try {
+        const response = await fetch(`/api/arsiv/proof/${recordId}`);
+        const res = await response.json();
+        if (res.status === 'success' && res.record) {
+            const r = res.record;
+            const elId = document.getElementById('editRecordId');
+            const elBc = document.getElementById('editBarcodeVal');
+            const elKb = document.getElementById('editKargoBarcodeVal');
+            const elOn = document.getElementById('editOrderNoVal');
+            const elCu = document.getElementById('editCustomerVal');
+            const elPr = document.getElementById('editProductVal');
+
+            if (elId) elId.value = r.id;
+            if (elBc) elBc.value = r.barkod_seri_no || '';
+            if (elKb) elKb.value = r.kargo_barkodu || '';
+            if (elOn) elOn.value = r.siparis_no || '';
+            if (elCu) elCu.value = r.musteri_adi || '';
+            if (elPr) elPr.value = r.urun_adi || '';
+
+            const modal = document.getElementById('editRecordModal');
+            if (modal) modal.style.display = 'flex';
+            if (elBc) elBc.focus();
+        } else {
+            alert('Kayıt detayları alınamadı.');
+        }
+    } catch (err) {
+        alert('Hata: ' + err.message);
+    }
+}
+
+function closeEditRecordModal() {
+    const modal = document.getElementById('editRecordModal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function saveRecordEdit() {
+    const recordId = document.getElementById('editRecordId')?.value;
+    const barcode = document.getElementById('editBarcodeVal')?.value.trim();
+    if (!recordId || !barcode) {
+        alert('Ürün Seri No / Barkod boş olamaz!');
+        return;
+    }
+
+    const payload = {
+        barkod_seri_no: barcode,
+        kargo_barkodu: document.getElementById('editKargoBarcodeVal')?.value.trim() || '',
+        siparis_no: document.getElementById('editOrderNoVal')?.value.trim() || '',
+        musteri_adi: document.getElementById('editCustomerVal')?.value.trim() || '',
+        urun_adi: document.getElementById('editProductVal')?.value.trim() || ''
+    };
+
+    try {
+        const response = await fetch(`/api/arsiv/update-record/${recordId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const res = await response.json();
+        if (res.status === 'success') {
+            closeEditRecordModal();
+            alert('Kayıt başarıyla güncellendi!');
+            if (typeof executeArchiveSearch === 'function') executeArchiveSearch();
+        } else {
+            alert('Hata: ' + (res.message || 'Güncellenemedi'));
+        }
+    } catch (err) {
+        alert('Bağlantı hatası: ' + err.message);
+    }
+}
+
+window.deleteScannedSerial = deleteScannedSerial;
+window.editScannedSerial = editScannedSerial;
+window.deleteArchiveRecord = deleteArchiveRecord;
+window.openEditRecordModal = openEditRecordModal;
+window.closeEditRecordModal = closeEditRecordModal;
+window.saveRecordEdit = saveRecordEdit;

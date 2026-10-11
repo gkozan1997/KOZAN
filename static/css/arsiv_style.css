@@ -1848,3 +1848,58 @@ to { opacity: 1; transform: translateY(0); }
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
+/* Barkod Duzeltme ve Silme Butonlari */
+.code-pill.serial-item-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 3px 8px !important;
+    margin: 2px 4px 2px 0 !important;
+    background: rgba(30, 41, 59, 0.9) !important;
+    border: 1px solid rgba(56, 189, 248, 0.35) !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+}
+
+.code-pill.serial-item-pill .sn-text {
+    font-family: monospace !important;
+    font-weight: 700 !important;
+    color: #38BDF8 !important;
+}
+
+.sn-action-btn {
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    font-size: 11px !important;
+    padding: 2px 4px !important;
+    border-radius: 4px !important;
+    opacity: 0.75 !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+}
+
+.sn-action-btn:hover {
+    opacity: 1 !important;
+    transform: scale(1.2) !important;
+}
+
+.sn-action-btn.sn-edit:hover {
+    background: rgba(56, 189, 248, 0.25) !important;
+}
+
+.sn-action-btn.sn-delete:hover {
+    background: rgba(239, 68, 68, 0.25) !important;
+}
+
+.edit-modal-box {
+    background: #0F172A !important;
+    border: 1px solid rgba(56, 189, 248, 0.3) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+    color: #F8FAFC !important;
+}

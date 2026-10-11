@@ -177,6 +177,159 @@ def append_to_daily_json(gun_str, record_data):
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(records, f, ensure_ascii=False, indent=2)
 
+def remove_from_daily_json(gun_str, record_id):
+    if not gun_str:
+        return
+    backup_dir = get_backup_dir()
+    json_path = os.path.join(backup_dir, f'{gun_str}.json')
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                records = json.load(f)
+            records = [r for r in records if r.get('id') != record_id]
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(records, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"JSON silme hatasi: {e}")
+
+def update_in_daily_json(gun_str, record_id, fields):
+    if not gun_str:
+        return
+    backup_dir = get_backup_dir()
+    json_path = os.path.join(backup_dir, f'{gun_str}.json')
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                records = json.load(f)
+            for r in records:
+                if r.get('id') == record_id:
+                    for k, v in fields.items():
+                        r[k] = v
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(records, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"JSON guncelleme hatasi: {e}")
+
+def delete_record_by_id(record_id):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM barkod_kayitlari WHERE id = ?", (record_id,))
+        row = cursor.fetchone()
+        if not row:
+            conn.close()
+            return False, "Kayıt bulunamadı"
+
+        rec = dict(row)
+        cursor.execute("DELETE FROM barkod_kayitlari WHERE id = ?", (record_id,))
+        conn.commit()
+        conn.close()
+
+        remove_from_daily_json(rec.get('kayit_gunu'), record_id)
+        return True, "Kayıt başarıyla silindi"
+    except Exception as e:
+        return False, str(e)
+
+def delete_record_by_barcode(barkod_seri_no, kargo_barkodu='', siparis_no=''):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        sql = "SELECT id, kayit_gunu FROM barkod_kayitlari WHERE barkod_seri_no = ?"
+        params = [str(barkod_seri_no).strip()]
+        if kargo_barkodu:
+            sql += " AND kargo_barkodu = ?"
+            params.append(str(kargo_barkodu).strip())
+        elif siparis_no:
+            sql += " AND siparis_no = ?"
+            params.append(str(siparis_no).strip())
+
+        sql += " ORDER BY id DESC LIMIT 1"
+        cursor.execute(sql, params)
+        row = cursor.fetchone()
+        if not row:
+            cursor.execute("SELECT id, kayit_gunu FROM barkod_kayitlari WHERE barkod_seri_no = ? ORDER BY id DESC LIMIT 1", (str(barkod_seri_no).strip(),))
+            row = cursor.fetchone()
+
+        if row:
+            rec_id = row['id']
+            rec_gun = row['kayit_gunu']
+            cursor.execute("DELETE FROM barkod_kayitlari WHERE id = ?", (rec_id,))
+            conn.commit()
+            conn.close()
+            remove_from_daily_json(rec_gun, rec_id)
+            return True, "Kayıt başarıyla silindi"
+
+        conn.close()
+        return True, "Kayıt silindi"
+    except Exception as e:
+        return False, str(e)
+
+def update_record_by_id(record_id, fields):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM barkod_kayitlari WHERE id = ?", (record_id,))
+        row = cursor.fetchone()
+        if not row:
+            conn.close()
+            return False, "Kayıt bulunamadı"
+
+        allowed = ['barkod_seri_no', 'kargo_barkodu', 'siparis_no', 'musteri_adi', 'urun_adi', 'pazaryeri', 'notlar', 'durum']
+        sets = []
+        params = []
+        for k in allowed:
+            if k in fields:
+                sets.append(f"{k} = ?")
+                params.append(str(fields[k]).strip())
+
+        if not sets:
+            conn.close()
+            return True, "Değişiklik yok"
+
+        params.append(record_id)
+        cursor.execute(f"UPDATE barkod_kayitlari SET {', '.join(sets)} WHERE id = ?", params)
+        conn.commit()
+        conn.close()
+
+        update_in_daily_json(row['kayit_gunu'], record_id, fields)
+        return True, "Kayıt başarıyla güncellendi"
+    except Exception as e:
+        return False, str(e)
+
+def update_record_by_barcode(old_barcode, new_barcode, kargo_barkodu='', siparis_no=''):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        sql = "SELECT id, kayit_gunu FROM barkod_kayitlari WHERE barkod_seri_no = ?"
+        params = [str(old_barcode).strip()]
+        if kargo_barkodu:
+            sql += " AND kargo_barkodu = ?"
+            params.append(str(kargo_barkodu).strip())
+        elif siparis_no:
+            sql += " AND siparis_no = ?"
+            params.append(str(siparis_no).strip())
+
+        sql += " ORDER BY id DESC LIMIT 1"
+        cursor.execute(sql, params)
+        row = cursor.fetchone()
+        if not row:
+            cursor.execute("SELECT id, kayit_gunu FROM barkod_kayitlari WHERE barkod_seri_no = ? ORDER BY id DESC LIMIT 1", (str(old_barcode).strip(),))
+            row = cursor.fetchone()
+
+        if row:
+            rec_id = row['id']
+            clean_new = str(new_barcode).strip()
+            cursor.execute("UPDATE barkod_kayitlari SET barkod_seri_no = ? WHERE id = ?", (clean_new, rec_id))
+            conn.commit()
+            conn.close()
+            update_in_daily_json(row['kayit_gunu'], rec_id, {'barkod_seri_no': clean_new})
+            return True, "Barkod başarıyla güncellendi"
+
+        conn.close()
+        return True, "Barkod güncellendi"
+    except Exception as e:
+        return False, str(e)
+
 def search_records(query='', start_date='', end_date='', limit=200):
     conn = get_connection()
     cursor = conn.cursor()
