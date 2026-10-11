@@ -221,15 +221,57 @@ async function fetchServerPersistedOrders(silent = false) {
     return false;
 }
 
-window.syncOrdersNow = async function() {
+window.triggerManualCloudSync = async function() {
     const btn = document.getElementById('btnSyncCloud');
-    if (btn) btn.textContent = 'Eşitleniyor...';
-    await fetchServerPersistedOrders();
-    if (btn) btn.textContent = '🔄 Bulut Eşitle';
-    const alertBox = document.getElementById('orderScanAlert');
-    showAlert(alertBox, 'success', `☁️ Bulut senkronizasyonu tamamlandı: ${loadedOrders.length} paket aktif.`);
-    playSuccessBeep();
+    const icon = document.getElementById('syncCloudIcon');
+    const txt = document.getElementById('syncCloudText');
+    if (btn) btn.disabled = true;
+    if (icon) icon.textContent = '⏳';
+    if (txt) txt.textContent = 'Eşitleniyor...';
+
+    try {
+        const syncUrl = window.location.pathname.startsWith('/arsiv') || window.location.pathname.startsWith('/barkod_arsiv')
+            ? '/api/arsiv/sync-cloud'
+            : (window.location.port === '5004' ? '/api/sync-cloud' : '/api/arsiv/sync-cloud');
+
+        const res = await fetch(syncUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+
+        // Aktif siparişleri de buluttan tazele
+        await fetchServerPersistedOrders(false);
+
+        // Güncel istatistikleri ve arama tablosunu tazele
+        if (typeof loadStats === 'function') loadStats();
+        if (typeof performArchiveSearch === 'function') performArchiveSearch();
+
+        if (icon) icon.textContent = '✅';
+        if (txt) txt.textContent = 'Senkronize';
+
+        const alertBox = document.getElementById('orderScanAlert');
+        const count = data?.sync_result?.total_records || data?.stats?.toplam_kayit || loadedOrders.length;
+        showAlert(alertBox, 'success', `☁️ Bulut arşiv ve cihazlar eşitlendi (${count} arşiv kaydı, ${loadedOrders.length} paket).`);
+        playSuccessBeep();
+
+        setTimeout(() => {
+            if (icon) icon.textContent = '☁️';
+            if (txt) txt.textContent = 'Bulutla Eşitle';
+            if (btn) btn.disabled = false;
+        }, 2000);
+    } catch (e) {
+        console.error('Senkronizasyon hatası:', e);
+        if (icon) icon.textContent = '⚠️';
+        if (txt) txt.textContent = 'Hata';
+        if (btn) btn.disabled = false;
+        setTimeout(() => {
+            if (icon) icon.textContent = '☁️';
+            if (txt) txt.textContent = 'Bulutla Eşitle';
+        }, 3000);
+    }
 };
+window.syncOrdersNow = window.triggerManualCloudSync;
 
 window.clearLoadedOrders = async function() {
     if (!confirm('Yüklü sipariş listesini tamamen temizlemek istediğinize emin misiniz?')) return;
@@ -481,7 +523,12 @@ function initExcelUpload() {
                     renderOrderCards();
                     resetToWaitingState();
                     const alertBox = document.getElementById('orderScanAlert');
-                    showAlert(alertBox, 'success', `📦 ${loadedOrders.length} Paket yüklendi ve kaydedildi! Kolideki KARGO BARKODUNU okutun.`);
+                    const restoredCount = loadedOrders.filter(o => o.tamamlandi).length;
+                    let successMsg = `📦 ${loadedOrders.length} Paket yüklendi ve kaydedildi!`;
+                    if (restoredCount > 0) {
+                        successMsg += ` (${restoredCount} paket geçmiş arşivden tamamlandı olarak geri yüklendi)`;
+                    }
+                    showAlert(alertBox, 'success', `${successMsg} Kolideki KARGO BARKODUNU okutun.`);
                     playSuccessBeep();
                 } else {
                     alert('Hata: ' + (res.message || 'Dosya okunamadı. Lütfen "Dosya Seç" ile yükleyin.'));
@@ -559,7 +606,12 @@ async function handleFileUpload(filesInput) {
 
             const alertBox = document.getElementById('orderScanAlert');
             const summaryBadge = validFiles.length > 1 ? `${validFiles.length} Dosya Birleştirildi` : loadedFileName;
-            showAlert(alertBox, 'success', `📦 ${loadedOrders.length} Paket yüklendi (${summaryBadge})! Kolideki kargo barkodunu veya sipariş numarasını okutun.`);
+            const restoredCount = loadedOrders.filter(o => o.tamamlandi).length;
+            let successMsg = `📦 ${loadedOrders.length} Paket yüklendi (${summaryBadge})!`;
+            if (restoredCount > 0) {
+                successMsg += ` (${restoredCount} paket geçmiş arşivden tamamlandı olarak geri yüklendi)`;
+            }
+            showAlert(alertBox, 'success', `${successMsg} Kolideki kargo barkodunu veya sipariş numarasını okutun.`);
             playSuccessBeep();
         } else {
             alert('Hata: ' + (res.message || 'Dosyalar okunamadı veya sipariş bulunamadı'));

@@ -3,9 +3,30 @@ import sys
 import sqlite3
 import json
 import tempfile
+import threading
 from datetime import datetime, timezone, timedelta
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+
+def _get_cloud_module():
+    try:
+        import core_arsiv_cloud
+        return core_arsiv_cloud
+    except ImportError:
+        try:
+            import core_cloud_sync
+            return core_cloud_sync
+        except ImportError:
+            return None
+
+def _sync_cloud_async(target_func, *args, **kwargs):
+    def _worker():
+        try:
+            target_func(*args, **kwargs)
+        except Exception as e:
+            print(f"[CloudArchiveWorker] Hata: {e}")
+    t = threading.Thread(target=_worker, daemon=True)
+    t.start()
 
 TZ_ISTANBUL = timezone(timedelta(hours=3))
 
@@ -161,6 +182,13 @@ def add_barcode_record(kargo_barkodu='', siparis_no='', musteri_adi='', urun_adi
     except Exception as e:
         print(f"JSON yedekleme hatası: {e}")
 
+    try:
+        cmod = _get_cloud_module()
+        if cmod and hasattr(cmod, 'append_archive_record_to_cloud'):
+            _sync_cloud_async(cmod.append_archive_record_to_cloud, record_data)
+    except Exception as e:
+        print(f"[CloudArchive] Async append hatasi: {e}")
+
     return record_data, is_dup, dup_info
 
 def append_to_daily_json(gun_str, record_data):
@@ -226,6 +254,12 @@ def delete_record_by_id(record_id):
         conn.close()
 
         remove_from_daily_json(rec.get('kayit_gunu'), record_id)
+        try:
+            cmod = _get_cloud_module()
+            if cmod and hasattr(cmod, 'delete_archive_record_from_cloud'):
+                _sync_cloud_async(cmod.delete_archive_record_from_cloud, record_id=record_id)
+        except Exception as e:
+            print(f"[CloudArchive] Async delete hatasi: {e}")
         return True, "Kayıt başarıyla silindi"
     except Exception as e:
         return False, str(e)
@@ -257,6 +291,12 @@ def delete_record_by_barcode(barkod_seri_no, kargo_barkodu='', siparis_no=''):
             conn.commit()
             conn.close()
             remove_from_daily_json(rec_gun, rec_id)
+            try:
+                cmod = _get_cloud_module()
+                if cmod and hasattr(cmod, 'delete_archive_record_from_cloud'):
+                    _sync_cloud_async(cmod.delete_archive_record_from_cloud, record_id=rec_id, barkod_seri_no=barkod_seri_no, kargo_barkodu=kargo_barkodu)
+            except Exception as e:
+                print(f"[CloudArchive] Async delete hatasi: {e}")
             return True, "Kayıt başarıyla silindi"
 
         conn.close()
@@ -292,6 +332,12 @@ def update_record_by_id(record_id, fields):
         conn.close()
 
         update_in_daily_json(row['kayit_gunu'], record_id, fields)
+        try:
+            cmod = _get_cloud_module()
+            if cmod and hasattr(cmod, 'update_archive_record_in_cloud'):
+                _sync_cloud_async(cmod.update_archive_record_in_cloud, record_id=record_id, fields=fields)
+        except Exception as e:
+            print(f"[CloudArchive] Async update hatasi: {e}")
         return True, "Kayıt başarıyla güncellendi"
     except Exception as e:
         return False, str(e)
@@ -323,6 +369,12 @@ def update_record_by_barcode(old_barcode, new_barcode, kargo_barkodu='', siparis
             conn.commit()
             conn.close()
             update_in_daily_json(row['kayit_gunu'], rec_id, {'barkod_seri_no': clean_new})
+            try:
+                cmod = _get_cloud_module()
+                if cmod and hasattr(cmod, 'update_archive_record_in_cloud'):
+                    _sync_cloud_async(cmod.update_archive_record_in_cloud, record_id=rec_id, fields={'barkod_seri_no': clean_new})
+            except Exception as e:
+                print(f"[CloudArchive] Async update hatasi: {e}")
             return True, "Barkod başarıyla güncellendi"
 
         conn.close()

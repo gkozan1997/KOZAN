@@ -634,12 +634,16 @@ from core_arsiv_cloud import (
     update_order_progress_cloud as update_arsiv_cloud,
     remove_serial_from_cloud as remove_arsiv_serial_cloud,
     update_serial_in_cloud as update_arsiv_serial_cloud,
+    sync_db_with_cloud_archive as sync_arsiv_cloud_db,
+    restore_scanned_status_from_archive as restore_arsiv_scanned_status,
 )
 
 try:
     init_arsiv_db()
+    # Arka planda kalıcı bulut arşivini SQLite ile çift yönlü eşitle
+    threading.Thread(target=sync_arsiv_cloud_db, daemon=True).start()
 except Exception as e:
-    print(f"[UYARI] Arsiv DB baslatma hatasi: {e}", file=sys.stderr)
+    print(f"[UYARI] Arsiv DB baslatma / bulut senkron hatasi: {e}", file=sys.stderr)
 
 @app.context_processor
 def inject_global_template_context():
@@ -827,10 +831,11 @@ def arsiv_load_recent_download():
         return jsonify({'status': 'error', 'message': 'İndirilenler klasöründe geçerli sipariş satırı içeren dosya bulunamadı'}), 404
 
     try:
+        orders = restore_arsiv_scanned_status(orders)
         save_arsiv_active_orders(selected_name, orders)
         save_arsiv_cloud(selected_name, orders)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[ArsivRestore/CloudSync] Hata: {e}")
 
     return jsonify({
         'status': 'success',
@@ -894,6 +899,7 @@ def arsiv_upload_orders():
             summary_name = f"{len(file_names)} Dosya ({names_summary})"
 
         try:
+            merged_orders = restore_arsiv_scanned_status(merged_orders)
             save_arsiv_active_orders(summary_name, merged_orders)
             save_arsiv_cloud(summary_name, merged_orders)
         except Exception as e:
@@ -1128,6 +1134,25 @@ def arsiv_clear_current_orders():
     except Exception:
         pass
     return jsonify({'status': 'success', 'message': 'Aktif siparis listesi temizlendi'})
+
+
+@app.route('/api/arsiv/sync-cloud', methods=['POST'])
+@app.route('/api/sync-cloud', methods=['POST'])
+def arsiv_sync_cloud():
+    """Tüm cihazlarda arşiv kayıtlarını ve aktif siparişleri anlık olarak GitHub bulutla eşitler."""
+    try:
+        res = sync_arsiv_cloud_db()
+        cloud_orders = get_arsiv_cloud(force_refresh=True)
+        stats = get_arsiv_stats()
+        return jsonify({
+            'status': 'success',
+            'message': 'Bulut arşiv senkronizasyonu tamamlandı',
+            'sync_result': res,
+            'active_orders': cloud_orders,
+            'stats': stats
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'Bulut senkronizasyon hatası: {str(e)}'}), 500
 
 
 def open_browser():
