@@ -967,12 +967,19 @@
             .screen-beko-divider,
             body:not(.active-tab-barkod) #view-barkod,
             body:not(.active-tab-oliz) #view-oliz,
+            body:not(.active-tab-arsiv) #view-arsiv,
             body.active-tab-siparis #view-barkod,
             body.active-tab-siparis #view-oliz,
+            body.active-tab-siparis #view-arsiv,
             body.active-tab-barkod #view-siparis,
             body.active-tab-barkod #view-oliz,
+            body.active-tab-barkod #view-arsiv,
             body.active-tab-oliz #view-siparis,
             body.active-tab-oliz #view-barkod,
+            body.active-tab-oliz #view-arsiv,
+            body.active-tab-arsiv #view-siparis,
+            body.active-tab-arsiv #view-barkod,
+            body.active-tab-arsiv #view-oliz,
             .no-print {
                 display: none !important;
                 visibility: hidden !important;
@@ -2315,12 +2322,19 @@
         @media print {
             body:not(.active-tab-barkod) #view-barkod,
             body:not(.active-tab-oliz) #view-oliz,
+            body:not(.active-tab-arsiv) #view-arsiv,
             body.active-tab-siparis #view-barkod,
             body.active-tab-siparis #view-oliz,
+            body.active-tab-siparis #view-arsiv,
             body.active-tab-barkod #view-siparis,
             body.active-tab-barkod #view-oliz,
+            body.active-tab-barkod #view-arsiv,
             body.active-tab-oliz #view-siparis,
             body.active-tab-oliz #view-barkod,
+            body.active-tab-oliz #view-arsiv,
+            body.active-tab-arsiv #view-siparis,
+            body.active-tab-arsiv #view-barkod,
+            body.active-tab-arsiv #view-oliz,
             .mobile-top-bar,
             .mobile-bottom-nav,
             .mobile-tabs-container,
@@ -2347,7 +2361,183 @@
                 pointer-events: none !important;
             }
         }
-    </style>
+    
+        /* ==============================================================
+           4. MODÜL: SERİ NO & BARKOD ARŞİV (BARKOD-EIGHT.VERCEL.APP)
+           ============================================================== */
+        .sidebar-nav-icon.icon-arsiv,
+        .mobtab-icon.icon-arsiv {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+            border-color: rgba(139, 92, 246, 0.35);
+        }
+        .sidebar-nav-btn#side-nav-arsiv.active .sidebar-nav-icon,
+        .mobile-tab-card#mobtab-arsiv.active .mobtab-icon {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+        }
+        .pill-purple {
+            background: rgba(139, 92, 246, 0.15);
+            color: #c084fc;
+            border: 1px solid rgba(139, 92, 246, 0.35);
+        }
+        .mobile-tab-card#mobtab-arsiv.active {
+            border-color: rgba(139, 92, 246, 0.6);
+            background: rgba(139, 92, 246, 0.1);
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.15);
+        }
+        .mobile-tab-card#mobtab-arsiv.active .mobtab-title {
+            color: #c084fc;
+        }
+        .mobile-nav-item#mobile-nav-arsiv.active {
+            color: #c084fc;
+        }
+        .mobile-nav-item#mobile-nav-arsiv.active .mobile-nav-icon-wrap {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.45);
+            color: #c084fc;
+        }
+
+        .arsiv-top-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .arsiv-brand-block {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .arsiv-brand-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(99, 102, 241, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
+        }
+        .arsiv-title-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .arsiv-title-row h2 {
+            font-size: 19px;
+            font-weight: 800;
+            color: #F8FAFC;
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+        .cloud-link-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34D399;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .cloud-link-badge:hover {
+            background: rgba(16, 185, 129, 0.25);
+            transform: translateY(-1px);
+            color: #FFFFFF;
+        }
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10B981;
+            box-shadow: 0 0 8px #10B981;
+            animation: pulseLiveDot 1.8s infinite;
+        }
+        @keyframes pulseLiveDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+        .arsiv-subtitle {
+            font-size: 13px;
+            color: #94A3B8;
+            margin: 3px 0 0 0;
+        }
+        .arsiv-actions-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .arsiv-view-modes {
+            display: flex;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 3px;
+            gap: 4px;
+        }
+        .arsiv-mode-btn {
+            border: none;
+            background: transparent;
+            color: #94A3B8;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .arsiv-mode-btn.active {
+            background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+            color: #FFFFFF;
+            box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+        }
+        .arsiv-cloud-frame-wrap {
+            width: 100%;
+            height: calc(100vh - 170px);
+            min-height: 680px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+            background: #0B101E;
+            position: relative;
+        }
+        .arsiv-cloud-frame-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .arsiv-top-header-bar {
+                padding: 12px 14px;
+                gap: 12px;
+            }
+            .arsiv-cloud-frame-wrap {
+                height: calc(100vh - 200px);
+                min-height: 520px;
+                border-radius: 12px;
+            }
+        }
+
+</style>
     <!-- Toplu Barkod & Kargo Etiketi (Proje 3) Kaynakları -->
     <link rel="stylesheet" href="/static/css/barcode_style.css?v=2.0">
     <script src="/static/js/JsBarcode.all.min.js"></script>
@@ -2449,6 +2639,20 @@
                     </div>
                     <span class="nav-pill pill-amber">Fırsat</span>
                 </button>
+                <!-- 4. Sayfa -->
+                <button class="sidebar-nav-btn" id="side-nav-arsiv" onclick="switchMainTab('arsiv')">
+                    <div class="sidebar-nav-icon icon-arsiv">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            <path d="m9 12 2 2 4-4"></path>
+                        </svg>
+                    </div>
+                    <div class="sidebar-nav-text">
+                        <span class="nav-title">Seri No & Barkod Arşiv</span>
+                        <span class="nav-desc">Çıkış Güvenlik & Kanıt</span>
+                    </div>
+                    <span class="nav-pill pill-purple">Güvenlik</span>
+                </button>
             </nav>
         </div>
 
@@ -2518,6 +2722,22 @@
             <div class="mobtab-body">
                 <span class="mobtab-title">Oliz Kampanya</span>
                 <span class="mobtab-desc">Beko & Arçelik Paket</span>
+            </div>
+        </button>
+        <!-- 4. Sekme -->
+        <button class="mobile-tab-card" id="mobtab-arsiv" onclick="switchMainTab('arsiv')" type="button">
+            <div class="mobtab-header-row">
+                <div class="mobtab-icon icon-arsiv">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <path d="m9 12 2 2 4-4"></path>
+                    </svg>
+                </div>
+                <span class="mobtab-pill pill-purple">Güvenlik</span>
+            </div>
+            <div class="mobtab-body">
+                <span class="mobtab-title">Seri No Arşiv</span>
+                <span class="mobtab-desc">Çıkış & Kanıt Belgesi</span>
             </div>
         </button>
     </nav>
@@ -3300,6 +3520,580 @@
     </div>
     </div> <!-- #view-oliz -->
 
+    <!-- 4. GÖRÜNÜM: BARKOD & SERİ NO ARŞİVLEME SİSTEMİ (BARKOD_ARSIV / BULUT ENTEGRASYONU) -->
+    <div id="view-arsiv" class="app-view-panel arsiv-view-scope" style="display: none;">
+        <!-- ÜST KONTROL & BULUT ŞERİDİ -->
+        <div class="arsiv-top-header-bar">
+            <div class="arsiv-brand-block">
+                <div class="arsiv-brand-icon">🛡️</div>
+                <div>
+                    <div class="arsiv-title-row">
+                        <h2>Barkod & Seri No Arşivleme Paneli</h2>
+                        <a href="https://barkod-eight.vercel.app/" target="_blank" rel="noopener noreferrer" class="cloud-link-badge">
+                            <span class="live-dot"></span> barkod-eight.vercel.app ↗
+                        </a>
+                    </div>
+                    <p class="arsiv-subtitle">Depo Çıkış Güvenliği & Kaybolmayı Önleme Sistemi</p>
+                </div>
+            </div>
+            <div class="arsiv-actions-block">
+                <div class="arsiv-view-modes">
+                    <button class="arsiv-mode-btn active" id="btn-mode-cloud" onclick="switchArsivDisplayMode('cloud')" title="Canlı Vercel Bulut Uygulaması">
+                        🌐 Canlı Bulut (7/24)
+                    </button>
+                    <button class="arsiv-mode-btn" id="btn-mode-local" onclick="switchArsivDisplayMode('local')" title="Entegre Yerel / Çevrimdışı Panel">
+                        ⚡ Entegre Panel
+                    </button>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="reloadArsivFrame()" title="Bulut Ekranını Yenile">
+                    🔄 Yenile
+                </button>
+                <a href="https://barkod-eight.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" title="Yeni Sekmede Tam Ekran Aç">
+                    ↗️ Yeni Sekmede Aç
+                </a>
+            </div>
+        </div>
+
+        <!-- 1. CANLI BULUT ÇERÇEVESİ (BARKOD-EIGHT.VERCEL.APP) -->
+        <div id="arsiv-cloud-container" class="arsiv-cloud-frame-wrap">
+            <iframe id="arsiv-cloud-iframe"
+                    src="https://barkod-eight.vercel.app/"
+                    title="Barkod & Seri No Arşivleme Paneli"
+                    allow="camera; microphone; clipboard-read; clipboard-write; fullscreen"
+                    loading="lazy"></iframe>
+        </div>
+
+        <!-- 2. ENTEGRE YEREL / ÇEVRİMDIŞI PANEL -->
+        <div id="arsiv-local-container" style="display: none;">
+    <!-- 4. GÖRÜNÜM: BARKOD & SERİ NO ARŞİVLEME SİSTEMİ -->
+    <div id="view-arsiv" class="app-view-panel arsiv-view-scope" style="display: none;">
+<div class="bg-glow"></div>
+
+    <div class="app-layout">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon">🛡️</div>
+                <div>
+                    <h1 class="brand-title">Barkod & Seri No Arşivleme</h1>
+                    <p class="brand-subtitle">Depo Çıkış Güvenliği & Kaybolmayı Önleme Sistemi</p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="status-pill">
+                    <span class="status-pulse"></span>
+                    <span class="status-text">🛡️ Arşiv Paneli • Aktif</span>
+                </div>
+                <div class="stats-badge">
+                    <span class="stats-label">Bugün Okutulan:</span>
+                    <span class="stats-val" id="headerTodayCount">{{ (arsiv_stats.bugun_kayit if arsiv_stats else 0) }}</span>
+                </div>
+            </div>
+        </header>
+
+                <!-- TOP NAVIGATION TABS -->
+        <nav class="main-tabs-nav">
+            <button class="nav-tab active" data-tab="tab-siparis" onclick="switchArsivTab('tab-siparis')">
+                <span class="tab-icon">🎯</span>
+                <span class="tab-text">Sipariş & Barkod Okutma</span>
+            </button>
+            <button class="nav-tab" data-tab="tab-paketler" id="navTabPaketler" onclick="switchArsivTab('tab-paketler')">
+                <span class="tab-icon">📋</span>
+                <span class="tab-text">Paketler / Kargo Barkodları</span>
+                <span class="nav-counter-pill" id="navOrderCount">0</span>
+            </button>
+            <button class="nav-tab" data-tab="tab-serbest" onclick="switchArsivTab('tab-serbest')">
+                <span class="tab-icon">⚡</span>
+                <span class="tab-text">Hızlı Serbest Kayıt</span>
+            </button>
+            <button class="nav-tab" data-tab="tab-arama" onclick="switchArsivTab('tab-arama')">
+                <span class="tab-icon">🔍</span>
+                <span class="tab-text">Arama & Kanıt Arşivi</span>
+            </button>
+            <button class="nav-tab" data-tab="tab-guvenlik" onclick="switchArsivTab('tab-guvenlik')">
+                <span class="tab-icon">📊</span>
+                <span class="tab-text">Veri Güvenliği & Yedek</span>
+            </button>
+        </nav>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- TAB 1: SİPARİŞ & BARKOD OKUTMA (ANA EKRAN - 100% ODAKLI VE FERAH) -->
+            <section id="tab-siparis" class="tab-pane active">
+                <!-- ANA EKRANDA DOĞRUDAN TAM GENİŞLİKTE AKTİF SİPARİŞ VE SERİ NO OKUTMA KONSOLU -->
+                <div class="scan-single-console">
+                    <div class="col-card active-order-card">
+                        <div class="active-order-header">
+                            <div>
+                                <span class="order-marketplace-badge" id="activeMarketplace">Paket Bekleniyor</span>
+                                <h2 class="active-order-title" id="activeOrderTitle">📦 Kargo Barkodu / Sipariş No Okutun</h2>
+                                <p class="active-order-customer" id="activeCustomerName">Kolideki kargo etiketini veya sipariş numarasını (Örn: 1099201) okutun ya da 'Paketler' sekmesinden bir paket seçin.</p>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 14px;">
+                                <div class="header-stat-box" id="headerStatBox" title="Toplam Okutulan Ürün / Toplam Sipariş">
+                                    <div class="stat-box-val" id="headerUnitsCount">0</div>
+                                    <div class="stat-box-lbl">Okutulan Adet</div>
+                                </div>
+                                <button class="btn-secondary btn-sm btn-nav-to-pkgs" type="button" onclick="switchArsivTab('tab-paketler')" style="padding: 8px 14px; font-weight: 600; border-color: rgba(59, 130, 246, 0.4); color: #93C5FD;">
+                                    📋 Paketler & Excel (<span id="headerPkgCount">0</span>) ➔
+                                </button>
+                                <div class="order-progress-box">
+                                    <div class="progress-percent" id="orderProgressPercent">%0</div>
+                                    <div class="progress-label">Tamamlandı</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2 ADIMLI AKILLI DEPO TARAMA AKIŞI -->
+                        <div class="workflow-stepper">
+                            <div class="step-chip active" id="stepChip1">
+                                <span class="step-badge">1</span>
+                                <div class="step-info">
+                                    <strong>1. ADIM: Kargo Barkodu / Sipariş No</strong>
+                                    <small>Koli veya Sipariş No Okutun</small>
+                                </div>
+                            </div>
+                            <div class="step-divider">➔</div>
+                            <div class="step-chip" id="stepChip2">
+                                <span class="step-badge">2</span>
+                                <div class="step-info">
+                                    <strong>2. ADIM: Ürün Seri No</strong>
+                                    <small>Ürünü Okut & Mühürle</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="scanner-input-box" id="scannerContainerBox">
+                            <label for="activeScanInput">
+                                <span class="scan-label-title" id="scanLabelTitle">📦 1. Adım: Kargo Barkodu / Sipariş No Okutun</span>
+                                <span class="scan-label-hint" id="scanLabelHint">Kolideki kargo etiketini veya sipariş numarasını (Örn: 1099201) okutun, paket açılsın</span>
+                            </label>
+                            <div class="input-with-actions">
+                                <input type="text" id="activeScanInput" class="scan-large-input step1-mode" placeholder="1. ADIM: Kargo Barkodu veya Sipariş No Okutun..." autocomplete="off">
+                                
+                                <!-- CANLI OKUTMA SAYACI ROZETİ (GİRİŞ KUTUSUNUN TAM YANINDA) -->
+                                <div class="scan-counter-badge" id="scanCounterBadge" title="Şu ana kadar okutulan toplam ürün adedi">
+                                    <div class="badge-icon">🎯</div>
+                                    <div class="badge-body">
+                                        <span class="badge-lbl">OKUTULAN</span>
+                                        <span class="badge-val"><span id="scanCounterVal">0</span> <small>Adet</small></span>
+                                    </div>
+                                </div>
+
+                                <!-- SAYAÇ SIFIRLAMA BUTONU -->
+                                <button class="btn-counter-reset" id="btnResetScanCounter" type="button" onclick="window.resetScanCounter && window.resetScanCounter()" title="Okutulan ürün sayacını sıfırla">
+                                    🔄 Sıfırla
+                                </button>
+
+                                <button class="btn-cam" id="btnToggleCamOrder" title="Kamera ile Tara">📷</button>
+                                <button class="btn-secondary btn-sm" id="btnResetToStep1" title="Kargo Barkodu okuma adımına dön">Başa Dön ↺</button>
+                            </div>
+
+                            <!-- CANLI SON OKUTULAN TEYİT ŞERİDİ -->
+                            <div class="scan-confirmation-bar" id="scanConfirmationBar" style="display: none;">
+                                <div class="confirm-left">
+                                    <span class="confirm-check">✅</span>
+                                    <span class="confirm-label">Son Teyit:</span>
+                                    <strong class="confirm-code" id="confirmBarcodeCode">-</strong>
+                                    <span class="confirm-name" id="confirmProductName">-</span>
+                                </div>
+                                <div class="confirm-right">
+                                    <span class="confirm-count-tag" id="confirmCountTag">🎯 Okutulan: 0 Adet</span>
+                                </div>
+                            </div>
+
+                            <div class="scan-feedback-alert" id="orderScanAlert" style="display: none;"></div>
+                        </div>
+
+                        <!-- SİPARİŞ KALEMLERİ LİSTESİ -->
+                        <div class="order-items-section">
+                            <h4>Pakete Girecek Ürünler</h4>
+                            <div class="items-table-wrap">
+                                <table class="items-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;">Durum</th>
+                                            <th>Ürün Adı</th>
+                                            <th style="width: 80px; text-align: center;">Adet</th>
+                                            <th>Kaydedilen Seri No</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="activeOrderItemsBody">
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted" style="padding: 30px;">📦 Kolideki kargo barkodunu okuttuğunuzda müşteri ve ürünler buraya gelecektir.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- TAMAMLANMA BİLDİRİMİ -->
+                        <div class="order-completion-banner" id="orderCompleteBanner" style="display: none;">
+                            <div class="completion-icon">✅</div>
+                            <div>
+                                <h4>Tüm Ürünlerin Barkod / Seri Numaraları Kaydedildi!</h4>
+                                <p>Bu siparişin tüm çıkış bilgileri veritabanına ve günlük arşive mühürlendi.</p>
+                            </div>
+                            <button class="btn-primary" id="btnNextOrder">Sıradaki Siparişe Geç ➡️</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: PAKETLER & KARGO BARKODLARI (EXCEL YÖNETİMİ VE TÜM PAKET LİSTESİ) -->
+            <section id="tab-paketler" class="tab-pane">
+                <div class="packages-tab-container">
+                    
+                    <!-- EXCEL YÜKLEME VE YÜKLÜ LİSTE ALANI (ARTIK BURADA!) -->
+                    <div class="excel-upload-bar">
+                        <div class="upload-dropzone" id="excelDropzone">
+                            <div class="dropzone-icon">📥</div>
+                            <div class="dropzone-text" id="dropzoneText">
+                                <strong id="dropzoneMainTitle">Çoklu Excel Sipariş Dosyalarını Sürükleyin veya Çoklu Seçin</strong>
+                                <span id="dropzoneSubtitle">(Trendyol, Hepsiburada, Web Sitesi vb. • Tek seferde birden fazla Excel seçip birleştirebilirsiniz)</span>
+                            </div>
+                            <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" multiple onchange="window.handleFileInputChange && window.handleFileInputChange(this.files)" style="position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none;">
+                            <div class="dropzone-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <button class="btn-primary" type="button" id="btnLoadRecentExcel" onclick="window.loadRecentExcel && window.loadRecentExcel()">⚡ İndirilenler'den Getir</button>
+                                <button type="button" class="btn-secondary" id="browseExcelBtn" onclick="document.getElementById('excelFileInput').click()" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin: 0; user-select: none;">📁 Çoklu Excel Seç</button>
+                                <button class="btn-secondary btn-sm" type="button" onclick="window.syncOrdersNow && window.syncOrdersNow()" id="btnSyncCloud" style="color: #38BDF8; border-color: rgba(56, 189, 248, 0.4);" title="Telefon ve tüm cihazlarla bulut eşitle">🔄 Bulut Eşitle</button>
+                                <button class="btn-primary btn-packages-quick" type="button" id="btnGoToScan" onclick="switchArsivTab('tab-siparis')" style="background: linear-gradient(135deg, #10B981, #059669); border: none;">🎯 Taramaya Başla ➔</button>
+                                <button class="btn-secondary btn-clear-quick" type="button" id="btnClearOrders" onclick="window.clearLoadedOrders && window.clearLoadedOrders()" style="display: none; color: #F87171; border-color: rgba(239, 68, 68, 0.35);" title="Yüklü Excel listesini temizle">🗑️ Temizle</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAKETLER BAŞLIĞI VE CANLI ARAÇ ÇUBUĞU -->
+                    <div class="packages-header-card">
+                        <div class="packages-header-top">
+                            <div>
+                                <h2 class="packages-title">📋 Yüklü Paketler & Kargo Barkodları (<span id="loadedOrderCount">0</span>)</h2>
+                                <p class="packages-subtitle">Excel'den aktarılan tüm koli paketleri. Listeden herhangi bir pakete tıklayarak hemen tarama ekranına geçebilirsiniz.</p>
+                            </div>
+                            <div class="packages-meta-box">
+                                <div class="active-file-pill" id="activeFileBadge">
+                                    <span class="file-icon">📁</span>
+                                    <span id="activeFileNameText">Henüz Excel Yüklenmedi</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="packages-toolbar-grid">
+                            <div class="search-wrap">
+                                <input type="text" id="orderFilterInput" class="filter-input-large" placeholder="🔍 Kargo Barkodu, Sipariş No veya Alıcı Ara...">
+                            </div>
+                            <div class="status-filters-pills">
+                                <button class="filter-pill active" id="btnFilterAll" onclick="window.setPackageStatusFilter && window.setPackageStatusFilter('all')">Tümü (<span id="countFilterAll">0</span>)</button>
+                                <button class="filter-pill" id="btnFilterPending" onclick="window.setPackageStatusFilter && window.setPackageStatusFilter('pending')">Bekleyenler (<span id="countFilterPending">0</span>)</button>
+                                <button class="filter-pill" id="btnFilterCompleted" onclick="window.setPackageStatusFilter && window.setPackageStatusFilter('completed')">Tamamlananlar (<span id="countFilterCompleted">0</span>)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAKET KARTLARI GRİD LİSTESİ -->
+                    <div class="order-cards-grid" id="orderCardsContainer">
+                        <div class="empty-state">
+                            Henüz sipariş yüklenmedi.<br>Yukarıdaki alandan Excel dosyanızı seçin.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: HIZLI SERBEST KAYIT -->
+            <section id="tab-serbest" class="tab-pane">
+                <div class="free-scan-layout">
+                    <div class="free-scan-card">
+                        <div class="free-scan-header">
+                            <div class="free-icon">⚡</div>
+                            <div>
+                                <h2>Hızlı Serbest Barkod / Seri No Kaydı</h2>
+                                <p>Excel yüklemeden, anlık gelen sipariş veya müşteri ürünlerini tek adımda kaydedin.</p>
+                            </div>
+                        </div>
+
+                        <div class="free-inputs-grid">
+                            <div class="input-group">
+                                <label>Kargo Barkodu / Takip No:</label>
+                                <input type="text" id="freeKargoBarcode" class="form-input" placeholder="Örn: 7330037763157327 (Öncelikli)">
+                            </div>
+                            <div class="input-group">
+                                <label>Sipariş Numarası:</label>
+                                <input type="text" id="freeOrderNo" class="form-input" placeholder="Örn: 11680652301 (Opsiyonel)">
+                            </div>
+                            <div class="input-group">
+                                <label>Müşteri Adı / Alıcı:</label>
+                                <input type="text" id="freeCustomerName" class="form-input" placeholder="Örn: Mehmet Özkan (Opsiyonel)">
+                            </div>
+                            <div class="input-group">
+                                <label>Ürün Adı / Açıklama:</label>
+                                <input type="text" id="freeProductName" class="form-input" placeholder="Örn: Beko Kahve Makinesi (Opsiyonel)">
+                            </div>
+                            <div class="input-group">
+                                <label>Pazaryeri / Kaynak:</label>
+                                <select id="freeMarketplace" class="form-input">
+                                    <option value="Trendyol">Trendyol</option>
+                                    <option value="Hepsiburada">Hepsiburada</option>
+                                    <option value="Amazon">Amazon</option>
+                                    <option value="Çiçeksepeti">Çiçeksepeti</option>
+                                    <option value="Pazarama">Pazarama</option>
+                                    <option value="N11">N11</option>
+                                    <option value="Doğrudan Mağaza">Doğrudan Mağaza</option>
+                                    <option value="Diğer">Diğer</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="scanner-input-box" style="margin-top: 24px;">
+                            <label for="freeScanInput">
+                                <span class="scan-label-title">🎯 Seri No / Barkod Taraması:</span>
+                                <span class="scan-label-hint">Okutulan kod anında mühürlenir ve diske yazılır</span>
+                            </label>
+                            <div class="input-with-actions">
+                                <input type="text" id="freeScanInput" class="scan-large-input" placeholder="Barkod veya Seri No Okutun..." autocomplete="off">
+                                <button class="btn-cam" id="btnToggleCamFree" title="Kamera ile Tara">📷</button>
+                                <button class="btn-primary" id="btnSaveFreeScan">Kaydet</button>
+                            </div>
+                            <div class="scan-feedback-alert" id="freeScanAlert" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- SON OKUTULANLAR TABLOSU -->
+                    <div class="recent-scans-card">
+                        <div class="recent-scans-header">
+                            <h3>Son Kaydedilen Barkodlar</h3>
+                            <button class="btn-secondary btn-sm" id="btnRefreshStats">Yenile 🔄</button>
+                        </div>
+                        <div class="recent-table-wrap">
+                            <table class="recent-table">
+                                <thead>
+                                    <tr>
+                                        <th>Kayıt Saati</th>
+                                        <th>Seri No / Barkod</th>
+                                        <th>Kargo Barkodu</th>
+                                        <th>Müşteri</th>
+                                        <th>Pazaryeri</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentScansBody">
+                                    {% if arsiv_stats and arsiv_stats.son_kayitlar %}
+                                    {% for r in arsiv_stats.son_kayitlar %}
+                                    <tr>
+                                        <td>{{ r.kayit_tarihi }}</td>
+                                        <td><span class="code-pill">{{ r.barkod_seri_no }}</span></td>
+                                        <td>{{ r.siparis_no or '-' }}</td>
+                                        <td>{{ r.musteri_adi or '-' }}</td>
+                                        <td><span class="market-tag">{{ r.pazaryeri }}</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Henüz kayıt bulunmuyor.</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: ARAMA & KANIT ARŞİVİ -->
+            <section id="tab-arama" class="tab-pane">
+                <div class="search-archive-card">
+                    <div class="search-bar-grid">
+                        <div class="search-input-wrap">
+                            <label>Sorgulama Terimi:</label>
+                            <input type="text" id="archiveSearchInput" class="form-input" placeholder="Kargo Barkodu, Seri No veya Alıcı Adı yazın...">
+                        </div>
+                        <div class="search-date-wrap">
+                            <label>Başlangıç Tarihi:</label>
+                            <input type="date" id="archiveStartDate" class="form-input">
+                        </div>
+                        <div class="search-date-wrap">
+                            <label>Bitiş Tarihi:</label>
+                            <input type="date" id="archiveEndDate" class="form-input">
+                        </div>
+                        <div class="search-actions-wrap">
+                            <button class="btn-primary" id="btnExecuteSearch">Sorgula 🔍</button>
+                            <button class="btn-secondary" id="btnDownloadExcelArchive">Excel İndir 📥</button>
+                        </div>
+                    </div>
+
+                    <div class="search-results-section">
+                        <div class="results-header">
+                            <h4>Arama Sonuçları (<span id="searchResultCount">0</span> Kayıt)</h4>
+                            <span class="results-hint">Tıklayarak resmi "Kanıt Belgesi" önizlemesi alabilirsiniz.</span>
+                        </div>
+                        <div class="search-table-wrap">
+                            <table class="search-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Kayıt Tarihi</th>
+                                        <th>Kargo Barkodu</th>
+                                        <th>Seri No / Barkod</th>
+                                        <th>Sipariş No</th>
+                                        <th>Müşteri Adı</th>
+                                        <th>Ürün Adı</th>
+                                        <th>Pazaryeri</th>
+                                        <th>İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="searchResultsBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">Arama yapmak için yukarıdaki kutuyu kullanın veya 'Sorgula' butonuna basın.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: VERİ GÜVENLİĞİ & YEDEK -->
+            <section id="tab-guvenlik" class="tab-pane">
+                <div class="security-dashboard-grid">
+                    <div class="security-card">
+                        <div class="sec-icon">🛡️</div>
+                        <h3>Çift Katmanlı Arşiv Güvenliği</h3>
+                        <p>Barkodlarınızın asla kaybolmaması için sistem her okutmada 2 ayrı bağımsız yere yazar:</p>
+                        <ul class="sec-list">
+                            <li><strong>1. Katman (SQLite Veritabanı):</strong> <code>data/barkod_arsiv.db</code> üzerinde atomik işlem garantisiyle diske işlenir.</li>
+                            <li><strong>2. Katman (Günlük JSON Yedeği):</strong> <code>data/arsiv_gunluk/YYYY-MM-DD.json</code> dosyasına anında eklenir.</li>
+                            <li><strong>Sıfır Kayıp:</strong> Elektrik kesintisi, bilgisayarın kapanması veya çökme durumunda dahi kayıtlar güven altındadır.</li>
+                        </ul>
+                    </div>
+
+                    <div class="security-card">
+                        <div class="sec-icon">📊</div>
+                        <h3>Sistem İstatistikleri</h3>
+                        <div class="stat-boxes-grid">
+                            <div class="stat-box">
+                                <div class="stat-box-title">Toplam Kayıtlı Barkod</div>
+                                <div class="stat-box-num" id="statTotalScans">{{ (arsiv_stats.toplam_kayit if arsiv_stats else 0) }}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-box-title">Bugün Okutulan</div>
+                                <div class="stat-box-num" id="statTodayScans">{{ (arsiv_stats.bugun_kayit if arsiv_stats else 0) }}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-box-title">Tekil Sipariş Sayısı</div>
+                                <div class="stat-box-num" id="statUniqueOrders">{{ (arsiv_stats.tekil_siparis if arsiv_stats else 0) }}</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button class="btn-primary" id="btnFullExcelExport">Tüm Arşivi Excel Olarak Yedekle 📥</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- KAMERA İLE AKILLI 2 ADIMLI TARAMA MODALI -->
+    <div class="modal-overlay" id="camModal" style="display: none;">
+        <div class="modal-box cam-modal-box">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="cam-step-pill step1-pill" id="camStepPill">📦 1. Adım: Kargo Barkodu</span>
+                    <h3 id="camModalTitle" style="margin: 0; font-size: 16px;">Koli Kargo Barkodunu Okutun</h3>
+                </div>
+                <button class="modal-close-btn" id="btnCloseCamModal" onclick="window.stopCameraScanner && window.stopCameraScanner()">✕</button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- AKTİF SİPARİŞ BİLGİ ŞERİDİ (2. ADIMDA AÇILIR) -->
+                <div class="cam-order-banner" id="camOrderBanner" style="display: none;">
+                    <div class="cam-banner-top">
+                        <span class="cam-banner-cust" id="camBannerCustomer">👤 Müşteri: -</span>
+                        <span class="cam-banner-kargo" id="camBannerKargo">🏷️ Kargo: -</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="cam-banner-item" id="camBannerProduct">📦 Beklenen Ürün: -</div>
+                        <span class="cam-counter-pill" id="camScanCounterPill">🎯 Okutulan: <strong id="camCounterVal">0</strong> Adet</span>
+                    </div>
+                </div>
+
+                <!-- KAMERA VİDEO ÇERÇEVESİ -->
+                <div class="camera-preview-wrapper">
+                    <div id="cameraPreview" style="width: 100%; min-height: 260px; background: #000;"></div>
+                </div>
+
+                <div class="camera-status status-step1" id="camStatusText">Kamera başlatılıyor...</div>
+
+                <div class="cam-actions-footer">
+                    <button class="btn-secondary btn-sm" id="btnCamSwitchStep" style="display: none;" onclick="window.resetToWaitingState && window.resetToWaitingState(); window.updateCameraUIForStep && window.updateCameraUIForStep(1);">↺ Başa Dön (Kargo Barkodu Oku)</button>
+                    <button class="btn-secondary btn-sm" id="btnDismissCamFooter" onclick="window.stopCameraScanner && window.stopCameraScanner()">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KANIT BELGESİ MODAL -->
+    <div class="modal-overlay" id="proofModal" style="display: none;">
+        <div class="modal-box proof-modal-box">
+            <div class="modal-header">
+                <h3>📜 Resmi Çıkış Kanıt Belgesi</h3>
+                <button class="modal-close-btn" id="btnCloseProofModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="proof-certificate-card" id="printableProofArea">
+                    <div class="cert-header">
+                        <div class="cert-logo">🛡️ BARKOD & SERİ NO ÇIKIŞ DOĞRULAMA BELGESİ</div>
+                        <div class="cert-date" id="proofCertDate">Tarih: -</div>
+                    </div>
+                    <div class="cert-badge">GÖNDERİ MÜHÜRLÜ VE ONAYLI</div>
+                    <div class="cert-details-grid">
+                        <div class="cert-item">
+                            <span class="cert-label">Kargo Barkodu:</span>
+                            <span class="cert-val code-val" id="proofKargoBarcode" style="font-size:15px; color:#38BDF8;">-</span>
+                        </div>
+                        <div class="cert-item">
+                            <span class="cert-label">Sipariş Numarası:</span>
+                            <span class="cert-val" id="proofOrderNo">-</span>
+                        </div>
+                        <div class="cert-item">
+                            <span class="cert-label">Alıcı / Müşteri:</span>
+                            <span class="cert-val" id="proofCustomer">-</span>
+                        </div>
+                        <div class="cert-item">
+                            <span class="cert-label">Ürün Adı:</span>
+                            <span class="cert-val" id="proofProduct">-</span>
+                        </div>
+                        <div class="cert-item">
+                            <span class="cert-label">Pazaryeri / Platform:</span>
+                            <span class="cert-val" id="proofMarketplace">-</span>
+                        </div>
+                        <div class="cert-item highlight-item">
+                            <span class="cert-label">KAYDEDİLEN SERİ NO / BARKOD:</span>
+                            <span class="cert-val code-val" id="proofBarcode">-</span>
+                        </div>
+                        <div class="cert-item">
+                            <span class="cert-label">Okutma / Kayıt Saati:</span>
+                            <span class="cert-val" id="proofTime">-</span>
+                        </div>
+                    </div>
+                    <div class="cert-footer">
+                        <p>Bu belge, ürünün depodan paketlenerek alıcıya sevk edildiğini kanıtlar. Sistem kayıt ID: <strong id="proofId">-</strong></p>
+                    </div>
+                </div>
+                <div class="cert-actions">
+                    <button class="btn-primary" id="btnPrintProof">Yazdır / PDF Kaydet 🖨️</button>
+                    <button class="btn-secondary" id="btnDismissProof">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    </div> <!-- #view-arsiv -->
+
+        </div>
+    </div> <!-- #view-arsiv -->
+
+
     </div> <!-- .app-main-viewport -->
 </div> <!-- .app-layout-wrapper -->
 
@@ -3337,6 +4131,16 @@
                 </svg>
             </div>
             <span class="mobile-nav-label">Oliz</span>
+        </button>
+        <!-- 4. Sekme -->
+        <button class="mobile-nav-item" id="mobile-nav-arsiv" onclick="switchMainTab('arsiv')" type="button">
+            <div class="mobile-nav-icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                </svg>
+            </div>
+            <span class="mobile-nav-label">Arşiv</span>
         </button>
     </nav>
 
@@ -3380,7 +4184,8 @@
     window.addEventListener('beforeprint', () => {
         const cls = document.body.className || '';
         const tab = cls.indexOf('active-tab-barkod') !== -1 ? 'barkod'
-            : (cls.indexOf('active-tab-oliz') !== -1 ? 'oliz' : 'siparis');
+            : (cls.indexOf('active-tab-oliz') !== -1 ? 'oliz'
+            : (cls.indexOf('active-tab-arsiv') !== -1 ? 'arsiv' : 'siparis'));
         applyPrintPageSize(tab);
 
         // Sipariş yazdırma öncesinde tüm listeyi ve aramayı garantiye al
@@ -3404,32 +4209,36 @@
         const sideSiparis = document.getElementById('side-nav-siparis');
         const sideBarkod = document.getElementById('side-nav-barkod');
         const sideOliz = document.getElementById('side-nav-oliz');
+        const sideArsiv = document.getElementById('side-nav-arsiv');
 
         // Mobil Üst Sekme Kartları (Mobil)
         const mobtabSiparis = document.getElementById('mobtab-siparis');
         const mobtabBarkod = document.getElementById('mobtab-barkod');
         const mobtabOliz = document.getElementById('mobtab-oliz');
+        const mobtabArsiv = document.getElementById('mobtab-arsiv');
 
         // Mobil Alt Menü Butonları (Mobil Dock)
         const mobSiparis = document.getElementById('mobile-nav-siparis');
         const mobBarkod = document.getElementById('mobile-nav-barkod');
         const mobOliz = document.getElementById('mobile-nav-oliz');
+        const mobArsiv = document.getElementById('mobile-nav-arsiv');
         const mobBadge = document.getElementById('mobile-module-badge');
 
         // Sayfa / Görünüm Konteynırları
         const viewSiparis = document.getElementById('view-siparis');
         const viewBarkod = document.getElementById('view-barkod');
         const viewOliz = document.getElementById('view-oliz');
+        const viewArsiv = document.getElementById('view-arsiv');
 
         // Tüm butonların active sınıfını temizle
-        [sideSiparis, sideBarkod, sideOliz, 
-         mobtabSiparis, mobtabBarkod, mobtabOliz, 
-         mobSiparis, mobBarkod, mobOliz].forEach(el => {
+        [sideSiparis, sideBarkod, sideOliz, sideArsiv,
+         mobtabSiparis, mobtabBarkod, mobtabOliz, mobtabArsiv,
+         mobSiparis, mobBarkod, mobOliz, mobArsiv].forEach(el => {
             if (el) el.classList.remove('active');
         });
 
         // Tüm sayfaları gizle
-        [viewSiparis, viewBarkod, viewOliz].forEach(el => {
+        [viewSiparis, viewBarkod, viewOliz, viewArsiv].forEach(el => {
             if (el) {
                 el.style.display = 'none';
                 el.classList.remove('active');
@@ -3437,7 +4246,7 @@
         });
 
         // Body print sınıflarını temizle
-        document.body.classList.remove('active-tab-siparis', 'active-tab-barkod', 'active-tab-oliz');
+        document.body.classList.remove('active-tab-siparis', 'active-tab-barkod', 'active-tab-oliz', 'active-tab-arsiv');
 
         // Aktif sekmeye göre sayfa boyutunu (A4 / 100x100mm termal) güncelle
         applyPrintPageSize(tab);
@@ -3473,6 +4282,21 @@
             if (typeof loadCatalog === 'function') {
                 loadCatalog(typeof currentCatalogType !== 'undefined' ? currentCatalogType : 'tekil');
             }
+        } else if (tab === 'arsiv') {
+            if (sideArsiv) sideArsiv.classList.add('active');
+            if (mobtabArsiv) mobtabArsiv.classList.add('active');
+            if (mobArsiv) mobArsiv.classList.add('active');
+            if (mobBadge) {
+                mobBadge.textContent = '🛡️ Seri No Arşiv';
+                mobBadge.className = 'mobile-module-pill pill-purple';
+            }
+            if (viewArsiv) { viewArsiv.style.display = 'block'; viewArsiv.classList.add('active'); }
+            document.body.classList.add('active-tab-arsiv');
+            try { history.replaceState(null, null, '#arsiv'); } catch (e) {}
+
+            if (typeof window.initArsivModule === 'function') {
+                window.initArsivModule();
+            }
         } else {
             if (sideSiparis) sideSiparis.classList.add('active');
             if (mobtabSiparis) mobtabSiparis.classList.add('active');
@@ -3486,6 +4310,33 @@
             try { history.replaceState(null, null, '#siparis'); } catch (e) {}
         }
     }
+
+    function switchArsivDisplayMode(mode) {
+        const cloudBox = document.getElementById('arsiv-cloud-container');
+        const localBox = document.getElementById('arsiv-local-container');
+        const btnCloud = document.getElementById('btn-mode-cloud');
+        const btnLocal = document.getElementById('btn-mode-local');
+        if (mode === 'local') {
+            if (cloudBox) cloudBox.style.display = 'none';
+            if (localBox) localBox.style.display = 'block';
+            if (btnCloud) btnCloud.classList.remove('active');
+            if (btnLocal) btnLocal.classList.add('active');
+        } else {
+            if (cloudBox) cloudBox.style.display = 'block';
+            if (localBox) localBox.style.display = 'none';
+            if (btnCloud) btnCloud.classList.add('active');
+            if (btnLocal) btnLocal.classList.remove('active');
+        }
+    }
+    window.switchArsivDisplayMode = switchArsivDisplayMode;
+
+    function reloadArsivFrame() {
+        const iframe = document.getElementById('arsiv-cloud-iframe');
+        if (iframe) {
+            iframe.src = 'https://barkod-eight.vercel.app/?t=' + Date.now();
+        }
+    }
+    window.reloadArsivFrame = reloadArsivFrame;
 
     async function loadOlizStats() {
         try {
@@ -3521,6 +4372,8 @@
             switchMainTab('barkod');
         } else if (hash === '#oliz' || initialTab === 'oliz') {
             switchMainTab('oliz');
+        } else if (hash === '#arsiv' || hash === '#barkod_arsiv' || initialTab === 'arsiv' || initialTab === 'barkod_arsiv') {
+            switchMainTab('arsiv');
         } else {
             switchMainTab('siparis');
         }
@@ -4091,5 +4944,7 @@
         }, 3500);
     }
 </script>
+    <script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/arsiv_main.js') }}?v=1.0"></script>
 </body>
 </html>

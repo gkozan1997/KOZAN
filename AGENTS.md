@@ -202,18 +202,19 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 
 ---
 
-## 12. Sol Menü Dashboard Mimarisi & 3 Sayfa Entegrasyonu (Sol Menü Standardı)
+## 12. Sol Menü Dashboard Mimarisi & 4 Modül Entegrasyonu (Sol Menü Standardı)
 
 * **Sol Menü (Sidebar) Navigasyon Paneli (`aside.app-sidebar`):**
   - Tüm platformun sol tarafında sabit (sticky), modern cam efektli (`rgba(11, 16, 28, 0.96)`) dikey sidebar yer alır.
-  - Sol tarafta sıralanan **3 Ana Modül Sayfası:**
+  - Sol tarafta sıralanan **4 Ana Modül Sayfası:**
     1. **`📦 Sipariş & Toplama` (`#side-nav-siparis`):** Pazaryeri sipariş konsolidasyonu, Beko/Grundig/Lenovo 2. sayfa standardı, özel not ve tam A4 dikey baskı.
     2. **`🏷️ Toplu Barkod & Kargo` (`#side-nav-barkod`):** 10x10cm termal rulo etiket, otomatik sütun eşleme, SVG barkod ve ReportLab PDF.
     3. **`🎁 Oliz Kampanya` (`#side-nav-oliz`):** Beko & Arçelik 1, 2, 3, 4 ürünlü sepet analizi, paket fırsatları, toptan kuponlar ve katılım payları.
+    4. **`🛡️ Seri No & Barkod Arşiv` (`#side-nav-arsiv`):** Depo çıkış güvenliği, mükerrer barkod engelleme, canlı kamera & el terminali okutma, resmi çıkış kanıt belgesi (proof) ve 7/24 canlı bulut entegrasyonu ([barkod-eight.vercel.app](https://barkod-eight.vercel.app)).
 * **Dinamik Geçiş ve URL Senkronizasyonu (`switchMainTab`):**
   - Sayfa yenilenmeden tek tıkla sekmeler arası geçiş yapılır.
-  - URL hash `#siparis`, `#barkod`, `#oliz` otomatik güncellenir.
-  - Bağımsız rotalar: `/barkod` ve `/oliz` doğrudan ilgili sayfayı açar.
+  - URL hash `#siparis`, `#barkod`, `#oliz`, `#arsiv` otomatik güncellenir.
+  - Bağımsız rotalar: `/barkod`, `/oliz`, `/arsiv` ve `/barkod_arsiv` doğrudan ilgili sayfayı açar.
 * **Baskı İzolasyonu:** `@media print` sırasında sol menü gizlenir (`display: none !important`), baskı alanı sayfa genişliğini tam doldurur.
 
 ---

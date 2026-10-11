@@ -606,13 +606,46 @@ except Exception as e:
     print(f"Oliz CampaignEngine init fallback: {e}")
     campaign_engine = CampaignEngine(None)
 
+# ---------------------------------------------------------------------------
+# BARKOD & SERI NO ARSIVLEME MODULU (BARKOD_ARSIV / PROJE 4 ENTEGRASYONU)
+# CANLI BULUT: https://barkod-eight.vercel.app/
+# ---------------------------------------------------------------------------
+from core_arsiv_db import (
+    init_db as init_arsiv_db,
+    add_barcode_record as add_arsiv_record,
+    check_duplicate as check_arsiv_duplicate,
+    search_records as search_arsiv_records,
+    get_stats as get_arsiv_stats,
+    get_record_by_id as get_arsiv_record_by_id,
+    export_records_to_excel as export_arsiv_excel,
+    save_active_orders_file as save_arsiv_active_orders,
+    get_active_orders_file as get_arsiv_active_orders,
+    clear_active_orders_file as clear_arsiv_active_orders,
+)
+from core_arsiv_parser import parse_order_file as parse_arsiv_order_file
+from core_arsiv_cloud import (
+    save_orders_to_cloud as save_arsiv_cloud,
+    get_orders_from_cloud as get_arsiv_cloud,
+    clear_orders_from_cloud as clear_arsiv_cloud,
+    update_order_progress_cloud as update_arsiv_cloud,
+)
+
+try:
+    init_arsiv_db()
+except Exception as e:
+    print(f"[UYARI] Arsiv DB baslatma hatasi: {e}", file=sys.stderr)
+
 @app.context_processor
 def inject_global_template_context():
     try:
         st = campaign_engine.get_stats()
     except Exception:
         st = {}
-    return dict(stats=st)
+    try:
+        ast = get_arsiv_stats()
+    except Exception:
+        ast = {}
+    return dict(stats=st, arsiv_stats=ast)
 
 
 @app.route('/oliz')
@@ -721,6 +754,291 @@ def oliz_upload_endpoint():
             'success': False,
             'message': f'Dosya işlenirken hata oluştu: {str(e)}'
         }), 500
+
+
+# ---------------------------------------------------------------------------
+# BARKOD & SERİ NO ARŞİVLEME SİSTEMİ ROTALARI (BARKOD_ARSIV / BULUT ENTEGRASYON)
+# CANLI YAYIN: https://barkod-eight.vercel.app/
+# ---------------------------------------------------------------------------
+
+@app.route('/arsiv')
+@app.route('/barkod_arsiv')
+def arsiv_view():
+    return render_template('index.html', is_cloud=IS_CLOUD, initial_tab='arsiv')
+
+
+def get_arsiv_temp_upload_dir():
+    if IS_CLOUD:
+        temp_dir = os.path.join(tempfile.gettempdir(), 'temp_uploads')
+    else:
+        temp_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'temp_uploads')
+    os.makedirs(temp_dir, exist_ok=True)
+    return temp_dir
+
+
+@app.route('/api/arsiv/load-recent-download', methods=['POST'])
+@app.route('/api/load-recent-download', methods=['POST'])
+def arsiv_load_recent_download():
+    """Yerelde İndirilenler klasöründeki en güncel pazaryeri veya e-ticaret web sipariş dosyasını otomatik yükler."""
+    downloads_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
+    if not os.path.exists(downloads_dir):
+        return jsonify({'status': 'error', 'message': 'İndirilenler klasörü bulunamadı'}), 404
+
+    recent_candidates = []
+    for f in os.listdir(downloads_dir):
+        if f.startswith('~') or f.startswith('.'):
+            continue
+        fl = f.lower()
+        if not fl.endswith(('.xlsx', '.xls', '.csv')):
+            continue
+        if any(fl.startswith(prefix) for prefix in ['barkod_serino_kayitlari_', 'urun_toplama_listesi_', 'beko_urun_toplama_']):
+            continue
+        fp = os.path.join(downloads_dir, f)
+        try:
+            mtime = os.path.getmtime(fp)
+            recent_candidates.append((mtime, fp, f))
+        except Exception:
+            pass
+
+    if not recent_candidates:
+        return jsonify({'status': 'error', 'message': 'İndirilenler klasöründe sipariş dosyası bulunamadı'}), 404
+
+    recent_candidates.sort(key=lambda x: x[0], reverse=True)
+    selected_name = None
+    orders = []
+
+    for _, fp, fname in recent_candidates[:10]:
+        try:
+            parsed = parse_arsiv_order_file(fp)
+            if parsed and len(parsed) > 0:
+                selected_name = fname
+                orders = parsed
+                break
+        except Exception:
+            continue
+
+    if not selected_name or not orders:
+        return jsonify({'status': 'error', 'message': 'İndirilenler klasöründe geçerli sipariş satırı içeren dosya bulunamadı'}), 404
+
+    try:
+        save_arsiv_active_orders(selected_name, orders)
+        save_arsiv_cloud(selected_name, orders)
+    except Exception:
+        pass
+
+    return jsonify({
+        'status': 'success',
+        'filename': selected_name,
+        'order_count': len(orders),
+        'orders': orders
+    })
+
+
+@app.route('/api/arsiv/upload-orders', methods=['POST'])
+@app.route('/api/upload-orders', methods=['POST'])
+def arsiv_upload_orders():
+    raw_files = request.files.getlist('files')
+    if not raw_files:
+        raw_files = request.files.getlist('file')
+    valid_files = [f for f in raw_files if f and getattr(f, 'filename', '').strip() != '']
+
+    if not valid_files:
+        return jsonify({'status': 'error', 'message': 'Hiçbir dosya seçilmedi veya dosya adı geçersiz'}), 400
+
+    upload_dir = get_arsiv_temp_upload_dir()
+    saved_paths = []
+    file_names = []
+
+    try:
+        all_packages_map = {}
+        for f in valid_files:
+            fname = f.filename
+            file_names.append(fname)
+            unique_name = f"{secrets.token_hex(4)}_{fname}"
+            temp_path = os.path.join(upload_dir, unique_name)
+            f.save(temp_path)
+            saved_paths.append(temp_path)
+
+            file_orders = parse_arsiv_order_file(temp_path)
+            for pkg in file_orders:
+                key = pkg.get('kargo_barkodu') or pkg.get('siparis_no') or pkg.get('paket_no')
+                if not key:
+                    key = f"pkg_{len(all_packages_map)+1}"
+
+                if key not in all_packages_map:
+                    all_packages_map[key] = pkg
+                else:
+                    existing = all_packages_map[key]
+                    existing_items = existing.setdefault('urunler', [])
+                    for item in pkg.get('urunler', []):
+                        item_copy = dict(item)
+                        item_copy['item_id'] = f"item_{len(existing_items) + 1}"
+                        existing_items.append(item_copy)
+
+        merged_orders = list(all_packages_map.values())
+        if not merged_orders:
+            return jsonify({'status': 'error', 'message': 'Seçilen dosyalarda uygun sipariş satırı tespit edilemedi'}), 400
+
+        if len(file_names) == 1:
+            summary_name = file_names[0]
+        else:
+            names_summary = ", ".join(file_names[:2])
+            if len(file_names) > 2:
+                names_summary += f" (+{len(file_names)-2} dosya)"
+            summary_name = f"{len(file_names)} Dosya ({names_summary})"
+
+        try:
+            save_arsiv_active_orders(summary_name, merged_orders)
+            save_arsiv_cloud(summary_name, merged_orders)
+        except Exception as e:
+            print(f"[CloudSync] Hata: {e}")
+
+        return jsonify({
+            'status': 'success',
+            'filename': summary_name,
+            'file_count': len(file_names),
+            'order_count': len(merged_orders),
+            'orders': merged_orders
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'Dosyalar işlenirken hata: {str(e)}'}), 500
+    finally:
+        for p in saved_paths:
+            if os.path.exists(p):
+                try:
+                    os.remove(p)
+                except Exception:
+                    pass
+
+
+@app.route('/api/arsiv/record', methods=['POST'])
+@app.route('/api/record', methods=['POST'])
+def arsiv_record():
+    data = request.get_json() or {}
+    barkod_seri_no = data.get('barkod_seri_no', '').strip()
+    if not barkod_seri_no:
+        return jsonify({'status': 'error', 'message': 'Barkod / Seri No boş olamaz'}), 400
+
+    kargo_barkodu = data.get('kargo_barkodu', '').strip()
+    siparis_no = data.get('siparis_no', '').strip()
+    musteri_adi = data.get('musteri_adi', '').strip()
+    urun_adi = data.get('urun_adi', '').strip()
+    pazaryeri = data.get('pazaryeri', 'Bilinmiyor').strip()
+    okutma_yontemi = data.get('okutma_yontemi', 'El Terminali')
+    notlar = data.get('notlar', '').strip()
+
+    try:
+        update_arsiv_cloud(kargo_barkodu, barkod_seri_no)
+    except Exception:
+        pass
+
+    record_data, is_dup, dup_info = add_arsiv_record(
+        kargo_barkodu=kargo_barkodu,
+        siparis_no=siparis_no,
+        musteri_adi=musteri_adi,
+        urun_adi=urun_adi,
+        barkod_seri_no=barkod_seri_no,
+        pazaryeri=pazaryeri,
+        okutma_yontemi=okutma_yontemi,
+        notlar=notlar
+    )
+
+    stats = get_arsiv_stats()
+    return jsonify({
+        'status': 'success',
+        'record': record_data,
+        'is_duplicate': is_dup,
+        'duplicate_info': dup_info,
+        'stats': {
+            'toplam_kayit': stats['toplam_kayit'],
+            'bugun_kayit': stats['bugun_kayit']
+        }
+    })
+
+
+@app.route('/api/arsiv/check-duplicate', methods=['GET'])
+@app.route('/api/check-duplicate', methods=['GET'])
+def arsiv_check_duplicate():
+    barcode = request.args.get('barcode', '').strip()
+    is_dup, dup_info = check_arsiv_duplicate(barcode)
+    return jsonify({
+        'is_duplicate': is_dup,
+        'duplicate_info': dup_info
+    })
+
+
+@app.route('/api/arsiv/search', methods=['GET'])
+@app.route('/api/search', methods=['GET'])
+def arsiv_search():
+    query = request.args.get('q', '').strip()
+    start_date = request.args.get('start_date', '').strip()
+    end_date = request.args.get('end_date', '').strip()
+    records = search_arsiv_records(query=query, start_date=start_date, end_date=end_date, limit=200)
+    return jsonify({
+        'status': 'success',
+        'count': len(records),
+        'records': records
+    })
+
+
+@app.route('/api/arsiv/stats', methods=['GET'])
+def arsiv_stats_endpoint():
+    return jsonify(get_arsiv_stats())
+
+
+@app.route('/api/arsiv/export-excel', methods=['GET'])
+@app.route('/api/export-excel', methods=['GET'])
+def arsiv_export_excel():
+    query = request.args.get('q', '').strip()
+    start_date = request.args.get('start_date', '').strip()
+    end_date = request.args.get('end_date', '').strip()
+    records = search_arsiv_records(query=query, start_date=start_date, end_date=end_date, limit=5000)
+    wb = export_arsiv_excel(records)
+    out = io.BytesIO()
+    wb.save(out)
+    out.seek(0)
+    filename = f"Barkod_SeriNo_Kayitlari_{get_arsiv_stats()['bugun_tarih']}.xlsx"
+    return send_file(
+        out,
+        as_attachment=True,
+        download_name=filename,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+
+@app.route('/api/arsiv/proof/<int:record_id>', methods=['GET'])
+@app.route('/api/proof/<int:record_id>', methods=['GET'])
+def arsiv_get_proof(record_id):
+    record = get_arsiv_record_by_id(record_id)
+    if not record:
+        return jsonify({'status': 'error', 'message': 'Kayıt bulunamadı'}), 404
+    return jsonify({'status': 'success', 'record': record})
+
+
+@app.route('/api/arsiv/get-current-orders', methods=['GET'])
+@app.route('/api/get-current-orders', methods=['GET'])
+def arsiv_get_current_orders():
+    data = get_arsiv_cloud() or get_arsiv_active_orders()
+    if data and data.get('orders'):
+        return jsonify({
+            'status': 'success',
+            'filename': data.get('filename', 'Aktif Siparisler'),
+            'updated_at': data.get('updated_at', ''),
+            'order_count': len(data.get('orders', [])),
+            'orders': data.get('orders', [])
+        })
+    return jsonify({'status': 'empty', 'message': 'Kayitli aktif siparis bulunmuyor', 'orders': []})
+
+
+@app.route('/api/arsiv/clear-current-orders', methods=['POST'])
+@app.route('/api/clear-current-orders', methods=['POST'])
+def arsiv_clear_current_orders():
+    clear_arsiv_active_orders()
+    try:
+        clear_arsiv_cloud()
+    except Exception:
+        pass
+    return jsonify({'status': 'success', 'message': 'Aktif siparis listesi temizlendi'})
 
 
 def open_browser():
