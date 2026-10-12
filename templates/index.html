@@ -2841,7 +2841,7 @@
                 <p>Excel Dosyalarını Buraya Bırakın veya Tıklayın</p>
                 <span>Birden fazla .xls ve .xlsx dosyasını aynı anda yükleyip birleştirebilirsiniz</span>
             </div>
-            <input type="file" id="file-input" multiple accept=".xls,.xlsx" onchange="handleFileUpload(this.files)">
+            <input type="file" id="file-input" multiple accept=".xls,.xlsx" onclick="event.stopPropagation()" onchange="handleSiparisFileUpload(this.files)">
 
             <div class="options-row">
                 <label class="toggle-label">
@@ -4531,7 +4531,7 @@
     }
 
     async function processLatestFile() {
-        const filterBeko = document.getElementById('toggle-beko').checked;
+        const filterBeko = document.getElementById('toggle-beko')?.checked || false;
         const page1Note = getPage1Note();
         showToast("Siparişler işleniyor ve A4 Excel çıktıları oluşturuluyor...");
         
@@ -4559,7 +4559,7 @@
     }
 
     async function processAllRecentFiles() {
-        const filterBeko = document.getElementById('toggle-beko').checked;
+        const filterBeko = document.getElementById('toggle-beko')?.checked || false;
         const page1Note = getPage1Note();
         showToast("İndirilenlerdeki tüm sipariş dosyaları taranıyor ve birleştiriliyor...");
         
@@ -4581,9 +4581,9 @@
         }
     }
 
-    async function handleFileUpload(files) {
+    async function handleSiparisFileUpload(files) {
         if (!files || files.length === 0) return;
-        const filterBeko = document.getElementById('toggle-beko').checked;
+        const filterBeko = document.getElementById('toggle-beko')?.checked || false;
         const page1Note = getPage1Note();
         
         const count = files.length;
@@ -4606,26 +4606,39 @@
                 body: formData
             });
             const data = await res.json();
-            if (data.success) {
-                renderDashboard(data.result);
+            if (data.success && data.result) {
+                try {
+                    renderDashboard(data.result);
+                    const resSec = document.getElementById('results-section');
+                    if (resSec) {
+                        resSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                } catch (renderErr) {
+                    console.error("renderDashboard hatası:", renderErr);
+                    showToast("❌ Tablo çizilirken hata oluştu: " + renderErr.message);
+                    return;
+                }
+
                 if (data.result.total_files > 1) {
                     showToast(`✅ ${data.result.total_files} dosya başarıyla birleştirildi ve listelendi!`);
                 } else if (data.result.was_renamed) {
                     const fname = (data.result.main_excel_path || '').replace(/\\/g, '/').split('/').pop();
                     showToast(`⚠️ Önceki Excel açık olduğu için yeni liste '${fname}' adıyla kaydedildi!`);
                 } else {
-                    showToast("✅ Dosya başarıyla işlendi ve klasörlendi!");
+                    showToast("✅ Dosya başarıyla işlendi ve ayrıştırıldı!");
                 }
             } else {
-                showToast("❌ Hata: " + data.error);
+                showToast("❌ Hata: " + (data.error || 'Dosya işlenemedi.'));
             }
         } catch (e) {
+            console.error("Bağlantı hatası:", e);
             showToast("❌ Bağlantı hatası: " + e);
         }
-        document.getElementById('file-input').value = '';
+        const fInput = document.getElementById('file-input');
+        if (fInput) fInput.value = '';
     }
-    window.handleFileUpload = handleFileUpload;
-    window.handleSiparisFileUpload = handleFileUpload;
+    window.handleSiparisFileUpload = handleSiparisFileUpload;
+    window.handleFileUpload = handleSiparisFileUpload;
 
     // Drag and Drop (Çoklu Dosya Destekli)
     const dropzone = document.getElementById('dropzone');
@@ -4634,8 +4647,8 @@
     dropzone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropzone.classList.remove('dragover');
-        if (e.dataTransfer.files.length > 0) {
-            handleFileUpload(e.dataTransfer.files);
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            handleSiparisFileUpload(e.dataTransfer.files);
         }
     });
 
@@ -4985,6 +4998,6 @@
     }
 </script>
     <script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/arsiv_main.js') }}?v=1.0"></script>
+    <script src="{{ url_for('static', filename='js/arsiv_main.js') }}?v=3.5"></script>
 </body>
 </html>

@@ -320,7 +320,26 @@ def find_column_index(headers, possible_names):
                 return idx
     return -1
 
-def detect_brand(full_name, store='', brand_col=''):
+def detect_brand(full_name, store='', brand_col='', stok=''):
+    stok_upper = canonical_key(stok)
+    if stok_upper:
+        if 'BABYLISS' in stok_upper:
+            return 'BABYLISS'
+        if 'TEFAL' in stok_upper:
+            return 'TEFAL'
+        if 'PHILIPS' in stok_upper:
+            return 'PHILIPS'
+        if 'BRAUN' in stok_upper:
+            return 'BRAUN'
+        if 'DELONGHI' in stok_upper:
+            return 'DELONGHI'
+        if 'KARCHER' in stok_upper:
+            return 'KARCHER'
+        if 'LENOVO' in stok_upper or 'IDEAPAD' in stok_upper:
+            return 'LENOVO'
+        if 'BEKO' in stok_upper:
+            return 'BEKO'
+
     if brand_col:
         m = canonical_key(brand_col)
         if m:
@@ -348,6 +367,14 @@ def detect_brand(full_name, store='', brand_col=''):
     # 0.2 Kärcher model kodları (SC 1-5, WV 1-6, WD 1-6, SE 3-6, K 2-7, FC 3-7, VC 2-7 vb.)
     if re.search(r'\b(SC\s*[1-5]|WV\s*[1-6]|WD\s*[1-6]|SE\s*[3-6]|K\s*[2-7]|FC\s*[3-7]|VC\s*[2-7])\b', u_upper) and any(kw in u_upper for kw in ['EASYFIX', 'BUHARLI', 'YIKAMA', 'SUPURGE', 'TEMIZLEME', 'BASINCLI']):
         return 'KARCHER'
+
+    # 0.3 Babyliss model kodları (MS750, C1600, AS773, AS774, AS970, AS6550, W2447, C112, C260, C325, T881, 5910E vb.)
+    if re.search(r'\b(MS750|C1600|AS773|AS774|AS970|AS6550|W2447|C112|C260|C325|T881|5910E|D572|ST395|ST492|C319|C338|C454|MS22)\b', u_upper):
+        return 'BABYLISS'
+
+    # 0.4 Tefal Blendeo
+    if 'BLENDEO' in u_upper or 'BLENDEO' in first_word:
+        return 'TEFAL'
 
     # 1. Başlangıç veya ilk kelime bilinen marka mı? (Delonghi, Thor, Philips, Tefal, vb.)
     for kb in sorted(KNOWN_BRANDS, key=len, reverse=True):
@@ -562,7 +589,7 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
             marka_val = str(sh.cell_value(r, idx_marka)).strip() if idx_marka != -1 else ''
             pazar_val = str(sh.cell_value(r, idx_pazar)).strip() if idx_pazar != -1 else ''
             
-            brand = detect_brand(full_name, magaza_val, marka_val)
+            brand = detect_brand(full_name, magaza_val, marka_val, stok=stok_val)
 
             raw_rows.append({
                 'name': full_name,
@@ -644,7 +671,7 @@ def parse_single_file_rows(file_item, custom_filename=None, temp_dir=None):
             marka_val = str(sh.cell(r, idx_marka + 1).value or '').strip() if idx_marka != -1 else ''
             pazar_val = str(sh.cell(r, idx_pazar + 1).value or '').strip() if idx_pazar != -1 else ''
             
-            brand = detect_brand(full_name, magaza_val, marka_val)
+            brand = detect_brand(full_name, magaza_val, marka_val, stok=stok_val)
 
             raw_rows.append({
                 'name': full_name,
@@ -942,6 +969,9 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         stok = (item.get('stok') or '').strip().upper()
         if stok.endswith('.0'):
             stok = stok[:-2]
+
+        if brand in ('DİĞER', 'DIGER', 'OTHER', 'UNKNOWN') or not brand:
+            brand = detect_brand(item['name'], item.get('magaza', ''), item.get('brand', ''), stok=stok)
 
         if brand in KNOWN_BRANDS and brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'):
             is_beko = False
