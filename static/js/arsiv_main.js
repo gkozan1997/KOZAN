@@ -1,6 +1,6 @@
 window.handleFileInputChange = function(files) {
     if (files && files.length > 0) {
-        handleFileUpload(files);
+        handleArsivFileUpload(files);
     }
 };
 let isUploadingExcel = false;
@@ -244,7 +244,7 @@ window.triggerManualCloudSync = async function() {
         await fetchServerPersistedOrders(false);
 
         // Güncel istatistikleri ve arama tablosunu tazele
-        if (typeof loadStats === 'function') loadStats();
+        if (typeof refreshDashboardStats === 'function') refreshDashboardStats();
         if (typeof performArchiveSearch === 'function') performArchiveSearch();
 
         if (icon) icon.textContent = '✅';
@@ -494,7 +494,7 @@ function initExcelUpload() {
             e.preventDefault();
             dropzone.style.borderColor = 'rgba(59, 130, 246, 0.35)';
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                handleFileUpload(e.dataTransfer.files);
+                handleArsivFileUpload(e.dataTransfer.files);
             }
         });
     }
@@ -502,7 +502,7 @@ function initExcelUpload() {
     if (fileInput) {
         fileInput.addEventListener('change', () => {
             if (fileInput.files && fileInput.files.length > 0) {
-                handleFileUpload(fileInput.files);
+                handleArsivFileUpload(fileInput.files);
             }
         });
     }
@@ -545,7 +545,7 @@ function initExcelUpload() {
     }
 }
 
-async function handleFileUpload(filesInput) {
+async function handleArsivFileUpload(filesInput) {
     if (isUploadingExcel) {
         console.warn('Yükleme zaten devam ediyor.');
         return;
@@ -1795,7 +1795,7 @@ async function refreshDashboardStats() {
     }
 }
 window.refreshDashboardStats = refreshDashboardStats;
-window.loadStats = refreshDashboardStats;
+window.loadArsivStats = refreshDashboardStats;
 
 
 // ==============================================================
@@ -1844,11 +1844,7 @@ window.switchTab = function(keyOrId, el) {
 };
 
 
-window.handleFileInputChange = function(files) {
-    if (files && files.length > 0) {
-        handleFileUpload(files);
-    }
-};
+window.handleArsivFileUpload = handleArsivFileUpload;
 
 window.loadRecentExcel = async function() {
     const recentBtn = document.getElementById('btnLoadRecentExcel');

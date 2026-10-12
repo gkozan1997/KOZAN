@@ -3518,7 +3518,8 @@
 
       <div id="upload-status" style="font-size: 13px; text-align: center; margin-top: 10px;"></div>
     </div>
-    </div> <!-- #view-oliz -->
+  </div> <!-- #upload-modal -->
+</div> <!-- #view-oliz -->
 
     <!-- 4. GÖRÜNÜM: BARKOD & SERİ NO ARŞİVLEME SİSTEMİ (BARKOD_ARSIV / BULUT ENTEGRASYONU) -->
     <div id="view-arsiv" class="app-view-panel arsiv-view-scope" style="display: none;">
@@ -4623,6 +4624,8 @@
         }
         document.getElementById('file-input').value = '';
     }
+    window.handleFileUpload = handleFileUpload;
+    window.handleSiparisFileUpload = handleFileUpload;
 
     // Drag and Drop (Çoklu Dosya Destekli)
     const dropzone = document.getElementById('dropzone');
