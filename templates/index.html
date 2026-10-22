@@ -1738,13 +1738,13 @@
                 white-space: nowrap;
             }
 
-            /* Mobil Sekmeler (3 Modül Kart Switcher) */
+            /* Mobil Sekmeler (4 Modül Kart Switcher - 2x2 Dengeli Grid) */
             .mobile-tabs-container,
             nav.mobile-tabs-container {
                 display: grid !important;
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
                 gap: 8px;
-                margin-bottom: 18px;
+                margin-bottom: 14px;
                 width: 100%;
                 user-select: none;
             }
@@ -1754,8 +1754,8 @@
                 flex-direction: column;
                 align-items: flex-start;
                 justify-content: space-between;
-                gap: 6px;
-                padding: 10px 10px;
+                gap: 4px;
+                padding: 9px 10px;
                 background: rgba(15, 23, 42, 0.75);
                 border: 1px solid var(--border-subtle);
                 border-radius: var(--radius-md);
@@ -1769,7 +1769,7 @@
                 position: relative;
                 backdrop-filter: blur(14px);
                 -webkit-backdrop-filter: blur(14px);
-                min-height: 82px;
+                min-height: 72px;
             }
 
             .mobile-tab-card:hover, .mobile-tab-card:active {
@@ -2001,13 +2001,13 @@
             }
 
             .app-main-viewport {
-                padding: 10px 8px 76px 8px !important;
+                padding: 10px 4px 76px 4px !important;
                 width: 100% !important;
                 overflow-x: hidden;
             }
 
             .container {
-                padding: 10px 6px 76px 6px !important;
+                padding: 6px 2px 76px 2px !important;
                 max-width: 100% !important;
             }
 
@@ -2292,7 +2292,7 @@
                 min-width: 100% !important;
                 table-layout: fixed !important; /* Hem 1. Tablo hem 2. Tablo kolonlarını milimetrik kilitler */
                 border-collapse: collapse;
-                font-size: 12px;
+                font-size: 11.5px;
             }
 
             table.data-table thead {
@@ -2300,100 +2300,101 @@
             }
 
             table.data-table th {
-                padding: 10px 4px;
-                font-size: 11px;
+                padding: 8px 3px !important;
+                font-size: 10.5px;
                 font-weight: 700;
                 letter-spacing: 0.02em;
                 color: #ffffff;
                 border-bottom: 1px solid var(--border-subtle);
             }
 
-            /* 1. SÜTUN: MİKTAR (Sabit 50px, ortalı, net rozet) */
+            /* 1. SÜTUN: MİKTAR (Kompakt 44px, ortalı, net rozet) */
             table.data-table th.col-qty, 
             table.data-table td.col-qty {
-                width: 50px !important;
-                max-width: 50px !important;
-                min-width: 50px !important;
-                padding: 8px 2px !important;
+                width: 44px !important;
+                max-width: 44px !important;
+                min-width: 44px !important;
+                padding: 6px 2px !important;
                 text-align: center !important;
                 vertical-align: middle;
             }
 
             .qty-badge {
-                font-size: 12px;
+                font-size: 11.5px;
                 font-weight: 800;
-                padding: 3px 5px;
-                min-width: 26px;
-                border-radius: 6px;
+                padding: 2px 4px;
+                min-width: 24px;
+                border-radius: 5px;
                 display: inline-block;
                 text-align: center;
             }
 
-            /* 2. SÜTUN: ÜRÜN ADI (Kalan genişliğin tamamı, okunaklı, düzgün kelime sarma) */
+            /* 2. SÜTUN: ÜRÜN ADI (Kalan genişliğin tamamı, okunaklı, esnek sarma) */
             table.data-table th.col-name, 
             table.data-table td.col-name {
                 width: auto !important;
-                padding: 8px 6px !important;
-                font-size: 12px !important;
-                line-height: 1.35 !important;
+                padding: 6px 5px !important;
+                font-size: 11.5px !important;
+                line-height: 1.30 !important;
                 text-align: left !important;
-                word-break: normal !important;
+                word-break: break-word !important;
                 overflow-wrap: break-word !important;
                 vertical-align: middle;
             }
 
-            /* 3. SÜTUN: STOK KODU (Sabit 96px, asla harf harf kırılmaz, okunaklı) */
+            /* 3. SÜTUN: STOK KODU (Kompakt 86px, tek parça ve okunaklı monospace) */
             table.data-table th.col-code, 
             table.data-table td.col-code {
-                width: 96px !important;
-                max-width: 96px !important;
-                min-width: 96px !important;
-                padding: 8px 3px !important;
-                font-size: 10.5px !important;
+                width: 86px !important;
+                max-width: 90px !important;
+                min-width: 80px !important;
+                padding: 6px 2px !important;
+                font-size: 10px !important;
                 font-family: 'JetBrains Mono', monospace !important;
                 font-weight: 600 !important;
                 text-align: center !important;
                 vertical-align: middle;
                 word-break: break-word !important; /* Harf harf break-all KESİNLİKLE YASAK */
                 white-space: normal !important;
-                line-height: 1.25 !important;
+                line-height: 1.20 !important;
             }
 
             .col-code .code-badge {
                 display: inline-block;
                 background: rgba(30, 41, 59, 0.85);
                 border: 1px solid rgba(71, 85, 105, 0.5);
-                padding: 2px 4px;
+                padding: 2px 3px;
                 border-radius: 4px;
                 color: #e2e8f0;
                 max-width: 100%;
                 word-break: break-word;
+                font-size: 9.5px;
             }
 
             /* 1. Sayfa Alt Not Satırı */
             tr.row-note td.col-qty {
-                width: 50px !important;
-                padding: 8px 2px !important;
+                width: 44px !important;
+                padding: 6px 2px !important;
             }
 
             tr.row-note td.col-name {
-                font-size: 11.5px !important;
-                line-height: 1.35 !important;
-                padding: 8px 8px !important;
+                font-size: 11px !important;
+                line-height: 1.30 !important;
+                padding: 6px 6px !important;
             }
 
             /* Toplam Satırı Mobil Uyumu */
             tr.row-total td.col-qty {
-                width: 50px !important;
-                padding: 8px 2px !important;
+                width: 44px !important;
+                padding: 6px 2px !important;
             }
             tr.row-total td.col-name {
-                font-size: 12px !important;
-                padding: 8px 8px !important;
+                font-size: 11.5px !important;
+                padding: 6px 6px !important;
             }
             tr.row-total td.col-code {
-                width: 96px !important;
-                padding: 8px 2px !important;
+                width: 86px !important;
+                padding: 6px 2px !important;
             }
 
             /* Ekran Ayırıcı (Beko, Grundig & Lenovo) */
@@ -2531,9 +2532,9 @@
 
             body:not(.active-tab-barkod) table.data-table th.col-qty,
             body:not(.active-tab-barkod) table.data-table td.col-qty {
-                width: 38px !important;
-                min-width: 34px !important;
-                max-width: 44px !important;
+                width: 32px !important;
+                min-width: 28px !important;
+                max-width: 38px !important;
                 padding-left: 2px !important;
                 padding-right: 2px !important;
                 text-align: center !important;
@@ -2544,8 +2545,8 @@
             body:not(.active-tab-barkod) table.data-table th.col-name,
             body:not(.active-tab-barkod) table.data-table td.col-name {
                 width: auto !important;
-                padding-left: 6px !important;
-                padding-right: 6px !important;
+                padding-left: 5px !important;
+                padding-right: 5px !important;
                 text-align: left !important;
                 word-break: normal !important;
                 overflow-wrap: break-word !important;
@@ -2553,15 +2554,15 @@
 
             body:not(.active-tab-barkod) table.data-table th.col-code,
             body:not(.active-tab-barkod) table.data-table td.col-code {
-                width: 95px !important;
-                min-width: 85px !important;
-                max-width: 110px !important;
-                padding-left: 3px !important;
-                padding-right: 3px !important;
+                width: 80px !important;
+                min-width: 72px !important;
+                max-width: 90px !important;
+                padding-left: 2px !important;
+                padding-right: 2px !important;
                 text-align: center !important;
                 white-space: nowrap !important;
                 font-family: 'JetBrains Mono', monospace !important;
-                font-size: 7.5pt !important;
+                font-size: inherit !important;
             }
 
             /* Badge padding ve min-width sıfırlama (baskıda satırı şişirmesin) */
@@ -2584,9 +2585,9 @@
                 color: #000000 !important;
             }
 
-            /* Tablo ve satırlar baskıda sayfa yüksekliğini orantılı doldurur */
+            /* Tablo ve satırlar baskıda paged media kurallarına tam uyar */
             body:not(.active-tab-barkod) table.data-table {
-                height: 100% !important;
+                height: auto !important;
             }
             body:not(.active-tab-barkod) table.data-table th,
             body:not(.active-tab-barkod) table.data-table td {
@@ -4439,8 +4440,8 @@
         let extra = 0;
         for (let i = 0; i < items.length; i++) {
             const nameLen = (items[i].name || '').length;
-            if (nameLen > 80) extra += 1.0;
-            else if (nameLen > 50) extra += 0.3;
+            if (nameLen > 85) extra += 2.0;
+            else if (nameLen > 48) extra += 1.0;
         }
         return extra;
     }
@@ -4450,8 +4451,8 @@
         if (count === 0) {
             return {
                 rowHPx: '28px',
-                headerHPx: '24px',
-                totalHPx: '24px',
+                headerHPx: '22px',
+                totalHPx: '22px',
                 noteHPx: '20px',
                 fontSize: '9.0pt',
                 codeSize: '8.5pt',
@@ -4462,34 +4463,46 @@
                 dateFont: '8.5pt'
             };
         }
-        // Güvenli A4 yazdırma alanı (Mobil Safari 12.7mm ve Masaüstü 4mm marjinleri tam destekler)
-        // Tablo yüksekliği maksimum 240-250mm aralığında tutularak 2. sayfaya taşma kesin olarak engellenir.
-        const baseAvailHPx = hasNote ? 885.0 : 905.0;
+        // Mobil Safari AirPrint ve Masaüstü tam uyumlu güvenli A4 yazdırma bütçesi (piksel):
+        // AirPrint marjinleri (12.7mm) + Safari başlık/altlıkları (~20mm) düşüldüğünde
+        // sayfa gövdesinde net ~235mm (yaklaşık 888px) güvenli alan kalır.
+        // Tarih (14px) + Thead (18px) + Toplam (18px) + Not (16px) = ~66px.
+        // Satırlar için kalan net maksimum güvenli alan: ~760px - 830px.
+        let baseAvailHPx;
+        if (count <= 35) {
+            baseAvailHPx = hasNote ? 850.0 : 880.0;
+        } else if (count <= 55) {
+            baseAvailHPx = hasNote ? 800.0 : 830.0;
+        } else {
+            baseAvailHPx = hasNote ? 760.0 : 790.0;
+        }
         
         // Uzun ürün adlarından kaynaklanan sarmalama payı
         const extraLines = calcEffectiveLines(items);
-        const extraLinePx = extraLines * 10.0;
+        const extraLinePx = extraLines * 7.5;
         
-        // Satırlara düşen toplam alan
-        const availForRows = Math.max(count * 9.5, baseAvailHPx - extraLinePx);
+        // Satırlara düşen toplam alan (asla 8.8px satır yüksekliğinin altına düşmez)
+        const availForRows = Math.max(count * 8.8, baseAvailHPx - extraLinePx);
         const targetRowH = availForRows / count;
         
-        // Satır yüksekliğini 9.8px (90+ satır) ile 32.0px (<= 25 satır) aralığında dinamik ayarla
-        const rowHPx = Math.min(32.0, Math.max(9.8, targetRowH));
-        const ratio = (rowHPx - 9.8) / (32.0 - 9.8); // 0.0 (en sıkışık) ile 1.0 (en ferah)
+        // Satır yüksekliğini 8.8px (90+ satır) ile 30.0px (<= 25 satır) aralığında dinamik ayarla
+        const minRowH = 8.8;
+        const maxRowH = 30.0;
+        const rowHPx = Math.min(maxRowH, Math.max(minRowH, targetRowH));
+        const ratio = (rowHPx - minRowH) / (maxRowH - minRowH); // 0.0 (en sıkışık) ile 1.0 (en ferah)
 
-        const fontSize = (5.8 + ratio * (9.2 - 5.8)).toFixed(1);
-        const codeSize = (5.3 + ratio * (8.7 - 5.3)).toFixed(1);
-        const padY = Math.max(0.3, (rowHPx - (parseFloat(fontSize) * 1.33)) / 2.0).toFixed(1);
-        const lineH = (1.03 + ratio * 0.20).toFixed(2);
+        const fontSize = (5.2 + ratio * (9.0 - 5.2)).toFixed(1);
+        const codeSize = (4.8 + ratio * (8.5 - 4.8)).toFixed(1);
+        const padY = Math.max(0.1, (rowHPx - (parseFloat(fontSize) * 1.25)) / 2.0).toFixed(1);
+        const lineH = (1.00 + ratio * 0.18).toFixed(2);
         
-        const totalFont = (6.4 + ratio * (9.4 - 6.4)).toFixed(1);
-        const totalPad = Math.max(0.8, rowHPx * 0.18).toFixed(1);
-        const dateFont = (7.0 + ratio * (8.8 - 7.0)).toFixed(1);
+        const totalFont = (6.0 + ratio * (9.0 - 6.0)).toFixed(1);
+        const totalPad = Math.max(0.5, rowHPx * 0.15).toFixed(1);
+        const dateFont = (6.8 + ratio * (8.5 - 6.8)).toFixed(1);
         
-        const headerHPx = Math.max(18, Math.min(26, rowHPx * 1.15)).toFixed(1);
-        const totalHPx = Math.max(18, Math.min(26, rowHPx * 1.15)).toFixed(1);
-        const noteHPx = Math.max(16, Math.min(24, rowHPx * 1.10)).toFixed(1);
+        const headerHPx = Math.max(16, Math.min(24, rowHPx * 1.12)).toFixed(1);
+        const totalHPx = Math.max(16, Math.min(24, rowHPx * 1.12)).toFixed(1);
+        const noteHPx = Math.max(14, Math.min(22, rowHPx * 1.08)).toFixed(1);
 
         return {
             rowHPx: rowHPx.toFixed(1) + 'px',
@@ -4540,6 +4553,7 @@
                     border-collapse: collapse !important;
                     margin: 0 !important;
                     padding: 0 !important;
+                    height: auto !important;
                 }
                 body:not(.active-tab-barkod) #table-page-1 thead tr th,
                 body:not(.active-tab-barkod) #table-page-1 thead tr th.col-qty,
@@ -4556,13 +4570,26 @@
                 body:not(.active-tab-barkod) #table-page-1 thead tr th.col-code,
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-code {
                     font-size: ${p1.codeSize} !important;
-                    width: 1% !important;
+                    width: 80px !important;
+                    min-width: 72px !important;
+                    max-width: 90px !important;
                     white-space: nowrap !important;
+                    text-align: center !important;
                 }
                 body:not(.active-tab-barkod) #table-page-1 thead tr th.col-qty,
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-qty {
-                    width: 1% !important;
+                    width: 32px !important;
+                    min-width: 28px !important;
+                    max-width: 38px !important;
                     white-space: nowrap !important;
+                    text-align: center !important;
+                }
+                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-name,
+                body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-name {
+                    width: auto !important;
+                    text-align: left !important;
+                    overflow-wrap: break-word !important;
+                    word-break: normal !important;
                 }
                 body:not(.active-tab-barkod) #table-page-1 tbody tr,
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td,
@@ -4616,6 +4643,7 @@
                     border-collapse: collapse !important;
                     margin: 0 !important;
                     padding: 0 !important;
+                    height: auto !important;
                 }
                 body:not(.active-tab-barkod) #table-page-2 thead tr th,
                 body:not(.active-tab-barkod) #table-page-2 thead tr th.col-qty,
@@ -4632,13 +4660,26 @@
                 body:not(.active-tab-barkod) #table-page-2 thead tr th.col-code,
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-code {
                     font-size: ${p2.codeSize} !important;
-                    width: 1% !important;
+                    width: 80px !important;
+                    min-width: 72px !important;
+                    max-width: 90px !important;
                     white-space: nowrap !important;
+                    text-align: center !important;
                 }
                 body:not(.active-tab-barkod) #table-page-2 thead tr th.col-qty,
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-qty {
-                    width: 1% !important;
+                    width: 32px !important;
+                    min-width: 28px !important;
+                    max-width: 38px !important;
                     white-space: nowrap !important;
+                    text-align: center !important;
+                }
+                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-name,
+                body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-name {
+                    width: auto !important;
+                    text-align: left !important;
+                    overflow-wrap: break-word !important;
+                    word-break: normal !important;
                 }
                 body:not(.active-tab-barkod) #table-page-2 tbody tr,
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td,
