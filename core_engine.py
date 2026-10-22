@@ -1082,6 +1082,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     for brand in sorted_other_keys:
         grouped_items.extend(brand_orders[brand])
     other_items_count = len(grouped_items)
+    other_page_items = list(grouped_items)
 
     if not filter_beko:
         grouped_items.extend(beko_grundig_orders)
