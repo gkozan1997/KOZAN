@@ -632,7 +632,15 @@
             width: 1%;
             white-space: nowrap;
             text-align: center;
-            padding: 12px 18px;
+            padding: 12px 14px;
+        }
+
+        th.col-check, td.col-check {
+            width: 1%;
+            white-space: nowrap;
+            text-align: center;
+            padding: 12px 10px;
+            vertical-align: middle;
         }
 
         th.col-name, td.col-name {
@@ -896,6 +904,9 @@
             vertical-align: middle !important;
         }
         tr.row-total td.col-qty {
+            text-align: center !important;
+        }
+        tr.row-total td.col-check {
             text-align: center !important;
         }
         tr.row-total .total-badge {
@@ -1199,9 +1210,9 @@
                 break-before: page !important;
                 page-break-before: always !important;
             }
-            td, td.col-name, td.col-code, td.col-qty {
+            td, td.col-name, td.col-code, td.col-qty, td.col-check {
                 border: 1px solid #cbd5e1 !important;
-                padding: 2px 5px !important;
+                padding: 2px 4px !important;
                 color: #000000 !important;
                 font-size: 8pt !important;
                 vertical-align: middle !important;
@@ -1214,6 +1225,12 @@
                 white-space: nowrap !important;
                 text-align: center !important;
                 font-weight: 700 !important;
+            }
+            th.col-check, td.col-check {
+                width: 1% !important;
+                white-space: nowrap !important;
+                text-align: center !important;
+                vertical-align: middle !important;
             }
             th.col-name, td.col-name {
                 width: auto !important;
@@ -1378,6 +1395,11 @@
                 font-size: inherit !important;
                 padding: 0 !important;
                 box-shadow: none !important;
+            }
+            tr.row-total td.col-check {
+                width: 1% !important;
+                white-space: nowrap !important;
+                text-align: center !important;
             }
             tr.row-total td.col-name {
                 text-align: left !important;
@@ -2384,12 +2406,23 @@
                 border-bottom: 1px solid var(--border-subtle);
             }
 
-            /* 1. SÜTUN: MİKTAR (Kompakt 48px, tikleme kutusu + miktar) */
+            /* 1. SÜTUN: MİKTAR (Kompakt 36px) */
             table.data-table th.col-qty, 
             table.data-table td.col-qty {
-                width: 48px !important;
-                max-width: 52px !important;
-                min-width: 46px !important;
+                width: 36px !important;
+                max-width: 40px !important;
+                min-width: 32px !important;
+                padding: 6px 1px !important;
+                text-align: center !important;
+                vertical-align: middle;
+            }
+
+            /* 2. SÜTUN: TİK KUTUSU (Kompakt 30px) */
+            table.data-table th.col-check, 
+            table.data-table td.col-check {
+                width: 30px !important;
+                max-width: 34px !important;
+                min-width: 26px !important;
                 padding: 6px 1px !important;
                 text-align: center !important;
                 vertical-align: middle;
@@ -2399,16 +2432,15 @@
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                gap: 4px;
                 user-select: none;
                 vertical-align: middle;
             }
 
             .collect-box {
-                width: 14px;
-                height: 14px;
-                min-width: 14px;
-                min-height: 14px;
+                width: 15px;
+                height: 15px;
+                min-width: 15px;
+                min-height: 15px;
                 border: 1.6px solid rgba(148, 163, 184, 0.65);
                 border-radius: 3.5px;
                 background: rgba(15, 23, 42, 0.5);
@@ -2420,6 +2452,8 @@
                 transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                 box-sizing: border-box;
                 position: relative;
+                margin: 0 auto;
+                vertical-align: middle;
             }
 
             .qty-badge {
@@ -2432,7 +2466,7 @@
                 text-align: center;
             }
 
-            /* 2. SÜTUN: ÜRÜN ADI (Kalan genişliğin tamamı, okunaklı, esnek sarma) */
+            /* 3. SÜTUN: ÜRÜN ADI (Kalan genişliğin tamamı, okunaklı, esnek sarma) */
             table.data-table th.col-name, 
             table.data-table td.col-name {
                 width: auto !important;
@@ -2445,12 +2479,12 @@
                 vertical-align: middle;
             }
 
-            /* 3. SÜTUN: STOK KODU (Kompakt 86px, tek parça ve okunaklı monospace) */
+            /* 4. SÜTUN: STOK KODU (Kompakt 82px, tek parça ve okunaklı monospace) */
             table.data-table th.col-code, 
             table.data-table td.col-code {
-                width: 86px !important;
-                max-width: 90px !important;
-                min-width: 80px !important;
+                width: 82px !important;
+                max-width: 86px !important;
+                min-width: 76px !important;
                 padding: 6px 2px !important;
                 font-size: 10px !important;
                 font-family: 'JetBrains Mono', monospace !important;
@@ -2476,8 +2510,8 @@
 
             /* 1. Sayfa Alt Not Satırı */
             tr.row-note td.col-qty {
-                width: 44px !important;
-                padding: 6px 2px !important;
+                width: 36px !important;
+                padding: 6px 1px !important;
             }
 
             tr.row-note td.col-name {
@@ -2488,15 +2522,20 @@
 
             /* Toplam Satırı Mobil Uyumu */
             tr.row-total td.col-qty {
-                width: 44px !important;
-                padding: 6px 2px !important;
+                width: 36px !important;
+                padding: 6px 1px !important;
+            }
+            tr.row-total td.col-check {
+                width: 30px !important;
+                padding: 6px 1px !important;
+                text-align: center !important;
             }
             tr.row-total td.col-name {
                 font-size: 11.5px !important;
                 padding: 6px 6px !important;
             }
             tr.row-total td.col-code {
-                width: 86px !important;
+                width: 82px !important;
                 padding: 6px 2px !important;
             }
 
@@ -2648,14 +2687,26 @@
 
             body:not(.active-tab-barkod) table.data-table th.col-qty,
             body:not(.active-tab-barkod) table.data-table td.col-qty {
-                width: 36px !important;
-                min-width: 32px !important;
-                max-width: 42px !important;
+                width: 24px !important;
+                min-width: 20px !important;
+                max-width: 28px !important;
                 padding-left: 2px !important;
                 padding-right: 2px !important;
                 text-align: center !important;
                 white-space: nowrap !important;
                 font-weight: 800 !important;
+            }
+
+            body:not(.active-tab-barkod) table.data-table th.col-check,
+            body:not(.active-tab-barkod) table.data-table td.col-check {
+                width: 16px !important;
+                min-width: 14px !important;
+                max-width: 18px !important;
+                padding-left: 1px !important;
+                padding-right: 1px !important;
+                text-align: center !important;
+                white-space: nowrap !important;
+                vertical-align: middle !important;
             }
 
             body:not(.active-tab-barkod) .qty-cell-wrap {
@@ -2680,7 +2731,7 @@
                 display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                margin: 0 !important;
+                margin: 0 auto !important;
                 padding: 0 !important;
                 box-sizing: border-box !important;
                 vertical-align: middle !important;
@@ -3352,6 +3403,7 @@
                     <thead>
                         <tr>
                             <th class="col-qty">Miktar</th>
+                            <th class="col-check" title="Toplandı / Tik">Tik</th>
                             <th class="col-name">Ürün Adı</th>
                             <th class="col-code">Stok Kodu</th>
                         </tr>
@@ -3374,6 +3426,7 @@
                     <thead>
                         <tr>
                             <th class="col-qty">Miktar</th>
+                            <th class="col-check" title="Toplandı / Tik">Tik</th>
                             <th class="col-name">Ürün Adı</th>
                             <th class="col-code">Stok Kodu</th>
                         </tr>
@@ -4704,6 +4757,7 @@
                 }
                 body:not(.active-tab-barkod) #table-page-1 thead tr th,
                 body:not(.active-tab-barkod) #table-page-1 thead tr th.col-qty,
+                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-check,
                 body:not(.active-tab-barkod) #table-page-1 thead tr th.col-name,
                 body:not(.active-tab-barkod) #table-page-1 thead tr th.col-code {
                     height: ${p1.headerHPx} !important;
@@ -4725,11 +4779,20 @@
                 }
                 body:not(.active-tab-barkod) #table-page-1 thead tr th.col-qty,
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-qty {
-                    width: 36px !important;
-                    min-width: 32px !important;
-                    max-width: 42px !important;
+                    width: 24px !important;
+                    min-width: 20px !important;
+                    max-width: 28px !important;
                     white-space: nowrap !important;
                     text-align: center !important;
+                }
+                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-check,
+                body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-check {
+                    width: 16px !important;
+                    min-width: 14px !important;
+                    max-width: 18px !important;
+                    white-space: nowrap !important;
+                    text-align: center !important;
+                    vertical-align: middle !important;
                 }
                 body:not(.active-tab-barkod) #table-page-1 thead tr th.col-name,
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-name {
@@ -4741,6 +4804,7 @@
                 body:not(.active-tab-barkod) #table-page-1 tbody tr,
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td,
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-qty,
+                body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-check,
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-name,
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-code {
                     height: ${p1.rowHPx} !important;
@@ -4755,6 +4819,7 @@
                 body:not(.active-tab-barkod) #table-page-1 tr.row-total,
                 body:not(.active-tab-barkod) #table-page-1 tr.row-total td,
                 body:not(.active-tab-barkod) #table-page-1 tr.row-total td.col-qty,
+                body:not(.active-tab-barkod) #table-page-1 tr.row-total td.col-check,
                 body:not(.active-tab-barkod) #table-page-1 tr.row-total td.col-name,
                 body:not(.active-tab-barkod) #table-page-1 tr.row-total td.col-code {
                     height: ${p1.totalHPx} !important;
@@ -4794,6 +4859,7 @@
                 }
                 body:not(.active-tab-barkod) #table-page-2 thead tr th,
                 body:not(.active-tab-barkod) #table-page-2 thead tr th.col-qty,
+                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-check,
                 body:not(.active-tab-barkod) #table-page-2 thead tr th.col-name,
                 body:not(.active-tab-barkod) #table-page-2 thead tr th.col-code {
                     height: ${p2.headerHPx} !important;
@@ -4815,11 +4881,20 @@
                 }
                 body:not(.active-tab-barkod) #table-page-2 thead tr th.col-qty,
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-qty {
-                    width: 36px !important;
-                    min-width: 32px !important;
-                    max-width: 42px !important;
+                    width: 24px !important;
+                    min-width: 20px !important;
+                    max-width: 28px !important;
                     white-space: nowrap !important;
                     text-align: center !important;
+                }
+                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-check,
+                body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-check {
+                    width: 16px !important;
+                    min-width: 14px !important;
+                    max-width: 18px !important;
+                    white-space: nowrap !important;
+                    text-align: center !important;
+                    vertical-align: middle !important;
                 }
                 body:not(.active-tab-barkod) #table-page-2 thead tr th.col-name,
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-name {
@@ -4831,6 +4906,7 @@
                 body:not(.active-tab-barkod) #table-page-2 tbody tr,
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td,
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-qty,
+                body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-check,
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-name,
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-code {
                     height: ${p2.rowHPx} !important;
@@ -4845,6 +4921,7 @@
                 body:not(.active-tab-barkod) #table-page-2 tr.row-total,
                 body:not(.active-tab-barkod) #table-page-2 tr.row-total td,
                 body:not(.active-tab-barkod) #table-page-2 tr.row-total td.col-qty,
+                body:not(.active-tab-barkod) #table-page-2 tr.row-total td.col-check,
                 body:not(.active-tab-barkod) #table-page-2 tr.row-total td.col-name,
                 body:not(.active-tab-barkod) #table-page-2 tr.row-total td.col-code {
                     height: ${p2.totalHPx} !important;
@@ -5480,12 +5557,8 @@
 
         const createRowHtml = (itm) => `
             <tr onclick="toggleRowCollected(this)" title="Dokunarak toplandı olarak işaretleyin / geri alın" style="cursor: pointer;">
-                <td class="col-qty">
-                    <div class="qty-cell-wrap">
-                        <span class="collect-box" aria-hidden="true" title="Toplandı olarak işaretle"></span>
-                        <span class="qty-badge">${itm.qty}</span>
-                    </div>
-                </td>
+                <td class="col-qty"><span class="qty-badge">${itm.qty}</span></td>
+                <td class="col-check"><span class="collect-box" aria-hidden="true" title="Toplandı olarak işaretle"></span></td>
                 <td class="col-name">${formatProductName(itm.name || '')}</td>
                 <td class="col-code"><span class="code-badge">${escapeHtml(itm.stok || '-')}</span></td>
             </tr>
@@ -5498,7 +5571,7 @@
         const noteRowHtml = page1Note ? `
             <tr class="row-note">
                 <td class="col-qty"><span class="qty-badge note-badge">NOT</span></td>
-                <td class="col-name" colspan="2"><strong>Not:</strong> ${escapeHtml(page1Note)}</td>
+                <td class="col-name" colspan="3"><strong>Not:</strong> ${escapeHtml(page1Note)}</td>
             </tr>
         ` : '';
 
@@ -5510,6 +5583,7 @@
             return `
                 <tr class="row-total" title="Toplam: ${totalQty} Adet (${totalCount} Kalem)">
                     <td class="col-qty"><span class="qty-badge total-badge">${totalQty}</span></td>
+                    <td class="col-check"></td>
                     <td class="col-name"><strong>TOPLAM MİKTAR</strong></td>
                     <td class="col-code"><span class="total-count-badge">${totalCount} Kalem</span></td>
                 </tr>
@@ -5532,7 +5606,7 @@
             applyDynamicPrintScale(p1, p2);
 
             if (otherItems.length === 0 && bekoItems.length === 0 && !page1Note) {
-                tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
+                tbody1.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
                 block1.style.display = 'block';
                 block2.style.display = 'none';
                 divider.style.display = 'none';
@@ -5572,7 +5646,7 @@
             applyDynamicPrintScale(pBrand, pBrand);
 
             if (items.length === 0) {
-                tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
+                tbody1.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
             } else {
                 const brandTotalRow = createTotalRowHtml(items);
                 tbody1.innerHTML = items.map(createRowHtml).join('') + brandTotalRow;
