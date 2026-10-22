@@ -2479,6 +2479,24 @@
                 pointer-events: none !important;
             }
 
+            .app-layout-wrapper,
+            .app-main-viewport,
+            #view-siparis,
+            .container,
+            .results-section,
+            .table-responsive {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: visible !important;
+                height: auto !important;
+                min-height: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
+
             /* Mobil tarayıcıların otomatik font büyütmesini (Font Boosting) engelle */
             html, body, table, table.data-table, tr, td, th {
                 -webkit-text-size-adjust: 100% !important;
@@ -2500,12 +2518,12 @@
             body:not(.active-tab-barkod) table.data-table th,
             body:not(.active-tab-barkod) table.data-table td {
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
-                padding-top: 1.5px !important;
-                padding-bottom: 1.5px !important;
-                padding-left: 4px !important;
-                padding-right: 4px !important;
-                font-size: 8pt !important;
-                line-height: 1.12 !important;
+                padding-top: 1px !important;
+                padding-bottom: 1px !important;
+                padding-left: 3px !important;
+                padding-right: 3px !important;
+                font-size: inherit !important;
+                line-height: 1.10 !important;
                 height: auto !important;
                 min-height: 0 !important;
                 max-height: none !important;
@@ -4497,47 +4515,92 @@
         }
         const css = `
             @media print {
+                .app-layout-wrapper,
+                .app-main-viewport,
+                #view-siparis,
+                .container,
+                .results-section,
+                .table-responsive {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    overflow: visible !important;
+                    height: auto !important;
+                    min-height: 0 !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    background: transparent !important;
+                }
+
                 body:not(.active-tab-barkod) #table-page-1 {
                     width: 100% !important;
+                    max-width: 100% !important;
                     table-layout: auto !important;
                     border-collapse: collapse !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
                 }
-                body:not(.active-tab-barkod) #table-page-1 thead tr th {
+                body:not(.active-tab-barkod) #table-page-1 thead tr th,
+                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-qty,
+                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-name,
+                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-code {
                     height: ${p1.headerHPx} !important;
                     font-size: ${p1.fontSize} !important;
                     padding-top: ${p1.padY} !important;
                     padding-bottom: ${p1.padY} !important;
+                    padding-left: 3px !important;
+                    padding-right: 3px !important;
                     vertical-align: middle !important;
                 }
-                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-code {
+                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-code,
+                body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-code {
                     font-size: ${p1.codeSize} !important;
+                    width: 1% !important;
+                    white-space: nowrap !important;
+                }
+                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-qty,
+                body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-qty {
+                    width: 1% !important;
+                    white-space: nowrap !important;
                 }
                 body:not(.active-tab-barkod) #table-page-1 tbody tr,
-                body:not(.active-tab-barkod) #table-page-1 tbody tr td {
+                body:not(.active-tab-barkod) #table-page-1 tbody tr td,
+                body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-qty,
+                body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-name,
+                body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-code {
                     height: ${p1.rowHPx} !important;
                     font-size: ${p1.fontSize} !important;
                     padding-top: ${p1.padY} !important;
                     padding-bottom: ${p1.padY} !important;
+                    padding-left: 3px !important;
+                    padding-right: 3px !important;
                     line-height: ${p1.lineH} !important;
                     vertical-align: middle !important;
                 }
-                body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-code {
-                    font-size: ${p1.codeSize} !important;
-                }
                 body:not(.active-tab-barkod) #table-page-1 tr.row-total,
-                body:not(.active-tab-barkod) #table-page-1 tr.row-total td {
+                body:not(.active-tab-barkod) #table-page-1 tr.row-total td,
+                body:not(.active-tab-barkod) #table-page-1 tr.row-total td.col-qty,
+                body:not(.active-tab-barkod) #table-page-1 tr.row-total td.col-name,
+                body:not(.active-tab-barkod) #table-page-1 tr.row-total td.col-code {
                     height: ${p1.totalHPx} !important;
                     font-size: ${p1.totalFont} !important;
                     padding-top: ${p1.totalPad} !important;
                     padding-bottom: ${p1.totalPad} !important;
+                    padding-left: 3px !important;
+                    padding-right: 3px !important;
                     vertical-align: middle !important;
                 }
                 body:not(.active-tab-barkod) #table-page-1 tr.row-note,
-                body:not(.active-tab-barkod) #table-page-1 tr.row-note td {
+                body:not(.active-tab-barkod) #table-page-1 tr.row-note td,
+                body:not(.active-tab-barkod) #table-page-1 tr.row-note td.col-qty,
+                body:not(.active-tab-barkod) #table-page-1 tr.row-note td.col-name {
                     height: ${p1.noteHPx} !important;
                     font-size: ${p1.fontSize} !important;
                     padding-top: ${p1.padY} !important;
                     padding-bottom: ${p1.padY} !important;
+                    padding-left: 3px !important;
+                    padding-right: 3px !important;
                     vertical-align: middle !important;
                 }
                 #print-page-date-1 {
@@ -4548,37 +4611,60 @@
 
                 body:not(.active-tab-barkod) #table-page-2 {
                     width: 100% !important;
+                    max-width: 100% !important;
                     table-layout: auto !important;
                     border-collapse: collapse !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
                 }
-                body:not(.active-tab-barkod) #table-page-2 thead tr th {
+                body:not(.active-tab-barkod) #table-page-2 thead tr th,
+                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-qty,
+                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-name,
+                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-code {
                     height: ${p2.headerHPx} !important;
                     font-size: ${p2.fontSize} !important;
                     padding-top: ${p2.padY} !important;
                     padding-bottom: ${p2.padY} !important;
+                    padding-left: 3px !important;
+                    padding-right: 3px !important;
                     vertical-align: middle !important;
                 }
-                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-code {
+                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-code,
+                body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-code {
                     font-size: ${p2.codeSize} !important;
+                    width: 1% !important;
+                    white-space: nowrap !important;
+                }
+                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-qty,
+                body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-qty {
+                    width: 1% !important;
+                    white-space: nowrap !important;
                 }
                 body:not(.active-tab-barkod) #table-page-2 tbody tr,
-                body:not(.active-tab-barkod) #table-page-2 tbody tr td {
+                body:not(.active-tab-barkod) #table-page-2 tbody tr td,
+                body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-qty,
+                body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-name,
+                body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-code {
                     height: ${p2.rowHPx} !important;
                     font-size: ${p2.fontSize} !important;
                     padding-top: ${p2.padY} !important;
                     padding-bottom: ${p2.padY} !important;
+                    padding-left: 3px !important;
+                    padding-right: 3px !important;
                     line-height: ${p2.lineH} !important;
                     vertical-align: middle !important;
                 }
-                body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-code {
-                    font-size: ${p2.codeSize} !important;
-                }
                 body:not(.active-tab-barkod) #table-page-2 tr.row-total,
-                body:not(.active-tab-barkod) #table-page-2 tr.row-total td {
+                body:not(.active-tab-barkod) #table-page-2 tr.row-total td,
+                body:not(.active-tab-barkod) #table-page-2 tr.row-total td.col-qty,
+                body:not(.active-tab-barkod) #table-page-2 tr.row-total td.col-name,
+                body:not(.active-tab-barkod) #table-page-2 tr.row-total td.col-code {
                     height: ${p2.totalHPx} !important;
                     font-size: ${p2.totalFont} !important;
                     padding-top: ${p2.totalPad} !important;
                     padding-bottom: ${p2.totalPad} !important;
+                    padding-left: 3px !important;
+                    padding-right: 3px !important;
                     vertical-align: middle !important;
                 }
                 #print-page-date-2 {
