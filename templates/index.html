@@ -4759,7 +4759,6 @@
         const dateEl1 = document.getElementById('print-page-date-1');
         const dateEl2 = document.getElementById('print-page-date-2');
 
-        const MOTTO = '"Hiçbir başarı tesadüf değildir" Gökhan Kozan...';
         let displayDate = '';
         if (currentResultData) {
             if (currentResultData.created_date) {
@@ -4767,18 +4766,17 @@
                 if (currentResultData.created_time && !displayDate.includes(':')) {
                     displayDate += ` - ${currentResultData.created_time}`;
                 }
-                if (!displayDate.includes('tesadüf')) {
-                    displayDate += ` - ${MOTTO}`;
-                }
             } else if (currentResultData.date) {
                 const parts = String(currentResultData.date).split('-');
                 const dStr = (parts.length === 3) ? `${parts[2]}.${parts[1]}.${parts[0]}` : currentResultData.date;
                 const ist = getIstanbulDateTime();
-                displayDate = `${dStr} - ${ist.timeStr} - ${MOTTO}`;
+                displayDate = `${dStr} - ${ist.timeStr}`;
             } else {
                 const ist = getIstanbulDateTime();
-                displayDate = `${ist.dateStr} - ${ist.timeStr} - ${MOTTO}`;
+                displayDate = `${ist.dateStr} - ${ist.timeStr}`;
             }
+            // Eski önbellekten veya oturumdan kalma motto varsa temizle
+            displayDate = displayDate.replace(/\s*-\s*[“"']?Hiçbir başarı tesadüf değildir[”"']?\s*Gökhan Kozan\.\.\./gi, '').trim();
         }
         if (dateEl1) dateEl1.innerText = displayDate;
         if (dateEl2) dateEl2.innerText = displayDate;

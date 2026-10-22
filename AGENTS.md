@@ -310,7 +310,7 @@ Statik + canlı denetimde tespit edilen **19 doğrulanmış hata** bulunmuş, ta
 
 ---
 
-## 15. Her Sayfada Liste Oluşturulma Tarihi, Saati ve Motto Standardı (Sol Üst / Miktar Sütunu Üzeri)
+## 15. Her Sayfada Liste Oluşturulma Tarihi ve Saati Standardı (Sol Üst / Miktar Sütunu Üzeri)
 
 * **Konum ve Yerleşim:**
   - Ana Toplama Listesinde (Sayfa 1: Diğer Markalar, Sayfa 2: Beko, Grundig, Lenovo & Sony) ve tekil marka sekmelerinde, tablonun sol üst köşesinde, doğrudan `Miktar` sütununun hemen üzerinde `.print-page-date` (`#print-page-date-1`, `#print-page-date-2`) yer alır.
@@ -319,7 +319,7 @@ Statik + canlı denetimde tespit edilen **19 doğrulanmış hata** bulunmuş, ta
   - Sayfa 2 blok kırılımında (`break-before: page`) 2. sayfanın da en başında otomatik olarak yer alır.
 * **Saat Dilimi Standardı (UTC+03:00 İstanbul):**
   - Sunucu bulutta (Vercel) veya yerelde çalışsa dahi saat ve tarih daima **Türkiye / İstanbul saat dilimine (`UTC+03:00`, `Europe/Istanbul`)** göre sabitlenir (`TZ_ISTANBUL = timezone(timedelta(hours=3))`). Sunucunun varsayılan UTC saati (3 saat geriden gelmesi) engellenmiştir.
-* **Tarih, Saat ve Motto Formatı:**
-  - Liste Excel'den aktarılıp oluşturulduğunda güncel İstanbul tarihi, saati ve motto (`GG.AA.YYYY - SS:DD - "Hiçbir başarı tesadüf değildir" Gökhan Kozan...`, örn: `06.10.2026 - 20:48 - "Hiçbir başarı tesadüf değildir" Gökhan Kozan...`) dinamik olarak basılır (`created_date`).
+* **Tarih ve Saat Formatı:**
+  - Liste Excel'den aktarılıp oluşturulduğunda güncel İstanbul tarihi ve saati (`GG.AA.YYYY - SS:DD`, örn: `06.10.2026 - 20:48`) dinamik olarak basılır (`created_date`). Kullanıcı isteğiyle motto metni kaldırılmıştır.
 * **Excel Çıktısı Entegrasyonu:**
-  - `core_engine.py` içindeki `setup_a4_sheet` fonksiyonunda `ws.oddHeader.left.text = f'{display_date} - {time_str} - “Hiçbir başarı tesadüf değildir” Gökhan Kozan...'` olarak atanır; böylece Excel'den yazdırıldığında da sayfanın sol üst köşesinde liste oluşturulma tarihi, saati ve motto görüntülenir ve 1. satır tablo başlığı (`Miktar`, `Ürün Adı`, `Stok Kodu`) yapısı korunur.
+  - `core_engine.py` içindeki `setup_a4_sheet` fonksiyonunda `ws.oddHeader.left.text = f'{display_date} - {time_str}'` olarak atanır; böylece Excel'den yazdırıldığında da sayfanın sol üst köşesinde liste oluşturulma tarihi ve saati görüntülenir ve 1. satır tablo başlığı (`Miktar`, `Ürün Adı`, `Stok Kodu`) yapısı korunur.
