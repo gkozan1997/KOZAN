@@ -837,6 +837,51 @@
             margin-right: 6px !important;
             font-weight: 700 !important;
         }
+
+        /* Web Tablo Toplam Satırı */
+        tr.row-total {
+            background: rgba(30, 41, 59, 0.95) !important;
+        }
+        tr.row-total td {
+            border-top: 2px solid rgba(59, 130, 246, 0.6) !important;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.6) !important;
+            padding: 10px 14px !important;
+            vertical-align: middle !important;
+        }
+        tr.row-total td.col-qty {
+            text-align: center !important;
+        }
+        tr.row-total .total-badge {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+            color: #ffffff !important;
+            font-weight: 800 !important;
+            font-size: 13px !important;
+            padding: 4px 10px !important;
+            border-radius: 6px !important;
+            display: inline-block !important;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3) !important;
+            border: none !important;
+        }
+        tr.row-total td.col-name {
+            color: #f8fafc !important;
+            font-size: 13px !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.04em !important;
+            text-transform: uppercase !important;
+        }
+        tr.row-total td.col-code {
+            text-align: center !important;
+        }
+        tr.row-total .total-count-badge {
+            display: inline-block !important;
+            background: rgba(148, 163, 184, 0.15) !important;
+            border: 1px solid rgba(148, 163, 184, 0.35) !important;
+            color: #cbd5e1 !important;
+            font-weight: 700 !important;
+            font-size: 11.5px !important;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+        }
         .badge-with-major {
             display: inline-block;
             margin-left: 6px;
@@ -1222,6 +1267,62 @@
                 font-size: 8.5pt !important;
                 padding: 0 !important;
                 margin-left: 4px !important;
+            }
+
+            /* A4 Baskı Toplam Satırı */
+            tr.row-total {
+                background: #e2e8f0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            tr.row-total td {
+                background: #e2e8f0 !important;
+                border: 1px solid #94a3b8 !important;
+                border-top: 1.5px solid #1e293b !important;
+                color: #000000 !important;
+                font-size: 8.5pt !important;
+                font-weight: 800 !important;
+                line-height: 1.2 !important;
+                padding: 3px 5px !important;
+                vertical-align: middle !important;
+            }
+            tr.row-total td.col-qty {
+                width: 1% !important;
+                white-space: nowrap !important;
+                text-align: center !important;
+                font-size: 9pt !important;
+                font-weight: 800 !important;
+                color: #000000 !important;
+            }
+            tr.row-total td.col-qty .total-badge {
+                font-weight: 800 !important;
+                color: #000000 !important;
+                background: transparent !important;
+                border: none !important;
+                font-size: 9pt !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+            }
+            tr.row-total td.col-name {
+                text-align: left !important;
+                font-weight: 800 !important;
+                font-size: 8.5pt !important;
+                color: #000000 !important;
+                text-transform: uppercase !important;
+            }
+            tr.row-total td.col-code {
+                text-align: center !important;
+                font-weight: 800 !important;
+                font-size: 8pt !important;
+                color: #000000 !important;
+            }
+            tr.row-total td.col-code .total-count-badge {
+                background: transparent !important;
+                border: none !important;
+                color: #000000 !important;
+                font-weight: 800 !important;
+                font-size: 8pt !important;
+                padding: 0 !important;
             }
 
             .print-only {
@@ -2278,6 +2379,20 @@
                 font-size: 11.5px !important;
                 line-height: 1.35 !important;
                 padding: 8px 8px !important;
+            }
+
+            /* Toplam Satırı Mobil Uyumu */
+            tr.row-total td.col-qty {
+                width: 50px !important;
+                padding: 8px 2px !important;
+            }
+            tr.row-total td.col-name {
+                font-size: 12px !important;
+                padding: 8px 8px !important;
+            }
+            tr.row-total td.col-code {
+                width: 96px !important;
+                padding: 8px 2px !important;
             }
 
             /* Ekran Ayırıcı (Beko, Grundig & Lenovo) */
@@ -4818,6 +4933,20 @@
             </tr>
         ` : '';
 
+        const createTotalRowHtml = (items) => {
+            const list = items || [];
+            if (list.length === 0) return '';
+            const totalQty = list.reduce((acc, itm) => acc + (parseInt(itm.qty, 10) || 0), 0);
+            const totalCount = list.length;
+            return `
+                <tr class="row-total" title="Toplam: ${totalQty} Adet (${totalCount} Kalem)">
+                    <td class="col-qty"><span class="qty-badge total-badge">${totalQty}</span></td>
+                    <td class="col-name"><strong>TOPLAM MİKTAR</strong></td>
+                    <td class="col-code"><span class="total-count-badge">${totalCount} Kalem</span></td>
+                </tr>
+            `;
+        };
+
         if (activeTabKey === 'all') {
             const splitIdx = currentResultData.other_items_count || 0;
             const allItems = currentResultData.grouped_items || [];
@@ -4833,14 +4962,16 @@
             }
 
             if (otherItems.length > 0 || page1Note) {
-                tbody1.innerHTML = otherItems.map(createRowHtml).join('') + noteRowHtml;
+                const totalRow1 = otherItems.length > 0 ? createTotalRowHtml(otherItems) : '';
+                tbody1.innerHTML = otherItems.map(createRowHtml).join('') + noteRowHtml + totalRow1;
                 block1.style.display = 'block';
             } else {
                 block1.style.display = 'none';
             }
 
             if (bekoItems.length > 0) {
-                tbody2.innerHTML = bekoItems.map(createRowHtml).join('');
+                const totalRow2 = createTotalRowHtml(bekoItems);
+                tbody2.innerHTML = bekoItems.map(createRowHtml).join('') + totalRow2;
                 block2.style.display = 'block';
                 divider.style.display = 'flex';
             } else {
@@ -4862,7 +4993,8 @@
             if (items.length === 0) {
                 tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
             } else {
-                tbody1.innerHTML = items.map(createRowHtml).join('');
+                const brandTotalRow = createTotalRowHtml(items);
+                tbody1.innerHTML = items.map(createRowHtml).join('') + brandTotalRow;
             }
             block1.style.display = 'block';
             block2.style.display = 'none';
@@ -4875,7 +5007,7 @@
     }
 
     function toggleRowCollected(tr) {
-        if (!tr || tr.classList.contains('row-note')) return;
+        if (!tr || tr.classList.contains('row-note') || tr.classList.contains('row-total')) return;
         tr.classList.toggle('row-collected');
     }
 

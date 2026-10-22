@@ -323,3 +323,21 @@ Statik + canlı denetimde tespit edilen **19 doğrulanmış hata** bulunmuş, ta
   - Liste Excel'den aktarılıp oluşturulduğunda güncel İstanbul tarihi ve saati (`GG.AA.YYYY - SS:DD`, örn: `06.10.2026 - 20:48`) dinamik olarak basılır (`created_date`). Kullanıcı isteğiyle motto metni kaldırılmıştır.
 * **Excel Çıktısı Entegrasyonu:**
   - `core_engine.py` içindeki `setup_a4_sheet` fonksiyonunda `ws.oddHeader.left.text = f'{display_date} - {time_str}'` olarak atanır; böylece Excel'den yazdırıldığında da sayfanın sol üst köşesinde liste oluşturulma tarihi ve saati görüntülenir ve 1. satır tablo başlığı (`Miktar`, `Ürün Adı`, `Stok Kodu`) yapısı korunur.
+
+---
+
+## 16. Tablo En Altında Miktarların Toplamı Standardı (TOPLAM MİKTAR Satırı)
+
+* **Konum ve Yerleşim:**
+  - Tablonun en alt sırasında (ürünler ve varsa özel not satırından hemen sonra) `<tr>` toplam satırı (`.row-total`) yer alır.
+  - **Miktar Sütunu:** O sayfadaki/tablodaki tüm ürünlerin toplam adet sayısını (`totalQty`) belirgin mavi vurgulu rozetle (`.total-badge`) basar.
+  - **Ürün Adı Sütunu:** Kalın ve büyük harflerle **`TOPLAM MİKTAR`** ibaresini taşır.
+  - **Stok Kodu Sütunu:** Toplam kalem/çeşit sayısını (`X Kalem`) taşır.
+* **A4 Dikey Baskı (`@media print`) Uyumu:**
+  - Arka plan `#E2E8F0` açık gri dolgulu, üst kenarlığı kalın çizgi (`border-top: 1.5px solid #1E293B`) ile tablodan net ayrılır.
+  - Sütun hizalamaları tam korunur (`Miktar`, `Ürün Adı`, `Stok Kodu`), sayfa düzenini bozmaz.
+* **Mobil Uyumluluk:**
+  - `table-layout: fixed` standardına uygun olarak mobilde `50px` / `auto` / `96px` sütun genişliklerini korur.
+  - Dokunmatik toplama kontrolünde (`toggleRowCollected`) toplam satırına basıldığında çizilme efekti engellenmiştir.
+* **Excel Çıktısı:**
+  - `core_engine.py` içinde 1. sayfanın en altına (sayfa sonu kırılımından hemen önce), 2. sayfanın (Beko/Grundig) en altına, her marka sekmesinin ve Beko bağımsız dosyasının sonuna otomatik eklenir; `#E2E8F0` zemin ve kalın fontla basılır.

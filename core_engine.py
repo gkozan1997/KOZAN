@@ -1152,18 +1152,29 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         for idx, itm in enumerate(rows_data, 1):
             row_num = idx + 1
             is_note_row = (str(itm.get('qty', '')).upper() == 'NOT')
+            is_total_row = (itm.get('is_total') is True or str(itm.get('name', '')).upper().startswith('TOPLAM'))
 
             c_q = ws.cell(row=row_num, column=1, value=itm['qty'])
             c_q.alignment = Alignment(horizontal='center', vertical='center')
-            c_q.font = Font(name='Segoe UI', size=10, bold=True, color='B45309') if is_note_row else f_qty
+            if is_note_row:
+                c_q.font = Font(name='Segoe UI', size=10, bold=True, color='B45309')
+            elif is_total_row:
+                c_q.font = Font(name='Segoe UI', size=11, bold=True, color='000000')
+            else:
+                c_q.font = f_qty
 
             c_n = ws.cell(row=row_num, column=2, value=itm['name'])
             c_n.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
-            c_n.font = Font(name='Segoe UI', size=9.5, bold=True, color='000000') if is_note_row else f_regular
+            if is_note_row:
+                c_n.font = Font(name='Segoe UI', size=9.5, bold=True, color='000000')
+            elif is_total_row:
+                c_n.font = Font(name='Segoe UI', size=10, bold=True, color='000000')
+            else:
+                c_n.font = f_regular
 
             c_s = ws.cell(row=row_num, column=3, value=itm.get('stok', ''))
             c_s.alignment = Alignment(horizontal='center', vertical='center')
-            c_s.font = f_code
+            c_s.font = Font(name='Segoe UI', size=9.5, bold=True, color='1E293B') if is_total_row else f_code
 
             ws.row_dimensions[row_num].height = row_h
 
@@ -1172,6 +1183,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
                 cell.border = cell_border
                 if is_note_row:
                     cell.fill = PatternFill(start_color='FFFBEB', end_color='FFFBEB', fill_type='solid')
+                elif is_total_row:
+                    cell.fill = PatternFill(start_color='E2E8F0', end_color='E2E8F0', fill_type='solid')
                 elif idx % 2 == 0:
                     cell.fill = fill_zebra
 
@@ -1200,39 +1213,78 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     wb_main = openpyxl.Workbook()
     ws1 = wb_main.active
     # Sheet 1: Genel Toplama Listesi (Sayfa 1: Diger Markalar, Sayfa 2: Beko & Grundig)
-    sheet1_items = list(grouped_items)
-    page_break_idx = other_items_count if (other_items_count > 0 and len(beko_grundig_orders) > 0 and not filter_beko) else None
+    sheet1_items = list(other_page_items)
 
     clean_note = (custom_note or '').strip()
     if clean_note:
         note_row = {'qty': 'NOT', 'name': f'Not: {clean_note}', 'stok': '', 'brand': 'NOTE'}
-        if other_items_count > 0:
-            sheet1_items.insert(other_items_count, note_row)
-            if page_break_idx is not None:
-                page_break_idx += 1
-        else:
-            sheet1_items.append(note_row)
+        sheet1_items.append(note_row)
+
+    if other_page_items:
+        sheet1_items.append({
+            'qty': sum(x['qty'] for x in other_page_items),
+            'name': 'TOPLAM MİKTAR',
+            'stok': f"{len(other_page_items)} Kalem",
+            'brand': 'TOTAL',
+            'is_total': True
+        })
+
+    page_break_idx = len(sheet1_items) if (sheet1_items and len(beko_grundig_orders) > 0 and not filter_beko) else None
+
+    if beko_grundig_orders and not filter_beko:
+        sheet1_items.extend(beko_grundig_orders)
+        sheet1_items.append({
+            'qty': sum(x['qty'] for x in beko_grundig_orders),
+            'name': 'TOPLAM MİKTAR',
+            'stok': f"{len(beko_grundig_orders)} Kalem",
+            'brand': 'TOTAL',
+            'is_total': True
+        })
 
     setup_a4_sheet(ws1, "Ürün Toplama Listesi", sheet1_items, page_break_after_idx=page_break_idx)
 
     # Sheet 2: BEKO, GRUNDIG, LENOVO & SONY Sekmesi (Eger Beko, Grundig, Lenovo veya Sony siparisi varsa)
     if beko_grundig_orders and not filter_beko:
         ws_bg = wb_main.create_sheet(title="BEKO, GRUNDIG, LENOVO & SONY")
-        setup_a4_sheet(ws_bg, "BEKO, GRUNDIG, LENOVO & SONY", beko_grundig_orders)
+        bg_items = list(beko_grundig_orders)
+        bg_items.append({
+            'qty': sum(x['qty'] for x in beko_grundig_orders),
+            'name': 'TOPLAM MİKTAR',
+            'stok': f"{len(beko_grundig_orders)} Kalem",
+            'brand': 'TOTAL',
+            'is_total': True
+        })
+        setup_a4_sheet(ws_bg, "BEKO, GRUNDIG, LENOVO & SONY", bg_items)
 
     # Sheet 3+: Diger Marka Sekmeleri (Tefal, Babyliss, Philips vb.)
     used_sheet_titles = set()
     for brand in sorted_other_keys:
         sheet_title = safe_sheet_title(brand, used_sheet_titles)
         ws_b = wb_main.create_sheet(title=sheet_title)
-        setup_a4_sheet(ws_b, sheet_title, brand_orders[brand])
+        b_items = list(brand_orders[brand])
+        b_items.append({
+            'qty': sum(x['qty'] for x in brand_orders[brand]),
+            'name': 'TOPLAM MİKTAR',
+            'stok': f"{len(brand_orders[brand])} Kalem",
+            'brand': 'TOTAL',
+            'is_total': True
+        })
+        setup_a4_sheet(ws_b, sheet_title, b_items)
 
     # 2. Beko, Grundig, Lenovo & Sony Workbook (Ayri dosya)
     wb_beko = None
     if beko_orders:
         wb_beko = openpyxl.Workbook()
         ws_beko = wb_beko.active
-        setup_a4_sheet(ws_beko, "Beko Grundig Lenovo Sony", beko_orders)
+        bo_items = list(beko_orders)
+        bo_items.append({
+            'qty': sum(x['qty'] for x in beko_orders),
+            'name': 'TOPLAM MİKTAR',
+            'stok': f"{len(beko_orders)} Kalem",
+            'brand': 'TOTAL',
+            'is_total': True
+        })
+        setup_a4_sheet(ws_beko, "Beko Grundig Lenovo Sony", bo_items)
 
     brand_stats = []
     if beko_grundig_orders and not filter_beko:
