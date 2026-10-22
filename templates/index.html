@@ -1401,41 +1401,79 @@
                 margin-bottom: 1px !important;
             }
 
-            /* 3. Maksimum Kompakt Mod (48+ Kalem) */
+            /* 3. Maksimum Kompakt Mod (38 - 49 Efektif Satır) */
             table.data-table.compact-max-table th {
-                padding: 1.5px 2px !important;
-                font-size: 5.8pt !important;
+                padding: 1.2px 2px !important;
+                font-size: 5.6pt !important;
             }
             table.data-table.compact-max-table td {
-                padding: 0.5px 2.5px !important;
-                font-size: 5.8pt !important;
-                line-height: 1.0 !important;
+                padding: 0.4px 2.2px !important;
+                font-size: 5.6pt !important;
+                line-height: 0.98 !important;
             }
             table.data-table.compact-max-table .qty-badge {
-                font-size: 5.8pt !important;
+                font-size: 5.6pt !important;
             }
             table.data-table.compact-max-table .code-badge,
             table.data-table.compact-max-table td.col-code {
-                font-size: 5.5pt !important;
+                font-size: 5.3pt !important;
             }
             table.data-table.compact-max-table tr.row-note td {
-                padding: 0.5px 2.5px !important;
-                font-size: 5.8pt !important;
+                padding: 0.4px 2.2px !important;
+                font-size: 5.6pt !important;
             }
             table.data-table.compact-max-table tr.row-note .note-badge {
-                font-size: 5.8pt !important;
+                font-size: 5.6pt !important;
             }
             table.data-table.compact-max-table tr.row-total td {
-                padding: 1px 2.5px !important;
-                font-size: 6.2pt !important;
+                padding: 0.8px 2.2px !important;
+                font-size: 5.8pt !important;
             }
             table.data-table.compact-max-table tr.row-total td.col-qty,
             table.data-table.compact-max-table tr.row-total .total-badge {
-                font-size: 6.4pt !important;
+                font-size: 6.0pt !important;
             }
             .print-page-block.compact-max-table .print-page-date {
-                font-size: 6.2pt !important;
+                font-size: 5.8pt !important;
                 margin-bottom: 1px !important;
+            }
+
+            /* 4. Hiper Kompakt Mod (50+ Efektif Satır) */
+            table.data-table.hyper-compact-table th {
+                padding: 1px 2px !important;
+                font-size: 5.0pt !important;
+                line-height: 0.95 !important;
+            }
+            table.data-table.hyper-compact-table td {
+                padding: 0.2px 2px !important;
+                font-size: 4.9pt !important;
+                line-height: 0.95 !important;
+            }
+            table.data-table.hyper-compact-table .qty-badge {
+                font-size: 4.9pt !important;
+            }
+            table.data-table.hyper-compact-table .code-badge,
+            table.data-table.hyper-compact-table td.col-code {
+                font-size: 4.6pt !important;
+            }
+            table.data-table.hyper-compact-table tr.row-note td {
+                padding: 0.2px 2px !important;
+                font-size: 4.9pt !important;
+            }
+            table.data-table.hyper-compact-table tr.row-note .note-badge {
+                font-size: 4.9pt !important;
+            }
+            table.data-table.hyper-compact-table tr.row-total td {
+                padding: 0.4px 2px !important;
+                font-size: 5.2pt !important;
+            }
+            table.data-table.hyper-compact-table tr.row-total td.col-qty,
+            table.data-table.hyper-compact-table tr.row-total .total-badge {
+                font-size: 5.4pt !important;
+            }
+            .print-page-block.hyper-compact-table .print-page-date {
+                font-size: 5.2pt !important;
+                margin-bottom: 0px !important;
             }
 
             .print-only {
@@ -2574,6 +2612,8 @@
             nav.mobile-bottom-nav,
             nav.mobile-tabs-container,
             header.mobile-top-bar,
+            #screen-beko-divider,
+            .screen-beko-divider,
             .no-print {
                 display: none !important;
                 visibility: hidden !important;
@@ -2597,28 +2637,122 @@
                 text-size-adjust: 100% !important;
             }
 
-            /* Mobilde ekrandaki 12px font ve 8px padding kurallarının baskıya sızmasını kesin olarak sıfırla */
+            /* Mobilde ekrandaki 12px font ve 8px padding kurallarının baskıya sızmasını KESİN VE NİHAİ olarak sıfırla */
             body:not(.active-tab-barkod) table.data-table {
                 width: 100% !important;
                 min-width: 100% !important;
                 table-layout: auto !important;
                 border-collapse: collapse !important;
+                margin: 0 !important;
             }
+
+            body:not(.active-tab-barkod) table.data-table tr,
+            body:not(.active-tab-barkod) table.data-table th,
+            body:not(.active-tab-barkod) table.data-table td {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+                padding: 1.5px 4px !important;
+                font-size: 8pt !important;
+                line-height: 1.12 !important;
+                height: auto !important;
+                min-height: 0 !important;
+                max-height: none !important;
+            }
+
             body:not(.active-tab-barkod) table.data-table th.col-qty,
             body:not(.active-tab-barkod) table.data-table td.col-qty {
-                width: 1% !important;
-                min-width: 0 !important;
-                max-width: none !important;
+                width: 34px !important;
+                min-width: 32px !important;
+                max-width: 38px !important;
+                padding: 1.5px 2px !important;
+                text-align: center !important;
+                white-space: nowrap !important;
+                font-weight: 800 !important;
             }
+
             body:not(.active-tab-barkod) table.data-table th.col-name,
             body:not(.active-tab-barkod) table.data-table td.col-name {
                 width: auto !important;
+                padding: 1.5px 5px !important;
+                text-align: left !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
             }
+
             body:not(.active-tab-barkod) table.data-table th.col-code,
             body:not(.active-tab-barkod) table.data-table td.col-code {
-                width: 1% !important;
+                width: 90px !important;
+                min-width: 80px !important;
+                max-width: 105px !important;
+                padding: 1.5px 3px !important;
+                text-align: center !important;
+                white-space: nowrap !important;
+                font-family: 'JetBrains Mono', monospace !important;
+                font-size: 7.5pt !important;
+            }
+
+            /* Badge padding ve min-width sıfırlama (baskıda satırı şişirmesin) */
+            body:not(.active-tab-barkod) .qty-badge,
+            body:not(.active-tab-barkod) .code-badge,
+            body:not(.active-tab-barkod) .total-badge,
+            body:not(.active-tab-barkod) .note-badge,
+            body:not(.active-tab-barkod) .total-count-badge {
+                padding: 0 !important;
+                margin: 0 !important;
+                font-size: inherit !important;
+                line-height: inherit !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
                 min-width: 0 !important;
-                max-width: none !important;
+                width: auto !important;
+                height: auto !important;
+                display: inline !important;
+                color: #000000 !important;
+            }
+
+            /* DİNAMİK YOĞUNLUK SINIFLARININ NİHAİ KURAL ENFORCEMENT'I */
+            body:not(.active-tab-barkod) table.data-table.dense-table th,
+            body:not(.active-tab-barkod) table.data-table.dense-table td {
+                padding: 1.2px 3.5px !important;
+                font-size: 7.1pt !important;
+                line-height: 1.07 !important;
+            }
+            body:not(.active-tab-barkod) table.data-table.dense-table th.col-code,
+            body:not(.active-tab-barkod) table.data-table.dense-table td.col-code {
+                font-size: 6.7pt !important;
+            }
+
+            body:not(.active-tab-barkod) table.data-table.ultra-dense-table th,
+            body:not(.active-tab-barkod) table.data-table.ultra-dense-table td {
+                padding: 0.8px 3px !important;
+                font-size: 6.3pt !important;
+                line-height: 1.03 !important;
+            }
+            body:not(.active-tab-barkod) table.data-table.ultra-dense-table th.col-code,
+            body:not(.active-tab-barkod) table.data-table.ultra-dense-table td.col-code {
+                font-size: 6.0pt !important;
+            }
+
+            body:not(.active-tab-barkod) table.data-table.compact-max-table th,
+            body:not(.active-tab-barkod) table.data-table.compact-max-table td {
+                padding: 0.4px 2.2px !important;
+                font-size: 5.6pt !important;
+                line-height: 0.98 !important;
+            }
+            body:not(.active-tab-barkod) table.data-table.compact-max-table th.col-code,
+            body:not(.active-tab-barkod) table.data-table.compact-max-table td.col-code {
+                font-size: 5.3pt !important;
+            }
+
+            body:not(.active-tab-barkod) table.data-table.hyper-compact-table th,
+            body:not(.active-tab-barkod) table.data-table.hyper-compact-table td {
+                padding: 0.2px 2px !important;
+                font-size: 4.9pt !important;
+                line-height: 0.95 !important;
+            }
+            body:not(.active-tab-barkod) table.data-table.hyper-compact-table th.col-code,
+            body:not(.active-tab-barkod) table.data-table.hyper-compact-table td.col-code {
+                font-size: 4.6pt !important;
             }
         }
     
@@ -4462,17 +4596,37 @@
         barkod: '@page { size: 100mm 100mm; margin: 0; }'
     };
 
+    function calcEffectiveLines(items, hasNote, hasTotal) {
+        if (!items || items.length === 0) return hasNote ? 1.5 : 0;
+        let lines = 0;
+        for (let i = 0; i < items.length; i++) {
+            const nameLen = (items[i].name || '').length;
+            if (nameLen > 90) lines += 2.5;
+            else if (nameLen > 45) lines += 1.8;
+            else lines += 1.0;
+        }
+        if (hasNote) lines += 1.5;
+        if (hasTotal) lines += 1.5;
+        return lines;
+    }
+
     function getSiparisPageRule() {
-        if (!currentResultData) return '@page { size: A4 portrait; margin: 6mm 8mm; }';
+        if (!currentResultData) return '@page { size: A4 portrait; margin: 6mm 7mm; }';
         const splitIdx = currentResultData.other_items_count || 0;
         const allItems = currentResultData.grouped_items || [];
-        const count1 = splitIdx + (getPage1Note() ? 1 : 0) + 1;
-        const count2 = (allItems.length - splitIdx) + 1;
-        const maxCount = Math.max(count1, count2);
-        if (maxCount >= 48) return '@page { size: A4 portrait; margin: 3mm 4mm; }';
-        if (maxCount >= 37) return '@page { size: A4 portrait; margin: 4mm 6mm; }';
-        if (maxCount >= 27) return '@page { size: A4 portrait; margin: 5mm 7mm; }';
-        return '@page { size: A4 portrait; margin: 6mm 8mm; }';
+        const otherItems = allItems.slice(0, splitIdx);
+        const bekoItems = allItems.slice(splitIdx);
+        const hasNote = !!getPage1Note();
+        
+        const lines1 = calcEffectiveLines(otherItems, hasNote, otherItems.length > 0);
+        const lines2 = calcEffectiveLines(bekoItems, false, bekoItems.length > 0);
+        const maxLines = Math.max(lines1, lines2);
+
+        if (maxLines >= 50) return '@page { size: A4 portrait; margin: 2.5mm 3.5mm; }';
+        if (maxLines >= 38) return '@page { size: A4 portrait; margin: 3mm 4mm; }';
+        if (maxLines >= 28) return '@page { size: A4 portrait; margin: 4mm 5mm; }';
+        if (maxLines >= 19) return '@page { size: A4 portrait; margin: 5mm 6mm; }';
+        return '@page { size: A4 portrait; margin: 6mm 7mm; }';
     }
 
     function applyPrintPageSize(tab) {
@@ -4500,22 +4654,29 @@
         const tab = cls.indexOf('active-tab-barkod') !== -1 ? 'barkod'
             : (cls.indexOf('active-tab-oliz') !== -1 ? 'oliz'
             : (cls.indexOf('active-tab-arsiv') !== -1 ? 'arsiv' : 'siparis'));
-        applyPrintPageSize(tab);
 
         // Sipariş yazdırma öncesinde tüm listeyi ve aramayı garantiye al
         if (tab === 'siparis' && currentResultData && currentResultData.grouped_items && currentResultData.grouped_items.length > 0) {
+            let needReRender = false;
+            const searchInput = document.getElementById('table-search');
+            if (searchInput && searchInput.value) {
+                searchInput.value = '';
+                needReRender = true;
+            }
             if (activeTabKey !== 'all') {
                 activeTabKey = 'all';
-                const searchInput = document.getElementById('table-search');
-                if (searchInput && searchInput.value) searchInput.value = '';
                 const allTabBtn = document.querySelector('#brand-tabs .tab-btn');
                 if (allTabBtn) {
                     document.querySelectorAll('#brand-tabs .tab-btn').forEach(b => b.classList.remove('active'));
                     allTabBtn.classList.add('active');
                 }
+                needReRender = true;
+            }
+            if (needReRender) {
                 renderTableRows();
             }
         }
+        applyPrintPageSize(tab);
     });
 
     function switchMainTab(tab) {
@@ -5113,14 +5274,15 @@
         const table1 = document.getElementById('table-page-1');
         const table2 = document.getElementById('table-page-2');
 
-        const applyDensity = (tbl, blk, count) => {
+        const applyDensity = (tbl, blk, effectiveLines) => {
             if (!tbl) return;
-            tbl.classList.remove('dense-table', 'ultra-dense-table', 'compact-max-table');
-            if (blk) blk.classList.remove('dense-table', 'ultra-dense-table', 'compact-max-table');
+            tbl.classList.remove('dense-table', 'ultra-dense-table', 'compact-max-table', 'hyper-compact-table');
+            if (blk) blk.classList.remove('dense-table', 'ultra-dense-table', 'compact-max-table', 'hyper-compact-table');
             let dClass = '';
-            if (count >= 48) dClass = 'compact-max-table';
-            else if (count >= 37) dClass = 'ultra-dense-table';
-            else if (count >= 27) dClass = 'dense-table';
+            if (effectiveLines >= 50) dClass = 'hyper-compact-table';
+            else if (effectiveLines >= 38) dClass = 'compact-max-table';
+            else if (effectiveLines >= 28) dClass = 'ultra-dense-table';
+            else if (effectiveLines >= 19) dClass = 'dense-table';
             if (dClass) {
                 tbl.classList.add(dClass);
                 if (blk) blk.classList.add(dClass);
@@ -5133,11 +5295,11 @@
             const otherItems = allItems.slice(0, splitIdx).filter(matchesQuery);
             const bekoItems = allItems.slice(splitIdx).filter(matchesQuery);
 
-            const count1 = otherItems.length + (page1Note ? 1 : 0) + (otherItems.length > 0 ? 1 : 0);
-            applyDensity(table1, block1, count1);
+            const lines1 = calcEffectiveLines(otherItems, !!page1Note, otherItems.length > 0);
+            applyDensity(table1, block1, lines1);
 
-            const count2 = bekoItems.length + (bekoItems.length > 0 ? 1 : 0);
-            applyDensity(table2, block2, count2);
+            const lines2 = calcEffectiveLines(bekoItems, false, bekoItems.length > 0);
+            applyDensity(table2, block2, lines2);
 
             if (otherItems.length === 0 && bekoItems.length === 0 && !page1Note) {
                 tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
@@ -5176,8 +5338,8 @@
 
             items = items.filter(matchesQuery);
 
-            const countBrand = items.length + (items.length > 0 ? 1 : 0);
-            applyDensity(table1, block1, countBrand);
+            const linesBrand = calcEffectiveLines(items, false, items.length > 0);
+            applyDensity(table1, block1, linesBrand);
 
             if (items.length === 0) {
                 tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
@@ -5224,11 +5386,12 @@
             allTabBtn.classList.add('active');
         }
         renderTableRows();
+        applyPrintPageSize('siparis');
 
         // iOS Safari ve mobil tarayıcılar için render motorunun A4 düzenini hazırlamasına zaman ver
         setTimeout(() => {
             window.print();
-        }, 250);
+        }, 300);
     }
 
     // Windows Action Triggers

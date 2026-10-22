@@ -1115,12 +1115,41 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         else:
             max_page_rows = len(rows_data)
 
-        is_dense = (max_page_rows > 35)
+        if max_page_rows > 45:
+            is_dense = True
+            row_h = 16.5
+            header_h = 20
+            f_header = Font(name='Segoe UI', size=9, bold=True, color='FFFFFF')
+            f_regular = Font(name='Segoe UI', size=8.5)
+            f_qty = Font(name='Segoe UI', size=9.5, bold=True)
+            f_code = Font(name='Segoe UI', size=8.5, bold=True, color='1E293B')
+            m_horiz = 0.25
+            m_vert = 0.3
+        elif max_page_rows > 30:
+            is_dense = True
+            row_h = 19.5
+            header_h = 24
+            f_header = Font(name='Segoe UI', size=10, bold=True, color='FFFFFF')
+            f_regular = Font(name='Segoe UI', size=9.5)
+            f_qty = Font(name='Segoe UI', size=10.5, bold=True)
+            f_code = Font(name='Segoe UI', size=9.5, bold=True, color='1E293B')
+            m_horiz = 0.35
+            m_vert = 0.4
+        else:
+            is_dense = False
+            row_h = 24
+            header_h = 28
+            f_header = Font(name='Segoe UI', size=11, bold=True, color='FFFFFF')
+            f_regular = Font(name='Segoe UI', size=10)
+            f_qty = Font(name='Segoe UI', size=11, bold=True)
+            f_code = Font(name='Segoe UI', size=10, bold=True, color='1E293B')
+            m_horiz = 0.4
+            m_vert = 0.5
 
-        ws.page_margins.left = 0.35 if is_dense else 0.4
-        ws.page_margins.right = 0.35 if is_dense else 0.4
-        ws.page_margins.top = 0.4 if is_dense else 0.5
-        ws.page_margins.bottom = 0.4 if is_dense else 0.5
+        ws.page_margins.left = m_horiz
+        ws.page_margins.right = m_horiz
+        ws.page_margins.top = m_vert
+        ws.page_margins.bottom = m_vert
         ws.page_margins.header = 0.2 if is_dense else 0.25
         ws.page_margins.footer = 0.2 if is_dense else 0.25
 
@@ -1134,11 +1163,6 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         # tablo dışı boş alanlara da çizgi basılır (H-11).
         ws.print_options.gridLines = False
 
-        f_header = Font(name='Segoe UI', size=10 if is_dense else 11, bold=True, color='FFFFFF')
-        f_regular = Font(name='Segoe UI', size=9.5 if is_dense else 10)
-        f_qty = Font(name='Segoe UI', size=10.5 if is_dense else 11, bold=True)
-        f_code = Font(name='Segoe UI', size=9.5 if is_dense else 10, bold=True, color='1E293B')
-
         headers = ['Miktar', 'Ürün Adı', 'Stok Kodu']
         for col_idx, h in enumerate(headers, 1):
             c = ws.cell(row=1, column=col_idx, value=h)
@@ -1146,9 +1170,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
             c.fill = fill_header
             c.alignment = Alignment(horizontal='center', vertical='center')
             c.border = cell_border
-        ws.row_dimensions[1].height = 24 if is_dense else 28
-
-        row_h = 20 if is_dense else 24
+        ws.row_dimensions[1].height = header_h
 
         for idx, itm in enumerate(rows_data, 1):
             row_num = idx + 1
