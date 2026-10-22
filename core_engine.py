@@ -842,6 +842,165 @@ def sort_items_by_family_and_color(items):
     return result
 
 
+fill_header = PatternFill(start_color='1E293B', end_color='1E293B', fill_type='solid')
+fill_zebra = PatternFill(start_color='F1F5F9', end_color='F1F5F9', fill_type='solid')
+border_thin = Side(border_style='thin', color='94A3B8')
+cell_border = Border(top=border_thin, left=border_thin, right=border_thin, bottom=border_thin)
+
+
+def setup_a4_sheet(ws, title, rows_data, page_break_after_idx=None, display_datetime=None):
+    ws.title = title
+    ws.page_setup.paperSize = ws.PAPERSIZE_A4
+    ws.page_setup.orientation = ws.ORIENTATION_PORTRAIT
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.page_setup.fitToWidth = 1
+
+    has_page_break = (page_break_after_idx is not None and 0 < page_break_after_idx < len(rows_data))
+    if has_page_break:
+        # 2 sayfa A4: 1. sayfa diger markalar, 2. sayfa Beko & Grundig
+        ws.page_setup.fitToHeight = 2
+        ws.print_title_rows = '1:1'
+    else:
+        # Tek sayfa A4
+        ws.page_setup.fitToHeight = 1
+
+    # Sayfa basina dusen maksimum satir sayisina gore dinamik optimizasyon
+    if has_page_break:
+        max_page_rows = max(page_break_after_idx, len(rows_data) - page_break_after_idx)
+    else:
+        max_page_rows = len(rows_data)
+
+    if max_page_rows > 60:
+        is_dense = True
+        row_h = 13.8
+        header_h = 18
+        f_header = Font(name='Segoe UI', size=8.5, bold=True, color='FFFFFF')
+        f_regular = Font(name='Segoe UI', size=7.8)
+        f_qty = Font(name='Segoe UI', size=8.5, bold=True)
+        f_code = Font(name='Segoe UI', size=7.8, bold=True, color='1E293B')
+        m_horiz = 0.25
+        m_vert = 0.25
+    elif max_page_rows > 45:
+        is_dense = True
+        row_h = 16.5
+        header_h = 20
+        f_header = Font(name='Segoe UI', size=9.5, bold=True, color='FFFFFF')
+        f_regular = Font(name='Segoe UI', size=8.5)
+        f_qty = Font(name='Segoe UI', size=9.5, bold=True)
+        f_code = Font(name='Segoe UI', size=8.5, bold=True, color='1E293B')
+        m_horiz = 0.3
+        m_vert = 0.3
+    elif max_page_rows > 30:
+        is_dense = True
+        row_h = 19.5
+        header_h = 24
+        f_header = Font(name='Segoe UI', size=10, bold=True, color='FFFFFF')
+        f_regular = Font(name='Segoe UI', size=9.5)
+        f_qty = Font(name='Segoe UI', size=10.5, bold=True)
+        f_code = Font(name='Segoe UI', size=9.5, bold=True, color='1E293B')
+        m_horiz = 0.35
+        m_vert = 0.4
+    else:
+        is_dense = False
+        row_h = 24
+        header_h = 28
+        f_header = Font(name='Segoe UI', size=11, bold=True, color='FFFFFF')
+        f_regular = Font(name='Segoe UI', size=10)
+        f_qty = Font(name='Segoe UI', size=11, bold=True)
+        f_code = Font(name='Segoe UI', size=10, bold=True, color='1E293B')
+        m_horiz = 0.4
+        m_vert = 0.5
+
+    ws.page_margins.left = m_horiz
+    ws.page_margins.right = m_horiz
+    ws.page_margins.top = m_vert
+    ws.page_margins.bottom = m_vert
+    ws.page_margins.header = 0.2 if is_dense else 0.25
+    ws.page_margins.footer = 0.2 if is_dense else 0.25
+
+    # Sayfa üst başlığı: Liste oluşturulma tarihi ve saati (A4 sol üst)
+    if display_datetime is None:
+        now = now_istanbul()
+        display_datetime = f"{now.strftime('%d.%m.%Y')} - {now.strftime('%H:%M')}"
+    ws.oddHeader.left.text = display_datetime
+    ws.oddHeader.left.size = 8.5
+    ws.oddHeader.left.font = "Segoe UI"
+
+    ws.print_options.horizontalCentered = True
+    # Hücrelere zaten kenarlık çizildiği için ızgara çizgileri basılırsa
+    # tablo dışı boş alanlara da çizgi basılır (H-11).
+    ws.print_options.gridLines = False
+
+    headers = ['Miktar', 'Ürün Adı', 'Stok Kodu']
+    for col_idx, h in enumerate(headers, 1):
+        c = ws.cell(row=1, column=col_idx, value=h)
+        c.font = f_header
+        c.fill = fill_header
+        c.alignment = Alignment(horizontal='center', vertical='center')
+        c.border = cell_border
+    ws.row_dimensions[1].height = header_h
+
+    for idx, itm in enumerate(rows_data, 1):
+        row_num = idx + 1
+        is_note_row = (str(itm.get('qty', '')).upper() == 'NOT')
+        is_total_row = (itm.get('is_total') is True or str(itm.get('name', '')).upper().startswith('TOPLAM'))
+
+        c_q = ws.cell(row=row_num, column=1, value=itm['qty'])
+        c_q.alignment = Alignment(horizontal='center', vertical='center')
+        if is_note_row:
+            c_q.font = Font(name='Segoe UI', size=10, bold=True, color='B45309')
+        elif is_total_row:
+            c_q.font = Font(name='Segoe UI', size=11, bold=True, color='000000')
+        else:
+            c_q.font = f_qty
+
+        c_n = ws.cell(row=row_num, column=2, value=itm['name'])
+        c_n.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
+        if is_note_row:
+            c_n.font = Font(name='Segoe UI', size=9.5, bold=True, color='000000')
+        elif is_total_row:
+            c_n.font = Font(name='Segoe UI', size=10, bold=True, color='000000')
+        else:
+            c_n.font = f_regular
+
+        c_s = ws.cell(row=row_num, column=3, value=itm.get('stok', ''))
+        c_s.alignment = Alignment(horizontal='center', vertical='center')
+        c_s.font = Font(name='Segoe UI', size=9.5, bold=True, color='1E293B') if is_total_row else f_code
+
+        ws.row_dimensions[row_num].height = row_h
+
+        for c in range(1, 4):
+            cell = ws.cell(row=row_num, column=c)
+            cell.border = cell_border
+            if is_note_row:
+                cell.fill = PatternFill(start_color='FFFBEB', end_color='FFFBEB', fill_type='solid')
+            elif is_total_row:
+                cell.fill = PatternFill(start_color='E2E8F0', end_color='E2E8F0', fill_type='solid')
+            elif idx % 2 == 0:
+                cell.fill = fill_zebra
+
+        if is_note_row:
+            ws.merge_cells(start_row=row_num, start_column=2, end_row=row_num, end_column=3)
+
+    if has_page_break:
+        ws.row_breaks.append(Break(id=page_break_after_idx + 1))
+
+    # Tablo sütun genişliklerini içerik uzunluğuna göre dinamik ayarla
+    max_q_len = max([len('Miktar')] + [len(str(itm.get('qty', ''))) for itm in rows_data]) if rows_data else 6
+    max_s_len = max([len('Stok Kodu')] + [len(str(itm.get('stok', ''))) for itm in rows_data]) if rows_data else 9
+
+    col_a_w = max(8, min(max_q_len + 4, 12))
+    col_c_w = max(14, min(max_s_len + 4, 22))
+
+    # A4 dikey toplam genişliği (~84-86 pt) içinde kalan genişliği Ürün Adı'na ver
+    target_total_w = 84 if is_dense else 86
+    col_b_w = max(50, target_total_w - col_a_w - col_c_w)
+
+    ws.column_dimensions['A'].width = col_a_w
+    ws.column_dimensions['B'].width = col_b_w
+    ws.column_dimensions['C'].width = col_c_w
+
+
 def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, custom_note="", target_date=None):
     """
     Mükerrer ürünleri konsolide eder ve A4 formatlı Excel dosyalarını BELLEKTE üretir.
@@ -1087,161 +1246,6 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     if not filter_beko:
         grouped_items.extend(beko_grundig_orders)
 
-    fill_header = PatternFill(start_color='1E293B', end_color='1E293B', fill_type='solid')
-    fill_zebra = PatternFill(start_color='F1F5F9', end_color='F1F5F9', fill_type='solid')
-
-    border_thin = Side(border_style='thin', color='94A3B8')
-    cell_border = Border(top=border_thin, left=border_thin, right=border_thin, bottom=border_thin)
-
-    def setup_a4_sheet(ws, title, rows_data, page_break_after_idx=None):
-        ws.title = title
-        ws.page_setup.paperSize = ws.PAPERSIZE_A4
-        ws.page_setup.orientation = ws.ORIENTATION_PORTRAIT
-        ws.sheet_properties.pageSetUpPr.fitToPage = True
-        ws.page_setup.fitToWidth = 1
-
-        has_page_break = (page_break_after_idx is not None and 0 < page_break_after_idx < len(rows_data))
-        if has_page_break:
-            # 2 sayfa A4: 1. sayfa diger markalar, 2. sayfa Beko & Grundig
-            ws.page_setup.fitToHeight = 2
-            ws.print_title_rows = '1:1'
-        else:
-            # Tek sayfa A4
-            ws.page_setup.fitToHeight = 1
-
-        # Sayfa basina dusen maksimum satir sayisina gore dinamik optimizasyon
-        if has_page_break:
-            max_page_rows = max(page_break_after_idx, len(rows_data) - page_break_after_idx)
-        else:
-            max_page_rows = len(rows_data)
-
-        if max_page_rows > 60:
-            is_dense = True
-            row_h = 13.8
-            header_h = 18
-            f_header = Font(name='Segoe UI', size=8.5, bold=True, color='FFFFFF')
-            f_regular = Font(name='Segoe UI', size=7.8)
-            f_qty = Font(name='Segoe UI', size=8.5, bold=True)
-            f_code = Font(name='Segoe UI', size=7.8, bold=True, color='1E293B')
-            m_horiz = 0.25
-            m_vert = 0.25
-        elif max_page_rows > 45:
-            is_dense = True
-            row_h = 16.5
-            header_h = 20
-            f_header = Font(name='Segoe UI', size=9.5, bold=True, color='FFFFFF')
-            f_regular = Font(name='Segoe UI', size=8.5)
-            f_qty = Font(name='Segoe UI', size=9.5, bold=True)
-            f_code = Font(name='Segoe UI', size=8.5, bold=True, color='1E293B')
-            m_horiz = 0.3
-            m_vert = 0.3
-        elif max_page_rows > 30:
-            is_dense = True
-            row_h = 19.5
-            header_h = 24
-            f_header = Font(name='Segoe UI', size=10, bold=True, color='FFFFFF')
-            f_regular = Font(name='Segoe UI', size=9.5)
-            f_qty = Font(name='Segoe UI', size=10.5, bold=True)
-            f_code = Font(name='Segoe UI', size=9.5, bold=True, color='1E293B')
-            m_horiz = 0.35
-            m_vert = 0.4
-        else:
-            is_dense = False
-            row_h = 24
-            header_h = 28
-            f_header = Font(name='Segoe UI', size=11, bold=True, color='FFFFFF')
-            f_regular = Font(name='Segoe UI', size=10)
-            f_qty = Font(name='Segoe UI', size=11, bold=True)
-            f_code = Font(name='Segoe UI', size=10, bold=True, color='1E293B')
-            m_horiz = 0.4
-            m_vert = 0.5
-
-        ws.page_margins.left = m_horiz
-        ws.page_margins.right = m_horiz
-        ws.page_margins.top = m_vert
-        ws.page_margins.bottom = m_vert
-        ws.page_margins.header = 0.2 if is_dense else 0.25
-        ws.page_margins.footer = 0.2 if is_dense else 0.25
-
-        # Sayfa üst başlığı: Liste oluşturulma tarihi ve saati (A4 sol üst)
-        ws.oddHeader.left.text = f"{display_date} - {time_str}"
-        ws.oddHeader.left.size = 8.5
-        ws.oddHeader.left.font = "Segoe UI"
-
-        ws.print_options.horizontalCentered = True
-        # Hücrelere zaten kenarlık çizildiği için ızgara çizgileri basılırsa
-        # tablo dışı boş alanlara da çizgi basılır (H-11).
-        ws.print_options.gridLines = False
-
-        headers = ['Miktar', 'Ürün Adı', 'Stok Kodu']
-        for col_idx, h in enumerate(headers, 1):
-            c = ws.cell(row=1, column=col_idx, value=h)
-            c.font = f_header
-            c.fill = fill_header
-            c.alignment = Alignment(horizontal='center', vertical='center')
-            c.border = cell_border
-        ws.row_dimensions[1].height = header_h
-
-        for idx, itm in enumerate(rows_data, 1):
-            row_num = idx + 1
-            is_note_row = (str(itm.get('qty', '')).upper() == 'NOT')
-            is_total_row = (itm.get('is_total') is True or str(itm.get('name', '')).upper().startswith('TOPLAM'))
-
-            c_q = ws.cell(row=row_num, column=1, value=itm['qty'])
-            c_q.alignment = Alignment(horizontal='center', vertical='center')
-            if is_note_row:
-                c_q.font = Font(name='Segoe UI', size=10, bold=True, color='B45309')
-            elif is_total_row:
-                c_q.font = Font(name='Segoe UI', size=11, bold=True, color='000000')
-            else:
-                c_q.font = f_qty
-
-            c_n = ws.cell(row=row_num, column=2, value=itm['name'])
-            c_n.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
-            if is_note_row:
-                c_n.font = Font(name='Segoe UI', size=9.5, bold=True, color='000000')
-            elif is_total_row:
-                c_n.font = Font(name='Segoe UI', size=10, bold=True, color='000000')
-            else:
-                c_n.font = f_regular
-
-            c_s = ws.cell(row=row_num, column=3, value=itm.get('stok', ''))
-            c_s.alignment = Alignment(horizontal='center', vertical='center')
-            c_s.font = Font(name='Segoe UI', size=9.5, bold=True, color='1E293B') if is_total_row else f_code
-
-            ws.row_dimensions[row_num].height = row_h
-
-            for c in range(1, 4):
-                cell = ws.cell(row=row_num, column=c)
-                cell.border = cell_border
-                if is_note_row:
-                    cell.fill = PatternFill(start_color='FFFBEB', end_color='FFFBEB', fill_type='solid')
-                elif is_total_row:
-                    cell.fill = PatternFill(start_color='E2E8F0', end_color='E2E8F0', fill_type='solid')
-                elif idx % 2 == 0:
-                    cell.fill = fill_zebra
-
-            if is_note_row:
-                ws.merge_cells(start_row=row_num, start_column=2, end_row=row_num, end_column=3)
-
-        if has_page_break:
-            ws.row_breaks.append(Break(id=page_break_after_idx + 1))
-
-        # Tablo sütun genişliklerini içerik uzunluğuna göre dinamik ayarla
-        max_q_len = max([len('Miktar')] + [len(str(itm.get('qty', ''))) for itm in rows_data]) if rows_data else 6
-        max_s_len = max([len('Stok Kodu')] + [len(str(itm.get('stok', ''))) for itm in rows_data]) if rows_data else 9
-
-        col_a_w = max(8, min(max_q_len + 4, 12))
-        col_c_w = max(14, min(max_s_len + 4, 22))
-
-        # A4 dikey toplam genişliği (~84-86 pt) içinde kalan genişliği Ürün Adı'na ver
-        target_total_w = 84 if is_dense else 86
-        col_b_w = max(50, target_total_w - col_a_w - col_c_w)
-
-        ws.column_dimensions['A'].width = col_a_w
-        ws.column_dimensions['B'].width = col_b_w
-        ws.column_dimensions['C'].width = col_c_w
-
     # 1. Main Workbook (Non-Beko or All)
     wb_main = openpyxl.Workbook()
     ws1 = wb_main.active
@@ -1274,7 +1278,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
             'is_total': True
         })
 
-    setup_a4_sheet(ws1, "Ürün Toplama Listesi", sheet1_items, page_break_after_idx=page_break_idx)
+    sheet_display_dt = f"{display_date} - {time_str}"
+    setup_a4_sheet(ws1, "Ürün Toplama Listesi", sheet1_items, page_break_after_idx=page_break_idx, display_datetime=sheet_display_dt)
 
     # Sheet 2: BEKO, GRUNDIG, LENOVO & SONY Sekmesi (Eger Beko, Grundig, Lenovo veya Sony siparisi varsa)
     if beko_grundig_orders and not filter_beko:
@@ -1287,7 +1292,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
             'brand': 'TOTAL',
             'is_total': True
         })
-        setup_a4_sheet(ws_bg, "BEKO, GRUNDIG, LENOVO & SONY", bg_items)
+        setup_a4_sheet(ws_bg, "BEKO, GRUNDIG, LENOVO & SONY", bg_items, display_datetime=sheet_display_dt)
 
     # Sheet 3+: Diger Marka Sekmeleri (Tefal, Babyliss, Philips vb.)
     used_sheet_titles = set()
@@ -1302,7 +1307,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
             'brand': 'TOTAL',
             'is_total': True
         })
-        setup_a4_sheet(ws_b, sheet_title, b_items)
+        setup_a4_sheet(ws_b, sheet_title, b_items, display_datetime=sheet_display_dt)
 
     # 2. Beko, Grundig, Lenovo & Sony Workbook (Ayri dosya)
     wb_beko = None
@@ -1317,7 +1322,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
             'brand': 'TOTAL',
             'is_total': True
         })
-        setup_a4_sheet(ws_beko, "Beko Grundig Lenovo Sony", bo_items)
+        setup_a4_sheet(ws_beko, "Beko Grundig Lenovo Sony", bo_items, display_datetime=sheet_display_dt)
 
     brand_stats = []
     if beko_grundig_orders and not filter_beko:
@@ -1377,6 +1382,88 @@ def workbooks_to_bytes(wb_main, wb_beko=None):
         beko_buf = io.BytesIO()
         wb_beko.save(beko_buf)
     return main_buf.getvalue(), (beko_buf.getvalue() if beko_buf else None)
+
+
+def build_filtered_workbook(grouped_items, other_items_count=None, custom_note=None, display_datetime=None):
+    """
+    Kullanıcının web arayüzünden seçerek hariç tuttuğu ürünler çıkarıldıktan sonra
+    kalan aktif kalemlerle eksiksiz A4 Excel çalışma kitabı üretir.
+    """
+    if other_items_count is None:
+        other_items_count = len(grouped_items)
+
+    if display_datetime is None:
+        now = now_istanbul()
+        display_datetime = f"{now.strftime('%d.%m.%Y')} - {now.strftime('%H:%M')}"
+
+    wb_main = openpyxl.Workbook()
+    ws1 = wb_main.active
+
+    other_items = list(grouped_items[:other_items_count])
+    beko_items = list(grouped_items[other_items_count:])
+
+    sheet1_items = list(other_items)
+    clean_note = (custom_note or '').strip()
+    if clean_note:
+        sheet1_items.append({'qty': 'NOT', 'name': clean_note, 'stok': '', 'brand': 'NOTE'})
+
+    if other_items:
+        sheet1_items.append({
+            'qty': sum(int(x.get('qty', 0)) for x in other_items),
+            'name': 'TOPLAM MİKTAR',
+            'stok': f"{len(other_items)} Kalem",
+            'brand': 'TOTAL',
+            'is_total': True
+        })
+
+    has_beko = len(beko_items) > 0
+    page_break_idx = len(sheet1_items) if (sheet1_items and has_beko) else None
+
+    if has_beko:
+        sheet1_items.extend(beko_items)
+        sheet1_items.append({
+            'qty': sum(int(x.get('qty', 0)) for x in beko_items),
+            'name': 'TOPLAM MİKTAR',
+            'stok': f"{len(beko_items)} Kalem",
+            'brand': 'TOTAL',
+            'is_total': True
+        })
+
+    setup_a4_sheet(ws1, "Ürün Toplama Listesi", sheet1_items, page_break_after_idx=page_break_idx, display_datetime=display_datetime)
+
+    if has_beko:
+        ws_bg = wb_main.create_sheet(title="BEKO, GRUNDIG, LENOVO & SONY")
+        bg_items = list(beko_items)
+        bg_items.append({
+            'qty': sum(int(x.get('qty', 0)) for x in beko_items),
+            'name': 'TOPLAM MİKTAR',
+            'stok': f"{len(beko_items)} Kalem",
+            'brand': 'TOTAL',
+            'is_total': True
+        })
+        setup_a4_sheet(ws_bg, "BEKO, GRUNDIG, LENOVO & SONY", bg_items, display_datetime=display_datetime)
+
+    # Diğer marka sekmeleri
+    brand_map = {}
+    for itm in other_items:
+        b = itm.get('brand', 'DİĞER')
+        brand_map.setdefault(b, []).append(itm)
+
+    used_titles = set()
+    for b in sorted(brand_map.keys(), key=lambda x: (sum(int(i.get('qty', 0)) for i in brand_map[x]), x), reverse=True):
+        stitle = safe_sheet_title(b, used_titles)
+        ws_b = wb_main.create_sheet(title=stitle)
+        b_list = list(brand_map[b])
+        b_list.append({
+            'qty': sum(int(x.get('qty', 0)) for x in b_list),
+            'name': 'TOPLAM MİKTAR',
+            'stok': f"{len(b_list)} Kalem",
+            'brand': 'TOTAL',
+            'is_total': True
+        })
+        setup_a4_sheet(ws_b, stitle, b_list, display_datetime=display_datetime)
+
+    return wb_main
 
 
 def parse_and_process_multiple_files(files_or_paths, filter_beko=False, target_date=None, custom_note=""):

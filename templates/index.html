@@ -654,6 +654,286 @@
             vertical-align: middle;
         }
 
+        /* 2. Sütun: Listeden Çıkarma Seçim Kutucuğu (Exclude Checkbox) */
+        .exclude-cb-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            padding: 4px;
+            margin: 0 auto;
+            border-radius: 6px;
+            user-select: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .exclude-cb {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+
+        .exclude-cb-custom {
+            width: 19px;
+            height: 19px;
+            border-radius: 5px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1.5px solid rgba(148, 163, 184, 0.45);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        /* Hover: Kırmızı uyarı efekti (Listeden çıkarılacağını belirtir) */
+        .exclude-cb-label:hover .exclude-cb-custom {
+            border-color: #f87171;
+            background: rgba(239, 68, 68, 0.16);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
+            transform: scale(1.08);
+        }
+
+        .exclude-cb-label:hover .exclude-cb-custom::after {
+            content: '';
+            width: 7px;
+            height: 2px;
+            background: #f87171;
+            border-radius: 1px;
+            display: block;
+        }
+
+        /* Seçildiğinde */
+        .exclude-cb:checked + .exclude-cb-custom {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-color: #b91c1c;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .exclude-cb:checked + .exclude-cb-custom::after {
+            content: '✓';
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            display: block;
+            line-height: 1;
+        }
+
+        /* Çıkarılan Ürünler Bildirim & Geri Alma Kartı (Excluded Banner) */
+        .excluded-banner {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(24, 34, 53, 0.95) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: var(--radius-md, 12px);
+            padding: 12px 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 20px -2px rgba(239, 68, 68, 0.15), 0 2px 6px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+            animation: fadeInExcluded 0.25s ease-out;
+        }
+
+        @keyframes fadeInExcluded {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .excluded-banner-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .excluded-banner-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+            color: #f1f5f9;
+        }
+
+        .excluded-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(239, 68, 68, 0.22);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .excluded-banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-excluded-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 7px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            font-family: inherit;
+        }
+
+        .btn-excluded-action:active {
+            transform: scale(0.97);
+        }
+
+        .btn-excluded-action.btn-undo {
+            background: rgba(56, 189, 248, 0.14);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+        }
+
+        .btn-excluded-action.btn-undo:hover {
+            background: rgba(56, 189, 248, 0.25);
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-excluded-action.btn-restore-all {
+            background: rgba(34, 197, 94, 0.14);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            color: #4ade80;
+        }
+
+        .btn-excluded-action.btn-restore-all:hover {
+            background: rgba(34, 197, 94, 0.25);
+            border-color: #4ade80;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-excluded-action.btn-toggle-drawer {
+            background: rgba(148, 163, 184, 0.12);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: #e2e8f0;
+        }
+
+        .btn-excluded-action.btn-toggle-drawer:hover {
+            background: rgba(148, 163, 184, 0.22);
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        /* Çekmece (Drawer) */
+        .excluded-drawer {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(239, 68, 68, 0.25);
+            animation: fadeInExcluded 0.2s ease-out;
+        }
+
+        .excluded-drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .excluded-drawer-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .excluded-drawer-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .excluded-drawer-list::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+        }
+
+        .excluded-item-chip {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-radius: 8px;
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .excluded-item-chip:hover {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .chip-qty {
+            background: rgba(239, 68, 68, 0.22);
+            color: #fca5a5;
+            font-weight: 700;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 5px;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .chip-name {
+            font-size: 12px;
+            color: #e2e8f0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            min-width: 0;
+            font-weight: 500;
+        }
+
+        .chip-code {
+            font-size: 11px;
+            color: #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .btn-chip-restore {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #4ade80;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 9px;
+            border-radius: 6px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        .btn-chip-restore:hover {
+            background: rgba(34, 197, 94, 0.35);
+            border-color: #4ade80;
+            transform: scale(1.05);
+        }
+
         th.col-name, td.col-name {
             width: auto;
             text-align: left;
@@ -1094,6 +1374,11 @@
             body.active-tab-arsiv #view-siparis,
             body.active-tab-arsiv #view-barkod,
             body.active-tab-arsiv #view-oliz,
+            #excluded-banner,
+            .excluded-banner,
+            .exclude-cb-label,
+            .exclude-cb,
+            .exclude-cb-custom,
             .no-print {
                 display: none !important;
                 visibility: hidden !important;
@@ -2469,6 +2754,37 @@
                 vertical-align: middle;
             }
 
+            .exclude-cb-label {
+                padding: 2px !important;
+            }
+            .exclude-cb-custom {
+                width: 17px !important;
+                height: 17px !important;
+            }
+            .excluded-banner {
+                padding: 10px 12px !important;
+            }
+            .excluded-banner-content {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+            .excluded-banner-actions {
+                width: 100% !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 6px !important;
+            }
+            .btn-excluded-action {
+                flex: 1 1 auto !important;
+                justify-content: center !important;
+                padding: 7px 10px !important;
+                font-size: 11.5px !important;
+            }
+            .excluded-drawer-list {
+                grid-template-columns: 1fr !important;
+            }
+
             .qty-cell-wrap {
                 display: inline-flex;
                 align-items: center;
@@ -2845,6 +3161,14 @@
             body:not(.active-tab-barkod) table.data-table th,
             body:not(.active-tab-barkod) table.data-table td {
                 vertical-align: middle !important;
+            }
+
+            body:not(.active-tab-barkod) .excluded-banner,
+            body:not(.active-tab-barkod) #excluded-banner,
+            body:not(.active-tab-barkod) .exclude-cb-label,
+            body:not(.active-tab-barkod) .exclude-cb,
+            body:not(.active-tab-barkod) .exclude-cb-custom {
+                display: none !important;
             }
         }
     
@@ -3446,6 +3770,39 @@
                     <button type="button" class="btn-note-clear" onclick="clearPage1Note()" title="Notu Temizle" style="display: none;">
                         ✕ Temizle
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Çıkarılan Ürünler Bildirim & Geri Alma Çubuğu -->
+        <div id="excluded-banner" class="excluded-banner" style="display: none;">
+            <div class="excluded-banner-content">
+                <div class="excluded-banner-info">
+                    <span class="excluded-icon">🚫</span>
+                    <span class="excluded-text">
+                        <strong><span id="excluded-count-badge">0</span> ürün</strong> (<span id="excluded-qty-badge">0</span> adet) listeden ve A4 baskıdan çıkarıldı
+                    </span>
+                </div>
+                <div class="excluded-banner-actions">
+                    <button type="button" class="btn-excluded-action btn-undo" onclick="restoreLastExcluded()" title="Son çıkarılan ürünü listeye geri ekle">
+                        ↩️ Son Çıkarılanı Geri Al
+                    </button>
+                    <button type="button" class="btn-excluded-action btn-restore-all" onclick="restoreAllExcluded()" title="Çıkarılan tüm ürünleri listeye geri yükle">
+                        🔄 Tümünü Geri Yükle
+                    </button>
+                    <button type="button" class="btn-excluded-action btn-toggle-drawer" onclick="toggleExcludedDrawer()" id="btn-toggle-excluded-drawer" title="Çıkarılan ürünlerin listesini gör">
+                        👁️ Çıkarılanları Gör (<span id="excluded-drawer-count">0</span>) ▾
+                    </button>
+                </div>
+            </div>
+            <!-- Açılır Çıkarılan Ürünler Çekmecesi (Drawer) -->
+            <div id="excluded-drawer" class="excluded-drawer" style="display: none;">
+                <div class="excluded-drawer-header">
+                    <span>Listeden Çıkarılan Kalemler</span>
+                    <span style="font-size: 11px; opacity: 0.7;">(İstediğiniz ürünün yanındaki '+' butonuna basarak tek tek geri ekleyebilirsiniz)</span>
+                </div>
+                <div class="excluded-drawer-list" id="excluded-drawer-list">
+                    <!-- Çıkarılan ürün kartları buraya dinamik eklenir -->
                 </div>
             </div>
         </div>
@@ -5272,6 +5629,8 @@
     let currentResultData = null;
     let activeTabKey = 'all';
     let IS_CLOUD = false;
+    let excludedItemKeys = new Set();
+    let excludedHistory = [];
 
     // Set today's date (UTC+03:00 İstanbul)
     const istInitial = getIstanbulDateTime();
@@ -5491,12 +5850,18 @@
 
     function renderDashboard(result) {
         currentResultData = result;
+        excludedItemKeys.clear();
+        excludedHistory = [];
 
-        // KPI
-        document.getElementById('kpi-total').innerHTML = `${result.total_orders} <span class="kpi-unit">Sipariş</span>`;
-        document.getElementById('kpi-non-beko').innerHTML = `${result.non_beko_qty} <span class="kpi-unit">Adet (${result.non_beko_count} Çeşit)</span>`;
-        document.getElementById('kpi-beko').innerHTML = `${result.beko_qty} <span class="kpi-unit">Adet (${result.beko_count} Çeşit)</span>`;
-        document.getElementById('kpi-brands').innerHTML = `${result.brands.length} <span class="kpi-unit">Marka</span>`;
+        // Her ürüne kararlı bir _uid ata
+        (result.grouped_items || []).forEach((itm, idx) => {
+            itm._uid = 'itm_' + idx;
+        });
+        if (Array.isArray(result.beko_items)) {
+            result.beko_items.forEach((itm, idx) => {
+                if (!itm._uid) itm._uid = 'beko_' + idx;
+            });
+        }
 
         const bekoLabel = document.getElementById('kpi-beko-label');
         if (bekoLabel) {
@@ -5534,46 +5899,16 @@
             document.getElementById('btn-open-beko').style.display = 'inline-flex';
         }
 
-        // Render Tabs
-        const tabsContainer = document.getElementById('brand-tabs');
-        tabsContainer.innerHTML = '';
+        activeTabKey = 'all';
 
-        const totalQty = (result.grouped_items || []).reduce((acc, it) => acc + (it.qty || 1), 0);
-        const allTab = document.createElement('button');
-        allTab.className = 'tab-btn active';
-        allTab.innerText = `Tümü (Ana Liste - ${totalQty} Adet)`;
-        allTab.onclick = () => switchBrandTab('all', allTab);
-        tabsContainer.appendChild(allTab);
-
-        const isSpecialBrandName = (name) => {
-            const u = (name || '').toUpperCase();
-            return u.includes('BEKO') || u.includes('GRUNDIG') || u.includes('LENOVO') || u.includes('IDEAPAD') || u.includes('SONY');
-        };
-
-        const bekoInBrands = result.brands.some(b => isSpecialBrandName(b.brand));
-
-        result.brands.forEach(b => {
-            const btn = document.createElement('button');
-            const isSpecial = isSpecialBrandName(b.brand);
-            btn.className = 'tab-btn' + (isSpecial ? ' tab-beko' : '');
-            btn.innerText = isSpecial ? `🛡️ ${b.brand} (${b.qty} Adet)` : `${b.brand} (${b.qty})`;
-            btn.onclick = () => switchBrandTab(b.brand, btn);
-            tabsContainer.appendChild(btn);
-        });
-
-        // Eger filter_beko=True ise BEKO, GRUNDIG, LENOVO & SONY result.brands icinde yer almaz; ayri sekme olarak ekle
-        if (!bekoInBrands && result.beko_count > 0) {
-            const bekoTab = document.createElement('button');
-            bekoTab.className = 'tab-btn tab-beko';
-            bekoTab.innerText = `🛡️ Beko, Grundig, Lenovo & Sony (${result.beko_qty} Adet)`;
-            bekoTab.onclick = () => switchBrandTab('BEKO, GRUNDIG, LENOVO & SONY', bekoTab);
-            tabsContainer.appendChild(bekoTab);
-        }
+        // KPI, Sekmeler ve Çıkarılanlar Çubuğunu Güncelle
+        updateDashboardKpis();
+        renderBrandTabs();
+        updateExcludedBanner();
 
         // Note Input Sync
         syncNoteInputs(result.custom_note);
 
-        activeTabKey = 'all';
         renderTableRows();
     }
 
@@ -5585,6 +5920,221 @@
     }
     window.switchBrandTab = switchBrandTab;
     window.switchTab = switchBrandTab;
+
+    // --- Listeden Ürün Çıkarma ve Geri Alma Yönetimi ---
+    function excludeItem(uid) {
+        if (!currentResultData || !currentResultData.grouped_items) return;
+        const itm = currentResultData.grouped_items.find(x => x._uid === uid) 
+                 || (currentResultData.beko_items || []).find(x => x._uid === uid);
+        if (!itm) return;
+
+        excludedItemKeys.add(uid);
+        excludedHistory.push({ uid: uid, item: itm });
+
+        updateExcludedBanner();
+        updateDashboardKpis();
+        renderBrandTabs();
+        renderTableRows();
+
+        const shortName = (itm.name || 'Ürün').length > 32 ? (itm.name.substring(0, 32) + '...') : itm.name;
+        showToast(`🚫 "${shortName}" listeden çıkarıldı.`, '↩️ Geri Al', () => {
+            restoreSingleExcluded(uid);
+        });
+    }
+    window.excludeItem = excludeItem;
+
+    function restoreLastExcluded() {
+        if (excludedHistory.length === 0) return;
+        const last = excludedHistory.pop();
+        excludedItemKeys.delete(last.uid);
+
+        updateExcludedBanner();
+        updateDashboardKpis();
+        renderBrandTabs();
+        renderTableRows();
+
+        const shortName = (last.item.name || 'Ürün').length > 30 ? (last.item.name.substring(0, 30) + '...') : last.item.name;
+        showToast(`↩️ "${shortName}" listeye geri eklendi.`);
+    }
+    window.restoreLastExcluded = restoreLastExcluded;
+
+    function restoreAllExcluded() {
+        const count = excludedItemKeys.size;
+        if (count === 0) return;
+        excludedItemKeys.clear();
+        excludedHistory = [];
+
+        updateExcludedBanner();
+        updateDashboardKpis();
+        renderBrandTabs();
+        renderTableRows();
+
+        showToast(`🔄 Çıkarılan tüm ürünler (${count} kalem) listeye geri yüklendi!`);
+    }
+    window.restoreAllExcluded = restoreAllExcluded;
+
+    function restoreSingleExcluded(uid) {
+        if (!excludedItemKeys.has(uid)) return;
+        const entry = excludedHistory.find(x => x.uid === uid);
+        const name = entry ? entry.item.name : 'Ürün';
+
+        excludedItemKeys.delete(uid);
+        excludedHistory = excludedHistory.filter(x => x.uid !== uid);
+
+        updateExcludedBanner();
+        updateDashboardKpis();
+        renderBrandTabs();
+        renderTableRows();
+
+        const shortName = name.length > 30 ? (name.substring(0, 30) + '...') : name;
+        showToast(`➕ "${shortName}" listeye geri eklendi.`);
+    }
+    window.restoreSingleExcluded = restoreSingleExcluded;
+
+    function updateExcludedBanner() {
+        const banner = document.getElementById('excluded-banner');
+        const countBadge = document.getElementById('excluded-count-badge');
+        const qtyBadge = document.getElementById('excluded-qty-badge');
+        const drawerCount = document.getElementById('excluded-drawer-count');
+        const drawerList = document.getElementById('excluded-drawer-list');
+        const drawer = document.getElementById('excluded-drawer');
+        if (!banner) return;
+
+        const count = excludedItemKeys.size;
+        if (count === 0) {
+            banner.style.display = 'none';
+            if (drawer) drawer.style.display = 'none';
+            return;
+        }
+
+        let totalExcludedQty = 0;
+        excludedHistory.forEach(h => {
+            totalExcludedQty += (parseInt(h.item.qty, 10) || 1);
+        });
+
+        if (countBadge) countBadge.innerText = count;
+        if (qtyBadge) qtyBadge.innerText = totalExcludedQty;
+        if (drawerCount) drawerCount.innerText = count;
+
+        if (drawerList) {
+            const reversed = [...excludedHistory].reverse();
+            drawerList.innerHTML = reversed.map(h => `
+                <div class="excluded-item-chip">
+                    <span class="chip-qty">${h.item.qty} Adet</span>
+                    <span class="chip-name" title="${escapeHtml(h.item.name || '')}">${escapeHtml(h.item.name || '')}</span>
+                    <span class="chip-code">${escapeHtml(h.item.stok || '-')}</span>
+                    <button type="button" class="btn-chip-restore" onclick="restoreSingleExcluded('${escapeHtml(h.uid)}')" title="Bu ürünü listeye geri ekle">
+                        ➕ Geri Ekle
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        banner.style.display = 'block';
+    }
+    window.updateExcludedBanner = updateExcludedBanner;
+
+    function toggleExcludedDrawer() {
+        const drawer = document.getElementById('excluded-drawer');
+        const btn = document.getElementById('btn-toggle-excluded-drawer');
+        if (!drawer) return;
+        const isHidden = (drawer.style.display === 'none' || !drawer.style.display);
+        drawer.style.display = isHidden ? 'block' : 'none';
+        if (btn) {
+            btn.innerHTML = isHidden 
+                ? `👁️ Çıkarılanları Gizle (<span id="excluded-drawer-count">${excludedItemKeys.size}</span>) ▴`
+                : `👁️ Çıkarılanları Gör (<span id="excluded-drawer-count">${excludedItemKeys.size}</span>) ▾`;
+        }
+    }
+    window.toggleExcludedDrawer = toggleExcludedDrawer;
+
+    function updateDashboardKpis() {
+        if (!currentResultData) return;
+        const splitIdx = currentResultData.other_items_count || 0;
+        const allItems = currentResultData.grouped_items || [];
+
+        const activeOther = allItems.slice(0, splitIdx).filter(x => !excludedItemKeys.has(x._uid));
+        const activeBeko = allItems.slice(splitIdx).filter(x => !excludedItemKeys.has(x._uid));
+
+        const activeOtherQty = activeOther.reduce((acc, it) => acc + (parseInt(it.qty, 10) || 1), 0);
+        const activeBekoQty = activeBeko.reduce((acc, it) => acc + (parseInt(it.qty, 10) || 1), 0);
+        const activeTotalQty = activeOtherQty + activeBekoQty;
+
+        const activeBrandSet = new Set();
+        allItems.filter(x => !excludedItemKeys.has(x._uid)).forEach(x => {
+            if (x.brand) activeBrandSet.add(x.brand);
+        });
+
+        if (excludedItemKeys.size === 0) {
+            document.getElementById('kpi-total').innerHTML = `${currentResultData.total_orders} <span class="kpi-unit">Sipariş</span>`;
+            document.getElementById('kpi-non-beko').innerHTML = `${currentResultData.non_beko_qty} <span class="kpi-unit">Adet (${currentResultData.non_beko_count} Çeşit)</span>`;
+            document.getElementById('kpi-beko').innerHTML = `${currentResultData.beko_qty} <span class="kpi-unit">Adet (${currentResultData.beko_count} Çeşit)</span>`;
+            document.getElementById('kpi-brands').innerHTML = `${(currentResultData.brands || []).length} <span class="kpi-unit">Marka</span>`;
+        } else {
+            document.getElementById('kpi-total').innerHTML = `${activeTotalQty} <span class="kpi-unit">Aktif Adet</span>`;
+            document.getElementById('kpi-non-beko').innerHTML = `${activeOtherQty} <span class="kpi-unit">Adet (${activeOther.length} Çeşit)</span>`;
+            document.getElementById('kpi-beko').innerHTML = `${activeBekoQty} <span class="kpi-unit">Adet (${activeBeko.length} Çeşit)</span>`;
+            document.getElementById('kpi-brands').innerHTML = `${activeBrandSet.size} <span class="kpi-unit">Aktif Marka</span>`;
+        }
+    }
+    window.updateDashboardKpis = updateDashboardKpis;
+
+    function renderBrandTabs() {
+        if (!currentResultData) return;
+        const tabsContainer = document.getElementById('brand-tabs');
+        if (!tabsContainer) return;
+        tabsContainer.innerHTML = '';
+
+        const isSpecialBrandName = (name) => {
+            const u = (name || '').toUpperCase();
+            return u.includes('BEKO') || u.includes('GRUNDIG') || u.includes('LENOVO') || u.includes('IDEAPAD') || u.includes('SONY');
+        };
+
+        const allItems = currentResultData.grouped_items || [];
+        const activeItems = allItems.filter(it => !excludedItemKeys.has(it._uid));
+        const activeTotalQty = activeItems.reduce((acc, it) => acc + (parseInt(it.qty, 10) || 1), 0);
+
+        const allTab = document.createElement('button');
+        allTab.className = 'tab-btn' + (activeTabKey === 'all' ? ' active' : '');
+        allTab.innerText = `Tümü (Ana Liste - ${activeTotalQty} Adet)`;
+        allTab.onclick = () => switchBrandTab('all', allTab);
+        tabsContainer.appendChild(allTab);
+
+        const brandQtyMap = {};
+        activeItems.forEach(it => {
+            const b = it.brand || 'Diğer';
+            brandQtyMap[b] = (brandQtyMap[b] || 0) + (parseInt(it.qty, 10) || 1);
+        });
+
+        const bekoInBrands = (currentResultData.brands || []).some(b => isSpecialBrandName(b.brand));
+
+        (currentResultData.brands || []).forEach(b => {
+            const activeBrandQty = brandQtyMap[b.brand] || 0;
+            const btn = document.createElement('button');
+            const isSpecial = isSpecialBrandName(b.brand);
+            const isActive = (activeTabKey === b.brand);
+            btn.className = 'tab-btn' + (isSpecial ? ' tab-beko' : '') + (isActive ? ' active' : '');
+            btn.innerText = isSpecial ? `🛡️ ${b.brand} (${activeBrandQty} Adet)` : `${b.brand} (${activeBrandQty})`;
+            btn.onclick = () => switchBrandTab(b.brand, btn);
+            tabsContainer.appendChild(btn);
+        });
+
+        if (!bekoInBrands && currentResultData.beko_count > 0) {
+            let activeBekoQty = 0;
+            activeItems.forEach(it => {
+                if (isSpecialBrandName(it.brand)) {
+                    activeBekoQty += (parseInt(it.qty, 10) || 1);
+                }
+            });
+            const bekoTab = document.createElement('button');
+            const isActive = (activeTabKey === 'BEKO, GRUNDIG, LENOVO & SONY');
+            bekoTab.className = 'tab-btn tab-beko' + (isActive ? ' active' : '');
+            bekoTab.innerText = `🛡️ Beko, Grundig, Lenovo & Sony (${activeBekoQty} Adet)`;
+            bekoTab.onclick = () => switchBrandTab('BEKO, GRUNDIG, LENOVO & SONY', bekoTab);
+            tabsContainer.appendChild(bekoTab);
+        }
+    }
+    window.renderBrandTabs = renderBrandTabs;
 
     function renderTableRows() {
         if (!currentResultData) return;
@@ -5639,7 +6189,12 @@
         const createRowHtml = (itm) => `
             <tr onclick="toggleRowCollected(this)" title="Dokunarak toplandı olarak işaretleyin / geri alın" style="cursor: pointer;">
                 <td class="col-qty"><span class="qty-badge">${itm.qty}</span></td>
-                <td class="col-check"></td>
+                <td class="col-check">
+                    <label class="exclude-cb-label" onclick="event.stopPropagation();" title="Bu ürünü listeden ve A4 baskıdan çıkar">
+                        <input type="checkbox" class="exclude-cb" onchange="excludeItem('${escapeHtml(itm._uid)}')">
+                        <span class="exclude-cb-custom" aria-hidden="true"></span>
+                    </label>
+                </td>
                 <td class="col-name">${formatProductName(itm.name || '')}</td>
                 <td class="col-code"><span class="code-badge">${escapeHtml(itm.stok || '-')}</span></td>
             </tr>
@@ -5674,13 +6229,15 @@
         const table1 = document.getElementById('table-page-1');
         const table2 = document.getElementById('table-page-2');
 
-
-
         if (activeTabKey === 'all') {
             const splitIdx = currentResultData.other_items_count || 0;
             const allItems = currentResultData.grouped_items || [];
-            const otherItems = allItems.slice(0, splitIdx).filter(matchesQuery);
-            const bekoItems = allItems.slice(splitIdx).filter(matchesQuery);
+            const otherItems = allItems.slice(0, splitIdx)
+                .filter(x => !excludedItemKeys.has(x._uid))
+                .filter(matchesQuery);
+            const bekoItems = allItems.slice(splitIdx)
+                .filter(x => !excludedItemKeys.has(x._uid))
+                .filter(matchesQuery);
 
             const p1 = computeScaleParams(otherItems, !!page1Note);
             const p2 = computeScaleParams(bekoItems, false);
@@ -5721,7 +6278,9 @@
                 items = (currentResultData.grouped_items || []).filter(x => x.brand === activeTabKey);
             }
 
-            items = items.filter(matchesQuery);
+            items = items
+                .filter(x => !excludedItemKeys.has(x._uid))
+                .filter(matchesQuery);
 
             const pBrand = computeScaleParams(items, false);
             applyDynamicPrintScale(pBrand, pBrand);
@@ -5796,6 +6355,9 @@
 
     async function openMainExcel() {
         if (!currentResultData) return;
+        if (excludedItemKeys && excludedItemKeys.size > 0) {
+            return downloadFilteredExcel();
+        }
         // Bulutta dosya sunucuda açılamaz; doğrudan indirilir.
         if (IS_CLOUD || !currentResultData.main_excel_path) {
             if (IS_CLOUD) return downloadCurrentExcel();
@@ -5840,8 +6402,49 @@
         window.location.href = `/api/download-file?id=` + encodeURIComponent(downloadId);
     }
 
+    async function downloadFilteredExcel() {
+        if (!currentResultData) return;
+        const splitIdx = currentResultData.other_items_count || 0;
+        const allItems = currentResultData.grouped_items || [];
+        const activeOther = allItems.slice(0, splitIdx).filter(x => !excludedItemKeys.has(x._uid));
+        const activeBeko = allItems.slice(splitIdx).filter(x => !excludedItemKeys.has(x._uid));
+        const activeItems = [...activeOther, ...activeBeko];
+
+        const payload = {
+            grouped_items: activeItems,
+            other_items_count: activeOther.length,
+            custom_note: getPage1Note()
+        };
+
+        try {
+            showToast('📄 Filtrelenmiş Excel hazırlanıyor...');
+            const res = await fetch('/api/export-filtered-excel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error('Excel üretilemedi');
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Urun_Toplama_Listesi_A4_Cikti.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+            showToast('✅ Filtrelenmiş Excel başarıyla indirildi.');
+        } catch (e) {
+            console.error(e);
+            showToast('⚠️ Excel indirilirken hata oluştu.');
+        }
+    }
+
     function downloadCurrentExcel() {
         if (!currentResultData) return;
+        if (excludedItemKeys && excludedItemKeys.size > 0) {
+            return downloadFilteredExcel();
+        }
         if (IS_CLOUD) {
             triggerDownload(currentResultData.main_download_id);
             return;
@@ -5850,18 +6453,38 @@
         window.location.href = `/api/download-file?path=${encodeURIComponent(currentResultData.main_excel_path)}`;
     }
 
-    function showToast(msg) {
+    function showToast(msg, actionText, actionCallback) {
         const container = document.getElementById('toast-container');
+        if (!container) return;
         const t = document.createElement('div');
         t.className = 'toast';
-        t.innerText = msg;
+        const span = document.createElement('span');
+        span.innerText = msg;
+        t.appendChild(span);
+
+        if (actionText && typeof actionCallback === 'function') {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-excluded-action btn-undo';
+            btn.style.marginLeft = '10px';
+            btn.style.padding = '4px 10px';
+            btn.style.fontSize = '11px';
+            btn.innerText = actionText;
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                actionCallback();
+                t.remove();
+            };
+            t.appendChild(btn);
+        }
+
         container.appendChild(t);
         setTimeout(() => {
             t.style.opacity = '0';
             t.style.transform = 'translateY(10px)';
             t.style.transition = 'all 0.3s ease';
             setTimeout(() => t.remove(), 300);
-        }, 3500);
+        }, 4000);
     }
 </script>
     <script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>

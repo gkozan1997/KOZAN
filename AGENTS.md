@@ -341,3 +341,23 @@ Statik + canlı denetimde tespit edilen **19 doğrulanmış hata** bulunmuş, ta
   - Dokunmatik toplama kontrolünde (`toggleRowCollected`) toplam satırına basıldığında çizilme efekti engellenmiştir.
 * **Excel Çıktısı:**
   - `core_engine.py` içinde 1. sayfanın en altına (sayfa sonu kırılımından hemen önce), 2. sayfanın (Beko/Grundig) en altına, her marka sekmesinin ve Beko bağımsız dosyasının sonuna otomatik eklenir; `#E2E8F0` zemin ve kalın fontla basılır.
+
+---
+
+## 17. Seçim Kutucuğu ile Ürün Çıkarma ve Geri Alma Standardı (`excludeItem`)
+
+* **Seçim Kutucuğu Yerleşimi (`td.col-check`):**
+  - Miktar sütununun hemen sağındaki ayrı sütunda (`col-check`) modern, koyu temaya uygun seçim kutucuğu (`.exclude-cb-label`, `.exclude-cb-custom`) yer alır.
+  - Tıklama yalıtımı (`event.stopPropagation()`): Kutucuğa veya etiketine dokunulduğunda satırın toplandı işaretlenmesi (`toggleRowCollected`) engellenir, doğrudan ürün çıkarma işlemi tetiklenir. Satırın geri kalanına (ürün adı, miktar, kod) basıldığında ise toplandı efekti çalışmaya devam eder.
+* **Anında Listeden ve A4 Baskıdan Çıkarma:**
+  - Kullanıcı kutucuğu işaretlediğinde ürün anında tablodan gizlenir (`renderTableRows()`), toplam adetler (`TOPLAM MİKTAR`), KPI kartları (`kpi-non-beko`, `kpi-beko`, `kpi-total`) ve marka sekmesi adetleri aktif ürün sayısına göre anında güncellenir.
+  - A4 dikey baskı motorunda (`computeScaleParams` ve `@media print`) çıkarılan ürünler basılmaz, sayfa ölçeklemesi kalan aktif ürünlere göre otomatik yapılır.
+  - `@media print` sırasında kutucuklar tamamen gizlenir (`display: none !important;`) ve baskıdaki `td.col-check` sütunu temiz, 24px genişliğinde, depo personelinin fiziksel kalemle tik atabileceği boş bir hücre olarak kalır.
+* **Şık Bildirim ve Geri Alma Çubuğu (`#excluded-banner`):**
+  - Tablonun hemen üstünde, çıkarılan ürün adedini ve toplam miktarını gösteren modern banner açılır (`X ürün (Y adet) listeden ve A4 baskıdan çıkarıldı`).
+  - **`[↩️ Son Çıkarılanı Geri Al]`:** En son çıkarılan ürünü sırasıyla geri yükler (`restoreLastExcluded`).
+  - **`[🔄 Tümünü Geri Yükle]`:** Çıkarılan tüm ürünleri tek tıkla geri yükler (`restoreAllExcluded`).
+  - **`[👁️ Çıkarılanları Gör]` Çekmecesi (`#excluded-drawer`):** Açılır çekmecede çıkarılan tüm ürünler çip kartları olarak listelenir (Miktar, Ürün Adı, Stok Kodu); her kartın yanındaki `[➕ Geri Ekle]` butonuyla kullanıcı istediği ürünü tek tek geri ekleyebilir (`restoreSingleExcluded`).
+* **Toast ve Excel Entegrasyonu:**
+  - Ürün çıkarıldığında ekranda beliren bildirimde (toast) doğrudan `[↩️ Geri Al]` aksiyon butonu yer alır.
+  - Ürün çıkarılmış haldeyken Excel İndirildiğinde (`/api/export-filtered-excel`) veya açıldığında, Excel dosyası da seçilen hariç tutmaları tanıyarak yalnızca aktif ürünlerle üretilir (`build_filtered_workbook`).

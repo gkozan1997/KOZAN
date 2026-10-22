@@ -20,6 +20,7 @@ from core_engine import (
     get_latest_download_file,
     get_latest_download_files,
     get_base_dirs,
+    build_filtered_workbook,
 )
 
 is_frozen = getattr(sys, 'frozen', False)
@@ -258,6 +259,29 @@ def download_file():
     if not path or not os.path.exists(path) or not _is_allowed_local_path(path):
         return "Dosya bulunamadı", 404
     return send_file(path, as_attachment=True, download_name=os.path.basename(path))
+
+
+@app.route('/api/export-filtered-excel', methods=['POST'])
+def export_filtered_excel():
+    data = request.get_json(silent=True) or {}
+    grouped_items = data.get('grouped_items', [])
+    other_items_count = data.get('other_items_count')
+    custom_note = data.get('custom_note', '')
+
+    try:
+        wb = build_filtered_workbook(grouped_items, other_items_count=other_items_count, custom_note=custom_note)
+        buf = io.BytesIO()
+        wb.save(buf)
+        buf.seek(0)
+        return send_file(
+            buf,
+            as_attachment=True,
+            download_name='Urun_Toplama_Listesi_A4_Cikti.xlsx',
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+    except Exception as e:
+        app.logger.exception('Filtered excel export error')
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 
