@@ -1325,6 +1325,119 @@
                 padding: 0 !important;
             }
 
+            /* --- DİNAMİK A4 BASKI SIKIŞTIRMA MODLARI (MOBİL VE ÇOKLU ÜRÜN SIĞDIRMA) --- */
+            
+            /* 1. Yoğun Mod (27 - 36 Kalem) */
+            table.data-table.dense-table th {
+                padding: 2.5px 4px !important;
+                font-size: 7.2pt !important;
+            }
+            table.data-table.dense-table td {
+                padding: 1.5px 4px !important;
+                font-size: 7.2pt !important;
+                line-height: 1.08 !important;
+            }
+            table.data-table.dense-table .qty-badge {
+                font-size: 7.2pt !important;
+            }
+            table.data-table.dense-table .code-badge,
+            table.data-table.dense-table td.col-code {
+                font-size: 6.8pt !important;
+            }
+            table.data-table.dense-table tr.row-note td {
+                padding: 1.5px 4px !important;
+                font-size: 7.2pt !important;
+            }
+            table.data-table.dense-table tr.row-note .note-badge {
+                font-size: 7.2pt !important;
+            }
+            table.data-table.dense-table tr.row-total td {
+                padding: 2px 4px !important;
+                font-size: 7.5pt !important;
+            }
+            table.data-table.dense-table tr.row-total td.col-qty,
+            table.data-table.dense-table tr.row-total .total-badge {
+                font-size: 7.8pt !important;
+            }
+            .print-page-block.dense-table .print-page-date {
+                font-size: 7.5pt !important;
+                margin-bottom: 1px !important;
+            }
+
+            /* 2. Ultra Yoğun Mod (37 - 47 Kalem) */
+            table.data-table.ultra-dense-table th {
+                padding: 2px 3px !important;
+                font-size: 6.4pt !important;
+            }
+            table.data-table.ultra-dense-table td {
+                padding: 1px 3px !important;
+                font-size: 6.4pt !important;
+                line-height: 1.04 !important;
+            }
+            table.data-table.ultra-dense-table .qty-badge {
+                font-size: 6.4pt !important;
+            }
+            table.data-table.ultra-dense-table .code-badge,
+            table.data-table.ultra-dense-table td.col-code {
+                font-size: 6.1pt !important;
+            }
+            table.data-table.ultra-dense-table tr.row-note td {
+                padding: 1px 3px !important;
+                font-size: 6.4pt !important;
+            }
+            table.data-table.ultra-dense-table tr.row-note .note-badge {
+                font-size: 6.4pt !important;
+            }
+            table.data-table.ultra-dense-table tr.row-total td {
+                padding: 1.5px 3px !important;
+                font-size: 6.8pt !important;
+            }
+            table.data-table.ultra-dense-table tr.row-total td.col-qty,
+            table.data-table.ultra-dense-table tr.row-total .total-badge {
+                font-size: 7pt !important;
+            }
+            .print-page-block.ultra-dense-table .print-page-date {
+                font-size: 6.8pt !important;
+                margin-bottom: 1px !important;
+            }
+
+            /* 3. Maksimum Kompakt Mod (48+ Kalem) */
+            table.data-table.compact-max-table th {
+                padding: 1.5px 2px !important;
+                font-size: 5.8pt !important;
+            }
+            table.data-table.compact-max-table td {
+                padding: 0.5px 2.5px !important;
+                font-size: 5.8pt !important;
+                line-height: 1.0 !important;
+            }
+            table.data-table.compact-max-table .qty-badge {
+                font-size: 5.8pt !important;
+            }
+            table.data-table.compact-max-table .code-badge,
+            table.data-table.compact-max-table td.col-code {
+                font-size: 5.5pt !important;
+            }
+            table.data-table.compact-max-table tr.row-note td {
+                padding: 0.5px 2.5px !important;
+                font-size: 5.8pt !important;
+            }
+            table.data-table.compact-max-table tr.row-note .note-badge {
+                font-size: 5.8pt !important;
+            }
+            table.data-table.compact-max-table tr.row-total td {
+                padding: 1px 2.5px !important;
+                font-size: 6.2pt !important;
+            }
+            table.data-table.compact-max-table tr.row-total td.col-qty,
+            table.data-table.compact-max-table tr.row-total .total-badge {
+                font-size: 6.4pt !important;
+            }
+            .print-page-block.compact-max-table .print-page-date {
+                font-size: 6.2pt !important;
+                margin-bottom: 1px !important;
+            }
+
             .print-only {
                 display: block !important;
             }
@@ -2474,6 +2587,38 @@
                 border: none !important;
                 box-shadow: none !important;
                 pointer-events: none !important;
+            }
+
+            /* Mobil tarayıcıların otomatik font büyütmesini (Font Boosting) engelle */
+            html, body, table, table.data-table, tr, td, th {
+                -webkit-text-size-adjust: 100% !important;
+                -moz-text-size-adjust: 100% !important;
+                -ms-text-size-adjust: 100% !important;
+                text-size-adjust: 100% !important;
+            }
+
+            /* Mobilde ekrandaki 12px font ve 8px padding kurallarının baskıya sızmasını kesin olarak sıfırla */
+            body:not(.active-tab-barkod) table.data-table {
+                width: 100% !important;
+                min-width: 100% !important;
+                table-layout: auto !important;
+                border-collapse: collapse !important;
+            }
+            body:not(.active-tab-barkod) table.data-table th.col-qty,
+            body:not(.active-tab-barkod) table.data-table td.col-qty {
+                width: 1% !important;
+                min-width: 0 !important;
+                max-width: none !important;
+            }
+            body:not(.active-tab-barkod) table.data-table th.col-name,
+            body:not(.active-tab-barkod) table.data-table td.col-name {
+                width: auto !important;
+            }
+            body:not(.active-tab-barkod) table.data-table th.col-code,
+            body:not(.active-tab-barkod) table.data-table td.col-code {
+                width: 1% !important;
+                min-width: 0 !important;
+                max-width: none !important;
             }
         }
     
@@ -4312,13 +4457,31 @@
     //   barkod  → 100mm x 100mm termal, margin 0
     // ==============================================================
     const PRINT_PAGE_RULES = {
-        siparis: '@page { size: A4 portrait; margin: 8mm 10mm; }',
-        oliz: '@page { size: A4 portrait; margin: 8mm 10mm; }',
+        siparis: '@page { size: A4 portrait; margin: 6mm 8mm; }',
+        oliz: '@page { size: A4 portrait; margin: 6mm 8mm; }',
         barkod: '@page { size: 100mm 100mm; margin: 0; }'
     };
 
+    function getSiparisPageRule() {
+        if (!currentResultData) return '@page { size: A4 portrait; margin: 6mm 8mm; }';
+        const splitIdx = currentResultData.other_items_count || 0;
+        const allItems = currentResultData.grouped_items || [];
+        const count1 = splitIdx + (getPage1Note() ? 1 : 0) + 1;
+        const count2 = (allItems.length - splitIdx) + 1;
+        const maxCount = Math.max(count1, count2);
+        if (maxCount >= 48) return '@page { size: A4 portrait; margin: 3mm 4mm; }';
+        if (maxCount >= 37) return '@page { size: A4 portrait; margin: 4mm 6mm; }';
+        if (maxCount >= 27) return '@page { size: A4 portrait; margin: 5mm 7mm; }';
+        return '@page { size: A4 portrait; margin: 6mm 8mm; }';
+    }
+
     function applyPrintPageSize(tab) {
-        const rule = PRINT_PAGE_RULES[tab] || PRINT_PAGE_RULES.siparis;
+        let rule = PRINT_PAGE_RULES[tab];
+        if (tab === 'siparis') {
+            rule = getSiparisPageRule();
+        } else if (!rule) {
+            rule = PRINT_PAGE_RULES.siparis;
+        }
         let styleEl = document.getElementById('dynamic-page-rule');
         if (!styleEl) {
             styleEl = document.createElement('style');
@@ -4947,11 +5110,34 @@
             `;
         };
 
+        const table1 = document.getElementById('table-page-1');
+        const table2 = document.getElementById('table-page-2');
+
+        const applyDensity = (tbl, blk, count) => {
+            if (!tbl) return;
+            tbl.classList.remove('dense-table', 'ultra-dense-table', 'compact-max-table');
+            if (blk) blk.classList.remove('dense-table', 'ultra-dense-table', 'compact-max-table');
+            let dClass = '';
+            if (count >= 48) dClass = 'compact-max-table';
+            else if (count >= 37) dClass = 'ultra-dense-table';
+            else if (count >= 27) dClass = 'dense-table';
+            if (dClass) {
+                tbl.classList.add(dClass);
+                if (blk) blk.classList.add(dClass);
+            }
+        };
+
         if (activeTabKey === 'all') {
             const splitIdx = currentResultData.other_items_count || 0;
             const allItems = currentResultData.grouped_items || [];
             const otherItems = allItems.slice(0, splitIdx).filter(matchesQuery);
             const bekoItems = allItems.slice(splitIdx).filter(matchesQuery);
+
+            const count1 = otherItems.length + (page1Note ? 1 : 0) + (otherItems.length > 0 ? 1 : 0);
+            applyDensity(table1, block1, count1);
+
+            const count2 = bekoItems.length + (bekoItems.length > 0 ? 1 : 0);
+            applyDensity(table2, block2, count2);
 
             if (otherItems.length === 0 && bekoItems.length === 0 && !page1Note) {
                 tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
@@ -4989,6 +5175,9 @@
             }
 
             items = items.filter(matchesQuery);
+
+            const countBrand = items.length + (items.length > 0 ? 1 : 0);
+            applyDensity(table1, block1, countBrand);
 
             if (items.length === 0) {
                 tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
