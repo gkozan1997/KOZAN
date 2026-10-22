@@ -167,7 +167,7 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * Not metni `localStorage` ile tarayıcıda kalıcı olarak saklanır ve tek tıkla temizlenebilir (`clearPage1Note`).
 * **1. Sayfa Sonuna Eklenme Davranışı:**
   * Girilen not, Ana Toplama Listesinde (1. Sekme) **yalnızca 1. sayfa listesinin en alt sırasına** (`<tr>` olarak) eklenir; 2. sayfaya (Beko, Grundig & Lenovo) asla taşmaz veya sirayet etmez.
-  * Miktar sütununda belirgin **`NOT`** rozeti (`.note-badge`), Ürün Adı ve Stok Kodu sütunlarını kapsayan birleşik alanda (`colspan="2"`) **`Not: [Metin]`** şeklinde basılır.
+  * Miktar sütununda belirgin **`NOT`** rozeti (`.note-badge`), Ürün Adı ve Stok Kodu sütunlarını kapsayan birleşik alanda (`colspan="3"`) doğrudan girilen serbest not metni şeklinde basılır (kullanıcı talebiyle sağdaki "Not:" ön eki kaldırılmıştır).
   * Hem web ekranında hafif sıcak vurguyla, hem de A4 baskı ve PDF çıktısında (`@media print`) net kenarlıklar ve Segoe UI font standardıyla kusursuz basılır.
   * Excel çalışma kitabında da (`core_engine.py`) 1. sekmenin 1. sayfa sonuna (sayfa sonu kırılımından hemen önce) otomatik eklenir ve B-C sütunları birleştirilir.
 

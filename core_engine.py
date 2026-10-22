@@ -1250,7 +1250,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
 
     clean_note = (custom_note or '').strip()
     if clean_note:
-        note_row = {'qty': 'NOT', 'name': f'Not: {clean_note}', 'stok': '', 'brand': 'NOTE'}
+        note_row = {'qty': 'NOT', 'name': clean_note, 'stok': '', 'brand': 'NOTE'}
         sheet1_items.append(note_row)
 
     if other_page_items:
