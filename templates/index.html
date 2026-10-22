@@ -1189,7 +1189,7 @@
                 background: transparent !important;
                 color: #000000 !important;
                 font-weight: 700 !important;
-                font-size: 8pt !important;
+                font-size: inherit !important;
                 padding: 0 !important;
             }
             .code-badge {
@@ -1198,7 +1198,7 @@
                 color: #000000 !important;
                 padding: 0 !important;
                 font-family: inherit !important;
-                font-size: 7.5pt !important;
+                font-size: inherit !important;
             }
             tbody tr.row-collected {
                 background: transparent !important;
@@ -1299,21 +1299,21 @@
                 color: #000000 !important;
                 background: transparent !important;
                 border: none !important;
-                font-size: 9pt !important;
+                font-size: inherit !important;
                 padding: 0 !important;
                 box-shadow: none !important;
             }
             tr.row-total td.col-name {
                 text-align: left !important;
                 font-weight: 800 !important;
-                font-size: 8.5pt !important;
+                font-size: inherit !important;
                 color: #000000 !important;
                 text-transform: uppercase !important;
             }
             tr.row-total td.col-code {
                 text-align: center !important;
                 font-weight: 800 !important;
-                font-size: 8pt !important;
+                font-size: inherit !important;
                 color: #000000 !important;
             }
             tr.row-total td.col-code .total-count-badge {
@@ -1321,161 +1321,11 @@
                 border: none !important;
                 color: #000000 !important;
                 font-weight: 800 !important;
-                font-size: 8pt !important;
+                font-size: inherit !important;
                 padding: 0 !important;
             }
 
-            /* --- DİNAMİK A4 BASKI SIKIŞTIRMA MODLARI (MOBİL VE ÇOKLU ÜRÜN SIĞDIRMA) --- */
-            
-            /* 1. Yoğun Mod (27 - 36 Kalem) */
-            table.data-table.dense-table th {
-                padding: 2.5px 4px !important;
-                font-size: 7.2pt !important;
-            }
-            table.data-table.dense-table td {
-                padding: 1.5px 4px !important;
-                font-size: 7.2pt !important;
-                line-height: 1.08 !important;
-            }
-            table.data-table.dense-table .qty-badge {
-                font-size: 7.2pt !important;
-            }
-            table.data-table.dense-table .code-badge,
-            table.data-table.dense-table td.col-code {
-                font-size: 6.8pt !important;
-            }
-            table.data-table.dense-table tr.row-note td {
-                padding: 1.5px 4px !important;
-                font-size: 7.2pt !important;
-            }
-            table.data-table.dense-table tr.row-note .note-badge {
-                font-size: 7.2pt !important;
-            }
-            table.data-table.dense-table tr.row-total td {
-                padding: 2px 4px !important;
-                font-size: 7.5pt !important;
-            }
-            table.data-table.dense-table tr.row-total td.col-qty,
-            table.data-table.dense-table tr.row-total .total-badge {
-                font-size: 7.8pt !important;
-            }
-            .print-page-block.dense-table .print-page-date {
-                font-size: 7.5pt !important;
-                margin-bottom: 1px !important;
-            }
-
-            /* 2. Ultra Yoğun Mod (37 - 47 Kalem) */
-            table.data-table.ultra-dense-table th {
-                padding: 2px 3px !important;
-                font-size: 6.4pt !important;
-            }
-            table.data-table.ultra-dense-table td {
-                padding: 1px 3px !important;
-                font-size: 6.4pt !important;
-                line-height: 1.04 !important;
-            }
-            table.data-table.ultra-dense-table .qty-badge {
-                font-size: 6.4pt !important;
-            }
-            table.data-table.ultra-dense-table .code-badge,
-            table.data-table.ultra-dense-table td.col-code {
-                font-size: 6.1pt !important;
-            }
-            table.data-table.ultra-dense-table tr.row-note td {
-                padding: 1px 3px !important;
-                font-size: 6.4pt !important;
-            }
-            table.data-table.ultra-dense-table tr.row-note .note-badge {
-                font-size: 6.4pt !important;
-            }
-            table.data-table.ultra-dense-table tr.row-total td {
-                padding: 1.5px 3px !important;
-                font-size: 6.8pt !important;
-            }
-            table.data-table.ultra-dense-table tr.row-total td.col-qty,
-            table.data-table.ultra-dense-table tr.row-total .total-badge {
-                font-size: 7pt !important;
-            }
-            .print-page-block.ultra-dense-table .print-page-date {
-                font-size: 6.8pt !important;
-                margin-bottom: 1px !important;
-            }
-
-            /* 3. Maksimum Kompakt Mod (38 - 49 Efektif Satır) */
-            table.data-table.compact-max-table th {
-                padding: 1.2px 2px !important;
-                font-size: 5.6pt !important;
-            }
-            table.data-table.compact-max-table td {
-                padding: 0.4px 2.2px !important;
-                font-size: 5.6pt !important;
-                line-height: 0.98 !important;
-            }
-            table.data-table.compact-max-table .qty-badge {
-                font-size: 5.6pt !important;
-            }
-            table.data-table.compact-max-table .code-badge,
-            table.data-table.compact-max-table td.col-code {
-                font-size: 5.3pt !important;
-            }
-            table.data-table.compact-max-table tr.row-note td {
-                padding: 0.4px 2.2px !important;
-                font-size: 5.6pt !important;
-            }
-            table.data-table.compact-max-table tr.row-note .note-badge {
-                font-size: 5.6pt !important;
-            }
-            table.data-table.compact-max-table tr.row-total td {
-                padding: 0.8px 2.2px !important;
-                font-size: 5.8pt !important;
-            }
-            table.data-table.compact-max-table tr.row-total td.col-qty,
-            table.data-table.compact-max-table tr.row-total .total-badge {
-                font-size: 6.0pt !important;
-            }
-            .print-page-block.compact-max-table .print-page-date {
-                font-size: 5.8pt !important;
-                margin-bottom: 1px !important;
-            }
-
-            /* 4. Hiper Kompakt Mod (50+ Efektif Satır) */
-            table.data-table.hyper-compact-table th {
-                padding: 1px 2px !important;
-                font-size: 5.0pt !important;
-                line-height: 0.95 !important;
-            }
-            table.data-table.hyper-compact-table td {
-                padding: 0.2px 2px !important;
-                font-size: 4.9pt !important;
-                line-height: 0.95 !important;
-            }
-            table.data-table.hyper-compact-table .qty-badge {
-                font-size: 4.9pt !important;
-            }
-            table.data-table.hyper-compact-table .code-badge,
-            table.data-table.hyper-compact-table td.col-code {
-                font-size: 4.6pt !important;
-            }
-            table.data-table.hyper-compact-table tr.row-note td {
-                padding: 0.2px 2px !important;
-                font-size: 4.9pt !important;
-            }
-            table.data-table.hyper-compact-table tr.row-note .note-badge {
-                font-size: 4.9pt !important;
-            }
-            table.data-table.hyper-compact-table tr.row-total td {
-                padding: 0.4px 2px !important;
-                font-size: 5.2pt !important;
-            }
-            table.data-table.hyper-compact-table tr.row-total td.col-qty,
-            table.data-table.hyper-compact-table tr.row-total .total-badge {
-                font-size: 5.4pt !important;
-            }
-            .print-page-block.hyper-compact-table .print-page-date {
-                font-size: 5.2pt !important;
-                margin-bottom: 0px !important;
-            }
-
+            /* Tablo ve satırlar baskıda sayfa yüksekliğini orantılı doldurur */
             .print-only {
                 display: block !important;
             }
@@ -2716,49 +2566,13 @@
                 color: #000000 !important;
             }
 
-            /* DİNAMİK YOĞUNLUK SINIFLARININ NİHAİ KURAL ENFORCEMENT'I */
-            body:not(.active-tab-barkod) table.data-table.dense-table th,
-            body:not(.active-tab-barkod) table.data-table.dense-table td {
-                padding: 1.2px 3.5px !important;
-                font-size: 7.1pt !important;
-                line-height: 1.07 !important;
+            /* Tablo ve satırlar baskıda sayfa yüksekliğini orantılı doldurur */
+            body:not(.active-tab-barkod) table.data-table {
+                height: 100% !important;
             }
-            body:not(.active-tab-barkod) table.data-table.dense-table th.col-code,
-            body:not(.active-tab-barkod) table.data-table.dense-table td.col-code {
-                font-size: 6.7pt !important;
-            }
-
-            body:not(.active-tab-barkod) table.data-table.ultra-dense-table th,
-            body:not(.active-tab-barkod) table.data-table.ultra-dense-table td {
-                padding: 0.8px 3px !important;
-                font-size: 6.3pt !important;
-                line-height: 1.03 !important;
-            }
-            body:not(.active-tab-barkod) table.data-table.ultra-dense-table th.col-code,
-            body:not(.active-tab-barkod) table.data-table.ultra-dense-table td.col-code {
-                font-size: 6.0pt !important;
-            }
-
-            body:not(.active-tab-barkod) table.data-table.compact-max-table th,
-            body:not(.active-tab-barkod) table.data-table.compact-max-table td {
-                padding: 0.4px 2.2px !important;
-                font-size: 5.6pt !important;
-                line-height: 0.98 !important;
-            }
-            body:not(.active-tab-barkod) table.data-table.compact-max-table th.col-code,
-            body:not(.active-tab-barkod) table.data-table.compact-max-table td.col-code {
-                font-size: 5.3pt !important;
-            }
-
-            body:not(.active-tab-barkod) table.data-table.hyper-compact-table th,
-            body:not(.active-tab-barkod) table.data-table.hyper-compact-table td {
-                padding: 0.2px 2px !important;
-                font-size: 4.9pt !important;
-                line-height: 0.95 !important;
-            }
-            body:not(.active-tab-barkod) table.data-table.hyper-compact-table th.col-code,
-            body:not(.active-tab-barkod) table.data-table.hyper-compact-table td.col-code {
-                font-size: 4.6pt !important;
+            body:not(.active-tab-barkod) table.data-table th,
+            body:not(.active-tab-barkod) table.data-table td {
+                vertical-align: middle !important;
             }
         }
     
@@ -4604,48 +4418,72 @@
 
     function calcEffectiveLines(items) {
         if (!items || items.length === 0) return 0;
-        let lines = 0;
+        let extra = 0;
         for (let i = 0; i < items.length; i++) {
             const nameLen = (items[i].name || '').length;
-            if (nameLen > 80) lines += 2.0;
-            else if (nameLen > 42) lines += 1.4;
-            else lines += 1.0;
+            if (nameLen > 85) extra += 1.0;
+            else if (nameLen > 55) extra += 0.35;
         }
-        return lines;
+        return extra;
     }
 
     function computeScaleParams(items, hasNote) {
         const count = items ? items.length : 0;
         if (count === 0) {
             return {
+                tableHeight: 'auto',
+                rowHPx: '28px',
+                headerHPx: '24px',
+                totalHPx: '24px',
+                noteHPx: '22px',
                 fontSize: '9.0pt',
                 codeSize: '8.5pt',
                 padY: '6.0px',
                 lineH: '1.20',
                 totalFont: '9.2pt',
-                totalPad: '6.5px',
+                totalPad: '6.0px',
                 dateFont: '8.5pt'
             };
         }
-        const effLines = calcEffectiveLines(items);
-        // Yazdırılabilir A4 yüksekliği: 287mm (1084px) - sabit başlık/toplam satırları (~66px) = 1018px
-        const availH = hasNote ? 996.0 : 1018.0;
-        const E = Math.max(1.0, effLines);
+        // Yazdırılabilir A4 yüksekliği: 287mm (1084.7px)
+        // Sabit başlık + toplam satırı + tarih satırı (~62px, not varsa ~84px)
+        // Güvenlik payı: 15px (yazıcı subpixel ve kenarlık yuvarlama koruması)
+        const baseAvailHPx = hasNote ? 985.0 : 1007.0;
         
-        const targetRowH = availH / E;
-        // Satır yüksekliğini 11.0px (90+ satır) ile 36.0px (<= 25 satır) aralığında dinamik sınırla
-        const rowH = Math.min(36.0, Math.max(11.0, targetRowH));
-        const ratio = (rowH - 11.0) / (36.0 - 11.0); // 0.0 (çok sıkışık) ile 1.0 (ferah)
+        // Uzun ürün adlarından kaynaklanan sarmalama hesabı
+        const extraLines = calcEffectiveLines(items);
+        const extraLinePx = extraLines * 11.5;
+        
+        // Satırlara düşen toplam dikey alan
+        const availForRows = Math.max(count * 10.5, baseAvailHPx - extraLinePx);
+        const targetRowH = availForRows / count;
+        
+        // Satır yüksekliğini 10.8px (90+ satır) ile 36.0px (<= 25 satır) aralığında dinamik ayarla
+        const rowHPx = Math.min(36.0, Math.max(10.8, targetRowH));
+        const ratio = (rowHPx - 10.8) / (36.0 - 10.8); // 0.0 (en sıkışık) ile 1.0 (en ferah)
 
-        const fontSize = (5.5 + ratio * (9.5 - 5.5)).toFixed(1);
-        const codeSize = (5.0 + ratio * (9.0 - 5.0)).toFixed(1);
-        const padY = (0.4 + ratio * (8.0 - 0.4)).toFixed(1);
-        const lineH = (1.02 + ratio * 0.25).toFixed(2);
-        const totalFont = (6.0 + ratio * (9.8 - 6.0)).toFixed(1);
-        const totalPad = (0.8 + ratio * (8.5 - 0.8)).toFixed(1);
-        const dateFont = (6.5 + ratio * (8.8 - 6.5)).toFixed(1);
+        const fontSize = (6.4 + ratio * (9.5 - 6.4)).toFixed(1);
+        const codeSize = (5.9 + ratio * (9.0 - 5.9)).toFixed(1);
+        const padY = Math.max(0.5, (rowHPx - (parseFloat(fontSize) * 1.33)) / 2.0).toFixed(1);
+        const lineH = (1.05 + ratio * 0.22).toFixed(2);
+        
+        const totalFont = (6.8 + ratio * (9.8 - 6.8)).toFixed(1);
+        const totalPad = Math.max(1.2, rowHPx * 0.22).toFixed(1);
+        const dateFont = (7.5 + ratio * (8.8 - 7.5)).toFixed(1);
+        
+        const headerHPx = Math.max(18, Math.min(28, rowHPx * 1.15)).toFixed(1);
+        const totalHPx = Math.max(20, Math.min(30, rowHPx * 1.2)).toFixed(1);
+        const noteHPx = Math.max(18, Math.min(26, rowHPx * 1.1)).toFixed(1);
+
+        // Tablonun toplam dikey boyutu (mm)
+        const totalTableHeightMm = Math.round((count * rowHPx + extraLinePx + (hasNote ? 70 : 48)) * 0.264583);
 
         return {
+            tableHeight: Math.min(276, Math.max(120, totalTableHeightMm)) + 'mm',
+            rowHPx: rowHPx.toFixed(1) + 'px',
+            headerHPx: headerHPx + 'px',
+            totalHPx: totalHPx + 'px',
+            noteHPx: noteHPx + 'px',
             fontSize: fontSize + 'pt',
             codeSize: codeSize + 'pt',
             padY: padY + 'px',
@@ -4665,49 +4503,98 @@
         }
         const css = `
             @media print {
-                body:not(.active-tab-barkod) #table-page-1 tr th,
-                body:not(.active-tab-barkod) #table-page-1 tr td {
+                body:not(.active-tab-barkod) #table-page-1 {
+                    width: 100% !important;
+                    table-layout: auto !important;
+                    border-collapse: collapse !important;
+                    height: ${p1.tableHeight} !important;
+                    min-height: ${p1.tableHeight} !important;
+                }
+                body:not(.active-tab-barkod) #table-page-1 thead tr th {
+                    height: ${p1.headerHPx} !important;
+                    font-size: ${p1.fontSize} !important;
+                    padding-top: ${p1.padY} !important;
+                    padding-bottom: ${p1.padY} !important;
+                    vertical-align: middle !important;
+                }
+                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-code {
+                    font-size: ${p1.codeSize} !important;
+                }
+                body:not(.active-tab-barkod) #table-page-1 tbody tr,
+                body:not(.active-tab-barkod) #table-page-1 tbody tr td {
+                    height: ${p1.rowHPx} !important;
                     font-size: ${p1.fontSize} !important;
                     padding-top: ${p1.padY} !important;
                     padding-bottom: ${p1.padY} !important;
                     line-height: ${p1.lineH} !important;
+                    vertical-align: middle !important;
                 }
-                body:not(.active-tab-barkod) #table-page-1 th.col-code,
-                body:not(.active-tab-barkod) #table-page-1 td.col-code {
+                body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-code {
                     font-size: ${p1.codeSize} !important;
                 }
+                body:not(.active-tab-barkod) #table-page-1 tr.row-total,
                 body:not(.active-tab-barkod) #table-page-1 tr.row-total td {
+                    height: ${p1.totalHPx} !important;
                     font-size: ${p1.totalFont} !important;
                     padding-top: ${p1.totalPad} !important;
                     padding-bottom: ${p1.totalPad} !important;
+                    vertical-align: middle !important;
                 }
+                body:not(.active-tab-barkod) #table-page-1 tr.row-note,
                 body:not(.active-tab-barkod) #table-page-1 tr.row-note td {
+                    height: ${p1.noteHPx} !important;
                     font-size: ${p1.fontSize} !important;
                     padding-top: ${p1.padY} !important;
                     padding-bottom: ${p1.padY} !important;
+                    vertical-align: middle !important;
                 }
                 #print-page-date-1 {
                     font-size: ${p1.dateFont} !important;
+                    line-height: 1.1 !important;
+                    margin-bottom: 2px !important;
                 }
 
-                body:not(.active-tab-barkod) #table-page-2 tr th,
-                body:not(.active-tab-barkod) #table-page-2 tr td {
+                body:not(.active-tab-barkod) #table-page-2 {
+                    width: 100% !important;
+                    table-layout: auto !important;
+                    border-collapse: collapse !important;
+                    height: ${p2.tableHeight} !important;
+                    min-height: ${p2.tableHeight} !important;
+                }
+                body:not(.active-tab-barkod) #table-page-2 thead tr th {
+                    height: ${p2.headerHPx} !important;
+                    font-size: ${p2.fontSize} !important;
+                    padding-top: ${p2.padY} !important;
+                    padding-bottom: ${p2.padY} !important;
+                    vertical-align: middle !important;
+                }
+                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-code {
+                    font-size: ${p2.codeSize} !important;
+                }
+                body:not(.active-tab-barkod) #table-page-2 tbody tr,
+                body:not(.active-tab-barkod) #table-page-2 tbody tr td {
+                    height: ${p2.rowHPx} !important;
                     font-size: ${p2.fontSize} !important;
                     padding-top: ${p2.padY} !important;
                     padding-bottom: ${p2.padY} !important;
                     line-height: ${p2.lineH} !important;
+                    vertical-align: middle !important;
                 }
-                body:not(.active-tab-barkod) #table-page-2 th.col-code,
-                body:not(.active-tab-barkod) #table-page-2 td.col-code {
+                body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-code {
                     font-size: ${p2.codeSize} !important;
                 }
+                body:not(.active-tab-barkod) #table-page-2 tr.row-total,
                 body:not(.active-tab-barkod) #table-page-2 tr.row-total td {
+                    height: ${p2.totalHPx} !important;
                     font-size: ${p2.totalFont} !important;
                     padding-top: ${p2.totalPad} !important;
                     padding-bottom: ${p2.totalPad} !important;
+                    vertical-align: middle !important;
                 }
                 #print-page-date-2 {
                     font-size: ${p2.dateFont} !important;
+                    line-height: 1.1 !important;
+                    margin-bottom: 2px !important;
                 }
             }
         `;
@@ -5363,20 +5250,7 @@
         const table1 = document.getElementById('table-page-1');
         const table2 = document.getElementById('table-page-2');
 
-        const applyDensity = (tbl, blk, effectiveLines) => {
-            if (!tbl) return;
-            tbl.classList.remove('dense-table', 'ultra-dense-table', 'compact-max-table', 'hyper-compact-table');
-            if (blk) blk.classList.remove('dense-table', 'ultra-dense-table', 'compact-max-table', 'hyper-compact-table');
-            let dClass = '';
-            if (effectiveLines >= 50) dClass = 'hyper-compact-table';
-            else if (effectiveLines >= 38) dClass = 'compact-max-table';
-            else if (effectiveLines >= 28) dClass = 'ultra-dense-table';
-            else if (effectiveLines >= 19) dClass = 'dense-table';
-            if (dClass) {
-                tbl.classList.add(dClass);
-                if (blk) blk.classList.add(dClass);
-            }
-        };
+
 
         if (activeTabKey === 'all') {
             const splitIdx = currentResultData.other_items_count || 0;
@@ -5387,12 +5261,6 @@
             const p1 = computeScaleParams(otherItems, !!page1Note);
             const p2 = computeScaleParams(bekoItems, false);
             applyDynamicPrintScale(p1, p2);
-
-            const lines1 = calcEffectiveLines(otherItems) + (page1Note ? 1.5 : 0) + (otherItems.length > 0 ? 1.5 : 0);
-            applyDensity(table1, block1, lines1);
-
-            const lines2 = calcEffectiveLines(bekoItems) + (bekoItems.length > 0 ? 1.5 : 0);
-            applyDensity(table2, block2, lines2);
 
             if (otherItems.length === 0 && bekoItems.length === 0 && !page1Note) {
                 tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
@@ -5433,9 +5301,6 @@
 
             const pBrand = computeScaleParams(items, false);
             applyDynamicPrintScale(pBrand, pBrand);
-
-            const linesBrand = calcEffectiveLines(items) + (items.length > 0 ? 1.5 : 0);
-            applyDensity(table1, block1, linesBrand);
 
             if (items.length === 0) {
                 tbody1.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">Aramanıza uygun ürün bulunamadı.</td></tr>`;
