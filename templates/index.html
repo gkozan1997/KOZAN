@@ -4421,8 +4421,8 @@
         let extra = 0;
         for (let i = 0; i < items.length; i++) {
             const nameLen = (items[i].name || '').length;
-            if (nameLen > 85) extra += 1.0;
-            else if (nameLen > 55) extra += 0.35;
+            if (nameLen > 80) extra += 1.0;
+            else if (nameLen > 50) extra += 0.3;
         }
         return extra;
     }
@@ -4431,55 +4431,49 @@
         const count = items ? items.length : 0;
         if (count === 0) {
             return {
-                tableHeight: 'auto',
                 rowHPx: '28px',
                 headerHPx: '24px',
                 totalHPx: '24px',
-                noteHPx: '22px',
+                noteHPx: '20px',
                 fontSize: '9.0pt',
                 codeSize: '8.5pt',
-                padY: '6.0px',
+                padY: '5.0px',
                 lineH: '1.20',
-                totalFont: '9.2pt',
-                totalPad: '6.0px',
+                totalFont: '9.0pt',
+                totalPad: '5.0px',
                 dateFont: '8.5pt'
             };
         }
-        // Yazdırılabilir A4 yüksekliği: 287mm (1084.7px)
-        // Sabit başlık + toplam satırı + tarih satırı (~62px, not varsa ~84px)
-        // Güvenlik payı: 15px (yazıcı subpixel ve kenarlık yuvarlama koruması)
-        const baseAvailHPx = hasNote ? 985.0 : 1007.0;
+        // Güvenli A4 yazdırma alanı (Mobil Safari 12.7mm ve Masaüstü 4mm marjinleri tam destekler)
+        // Tablo yüksekliği maksimum 240-250mm aralığında tutularak 2. sayfaya taşma kesin olarak engellenir.
+        const baseAvailHPx = hasNote ? 885.0 : 905.0;
         
-        // Uzun ürün adlarından kaynaklanan sarmalama hesabı
+        // Uzun ürün adlarından kaynaklanan sarmalama payı
         const extraLines = calcEffectiveLines(items);
-        const extraLinePx = extraLines * 11.5;
+        const extraLinePx = extraLines * 10.0;
         
-        // Satırlara düşen toplam dikey alan
-        const availForRows = Math.max(count * 10.5, baseAvailHPx - extraLinePx);
+        // Satırlara düşen toplam alan
+        const availForRows = Math.max(count * 9.5, baseAvailHPx - extraLinePx);
         const targetRowH = availForRows / count;
         
-        // Satır yüksekliğini 10.8px (90+ satır) ile 36.0px (<= 25 satır) aralığında dinamik ayarla
-        const rowHPx = Math.min(36.0, Math.max(10.8, targetRowH));
-        const ratio = (rowHPx - 10.8) / (36.0 - 10.8); // 0.0 (en sıkışık) ile 1.0 (en ferah)
+        // Satır yüksekliğini 9.8px (90+ satır) ile 32.0px (<= 25 satır) aralığında dinamik ayarla
+        const rowHPx = Math.min(32.0, Math.max(9.8, targetRowH));
+        const ratio = (rowHPx - 9.8) / (32.0 - 9.8); // 0.0 (en sıkışık) ile 1.0 (en ferah)
 
-        const fontSize = (6.4 + ratio * (9.5 - 6.4)).toFixed(1);
-        const codeSize = (5.9 + ratio * (9.0 - 5.9)).toFixed(1);
-        const padY = Math.max(0.5, (rowHPx - (parseFloat(fontSize) * 1.33)) / 2.0).toFixed(1);
-        const lineH = (1.05 + ratio * 0.22).toFixed(2);
+        const fontSize = (5.8 + ratio * (9.2 - 5.8)).toFixed(1);
+        const codeSize = (5.3 + ratio * (8.7 - 5.3)).toFixed(1);
+        const padY = Math.max(0.3, (rowHPx - (parseFloat(fontSize) * 1.33)) / 2.0).toFixed(1);
+        const lineH = (1.03 + ratio * 0.20).toFixed(2);
         
-        const totalFont = (6.8 + ratio * (9.8 - 6.8)).toFixed(1);
-        const totalPad = Math.max(1.2, rowHPx * 0.22).toFixed(1);
-        const dateFont = (7.5 + ratio * (8.8 - 7.5)).toFixed(1);
+        const totalFont = (6.4 + ratio * (9.4 - 6.4)).toFixed(1);
+        const totalPad = Math.max(0.8, rowHPx * 0.18).toFixed(1);
+        const dateFont = (7.0 + ratio * (8.8 - 7.0)).toFixed(1);
         
-        const headerHPx = Math.max(18, Math.min(28, rowHPx * 1.15)).toFixed(1);
-        const totalHPx = Math.max(20, Math.min(30, rowHPx * 1.2)).toFixed(1);
-        const noteHPx = Math.max(18, Math.min(26, rowHPx * 1.1)).toFixed(1);
-
-        // Tablonun toplam dikey boyutu (mm)
-        const totalTableHeightMm = Math.round((count * rowHPx + extraLinePx + (hasNote ? 70 : 48)) * 0.264583);
+        const headerHPx = Math.max(18, Math.min(26, rowHPx * 1.15)).toFixed(1);
+        const totalHPx = Math.max(18, Math.min(26, rowHPx * 1.15)).toFixed(1);
+        const noteHPx = Math.max(16, Math.min(24, rowHPx * 1.10)).toFixed(1);
 
         return {
-            tableHeight: Math.min(276, Math.max(120, totalTableHeightMm)) + 'mm',
             rowHPx: rowHPx.toFixed(1) + 'px',
             headerHPx: headerHPx + 'px',
             totalHPx: totalHPx + 'px',
@@ -4507,8 +4501,6 @@
                     width: 100% !important;
                     table-layout: auto !important;
                     border-collapse: collapse !important;
-                    height: ${p1.tableHeight} !important;
-                    min-height: ${p1.tableHeight} !important;
                 }
                 body:not(.active-tab-barkod) #table-page-1 thead tr th {
                     height: ${p1.headerHPx} !important;
@@ -4558,8 +4550,6 @@
                     width: 100% !important;
                     table-layout: auto !important;
                     border-collapse: collapse !important;
-                    height: ${p2.tableHeight} !important;
-                    min-height: ${p2.tableHeight} !important;
                 }
                 body:not(.active-tab-barkod) #table-page-2 thead tr th {
                     height: ${p2.headerHPx} !important;
