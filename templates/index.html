@@ -5639,7 +5639,7 @@
         const createRowHtml = (itm) => `
             <tr onclick="toggleRowCollected(this)" title="Dokunarak toplandı olarak işaretleyin / geri alın" style="cursor: pointer;">
                 <td class="col-qty"><span class="qty-badge">${itm.qty}</span></td>
-                <td class="col-check"><span class="collect-box" aria-hidden="true" title="Toplandı olarak işaretle"></span></td>
+                <td class="col-check"></td>
                 <td class="col-name">${formatProductName(itm.name || '')}</td>
                 <td class="col-code"><span class="code-badge">${escapeHtml(itm.stok || '-')}</span></td>
             </tr>
