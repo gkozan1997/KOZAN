@@ -1115,15 +1115,25 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         else:
             max_page_rows = len(rows_data)
 
-        if max_page_rows > 45:
+        if max_page_rows > 60:
+            is_dense = True
+            row_h = 13.8
+            header_h = 18
+            f_header = Font(name='Segoe UI', size=8.5, bold=True, color='FFFFFF')
+            f_regular = Font(name='Segoe UI', size=7.8)
+            f_qty = Font(name='Segoe UI', size=8.5, bold=True)
+            f_code = Font(name='Segoe UI', size=7.8, bold=True, color='1E293B')
+            m_horiz = 0.25
+            m_vert = 0.25
+        elif max_page_rows > 45:
             is_dense = True
             row_h = 16.5
             header_h = 20
-            f_header = Font(name='Segoe UI', size=9, bold=True, color='FFFFFF')
+            f_header = Font(name='Segoe UI', size=9.5, bold=True, color='FFFFFF')
             f_regular = Font(name='Segoe UI', size=8.5)
             f_qty = Font(name='Segoe UI', size=9.5, bold=True)
             f_code = Font(name='Segoe UI', size=8.5, bold=True, color='1E293B')
-            m_horiz = 0.25
+            m_horiz = 0.3
             m_vert = 0.3
         elif max_page_rows > 30:
             is_dense = True

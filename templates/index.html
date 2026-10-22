@@ -2650,7 +2650,10 @@
             body:not(.active-tab-barkod) table.data-table th,
             body:not(.active-tab-barkod) table.data-table td {
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
-                padding: 1.5px 4px !important;
+                padding-top: 1.5px !important;
+                padding-bottom: 1.5px !important;
+                padding-left: 4px !important;
+                padding-right: 4px !important;
                 font-size: 8pt !important;
                 line-height: 1.12 !important;
                 height: auto !important;
@@ -2660,10 +2663,11 @@
 
             body:not(.active-tab-barkod) table.data-table th.col-qty,
             body:not(.active-tab-barkod) table.data-table td.col-qty {
-                width: 34px !important;
-                min-width: 32px !important;
-                max-width: 38px !important;
-                padding: 1.5px 2px !important;
+                width: 38px !important;
+                min-width: 34px !important;
+                max-width: 44px !important;
+                padding-left: 2px !important;
+                padding-right: 2px !important;
                 text-align: center !important;
                 white-space: nowrap !important;
                 font-weight: 800 !important;
@@ -2672,7 +2676,8 @@
             body:not(.active-tab-barkod) table.data-table th.col-name,
             body:not(.active-tab-barkod) table.data-table td.col-name {
                 width: auto !important;
-                padding: 1.5px 5px !important;
+                padding-left: 6px !important;
+                padding-right: 6px !important;
                 text-align: left !important;
                 word-break: normal !important;
                 overflow-wrap: break-word !important;
@@ -2680,10 +2685,11 @@
 
             body:not(.active-tab-barkod) table.data-table th.col-code,
             body:not(.active-tab-barkod) table.data-table td.col-code {
-                width: 90px !important;
-                min-width: 80px !important;
-                max-width: 105px !important;
-                padding: 1.5px 3px !important;
+                width: 95px !important;
+                min-width: 85px !important;
+                max-width: 110px !important;
+                padding-left: 3px !important;
+                padding-right: 3px !important;
                 text-align: center !important;
                 white-space: nowrap !important;
                 font-family: 'JetBrains Mono', monospace !important;
@@ -4591,42 +4597,125 @@
     //   barkod  → 100mm x 100mm termal, margin 0
     // ==============================================================
     const PRINT_PAGE_RULES = {
-        siparis: '@page { size: A4 portrait; margin: 6mm 8mm; }',
+        siparis: '@page { size: A4 portrait; margin: 5mm 6mm; }',
         oliz: '@page { size: A4 portrait; margin: 6mm 8mm; }',
         barkod: '@page { size: 100mm 100mm; margin: 0; }'
     };
 
-    function calcEffectiveLines(items, hasNote, hasTotal) {
-        if (!items || items.length === 0) return hasNote ? 1.5 : 0;
+    function calcEffectiveLines(items) {
+        if (!items || items.length === 0) return 0;
         let lines = 0;
         for (let i = 0; i < items.length; i++) {
             const nameLen = (items[i].name || '').length;
-            if (nameLen > 90) lines += 2.5;
-            else if (nameLen > 45) lines += 1.8;
+            if (nameLen > 80) lines += 2.0;
+            else if (nameLen > 42) lines += 1.4;
             else lines += 1.0;
         }
-        if (hasNote) lines += 1.5;
-        if (hasTotal) lines += 1.5;
         return lines;
     }
 
-    function getSiparisPageRule() {
-        if (!currentResultData) return '@page { size: A4 portrait; margin: 6mm 7mm; }';
-        const splitIdx = currentResultData.other_items_count || 0;
-        const allItems = currentResultData.grouped_items || [];
-        const otherItems = allItems.slice(0, splitIdx);
-        const bekoItems = allItems.slice(splitIdx);
-        const hasNote = !!getPage1Note();
+    function computeScaleParams(items, hasNote) {
+        const count = items ? items.length : 0;
+        if (count === 0) {
+            return {
+                fontSize: '9.0pt',
+                codeSize: '8.5pt',
+                padY: '6.0px',
+                lineH: '1.20',
+                totalFont: '9.2pt',
+                totalPad: '6.5px',
+                dateFont: '8.5pt'
+            };
+        }
+        const effLines = calcEffectiveLines(items);
+        // Yazdırılabilir A4 yüksekliği: 287mm (1084px) - sabit başlık/toplam satırları (~66px) = 1018px
+        const availH = hasNote ? 996.0 : 1018.0;
+        const E = Math.max(1.0, effLines);
         
-        const lines1 = calcEffectiveLines(otherItems, hasNote, otherItems.length > 0);
-        const lines2 = calcEffectiveLines(bekoItems, false, bekoItems.length > 0);
-        const maxLines = Math.max(lines1, lines2);
+        const targetRowH = availH / E;
+        // Satır yüksekliğini 11.0px (90+ satır) ile 36.0px (<= 25 satır) aralığında dinamik sınırla
+        const rowH = Math.min(36.0, Math.max(11.0, targetRowH));
+        const ratio = (rowH - 11.0) / (36.0 - 11.0); // 0.0 (çok sıkışık) ile 1.0 (ferah)
 
-        if (maxLines >= 50) return '@page { size: A4 portrait; margin: 2.5mm 3.5mm; }';
-        if (maxLines >= 38) return '@page { size: A4 portrait; margin: 3mm 4mm; }';
-        if (maxLines >= 28) return '@page { size: A4 portrait; margin: 4mm 5mm; }';
-        if (maxLines >= 19) return '@page { size: A4 portrait; margin: 5mm 6mm; }';
-        return '@page { size: A4 portrait; margin: 6mm 7mm; }';
+        const fontSize = (5.5 + ratio * (9.5 - 5.5)).toFixed(1);
+        const codeSize = (5.0 + ratio * (9.0 - 5.0)).toFixed(1);
+        const padY = (0.4 + ratio * (8.0 - 0.4)).toFixed(1);
+        const lineH = (1.02 + ratio * 0.25).toFixed(2);
+        const totalFont = (6.0 + ratio * (9.8 - 6.0)).toFixed(1);
+        const totalPad = (0.8 + ratio * (8.5 - 0.8)).toFixed(1);
+        const dateFont = (6.5 + ratio * (8.8 - 6.5)).toFixed(1);
+
+        return {
+            fontSize: fontSize + 'pt',
+            codeSize: codeSize + 'pt',
+            padY: padY + 'px',
+            lineH: lineH,
+            totalFont: totalFont + 'pt',
+            totalPad: totalPad + 'px',
+            dateFont: dateFont + 'pt'
+        };
+    }
+
+    function applyDynamicPrintScale(p1, p2) {
+        let styleEl = document.getElementById('dynamic-table-scale-rule');
+        if (!styleEl) {
+            styleEl = document.createElement('style');
+            styleEl.id = 'dynamic-table-scale-rule';
+            document.head.appendChild(styleEl);
+        }
+        const css = `
+            @media print {
+                body:not(.active-tab-barkod) #table-page-1 tr th,
+                body:not(.active-tab-barkod) #table-page-1 tr td {
+                    font-size: ${p1.fontSize} !important;
+                    padding-top: ${p1.padY} !important;
+                    padding-bottom: ${p1.padY} !important;
+                    line-height: ${p1.lineH} !important;
+                }
+                body:not(.active-tab-barkod) #table-page-1 th.col-code,
+                body:not(.active-tab-barkod) #table-page-1 td.col-code {
+                    font-size: ${p1.codeSize} !important;
+                }
+                body:not(.active-tab-barkod) #table-page-1 tr.row-total td {
+                    font-size: ${p1.totalFont} !important;
+                    padding-top: ${p1.totalPad} !important;
+                    padding-bottom: ${p1.totalPad} !important;
+                }
+                body:not(.active-tab-barkod) #table-page-1 tr.row-note td {
+                    font-size: ${p1.fontSize} !important;
+                    padding-top: ${p1.padY} !important;
+                    padding-bottom: ${p1.padY} !important;
+                }
+                #print-page-date-1 {
+                    font-size: ${p1.dateFont} !important;
+                }
+
+                body:not(.active-tab-barkod) #table-page-2 tr th,
+                body:not(.active-tab-barkod) #table-page-2 tr td {
+                    font-size: ${p2.fontSize} !important;
+                    padding-top: ${p2.padY} !important;
+                    padding-bottom: ${p2.padY} !important;
+                    line-height: ${p2.lineH} !important;
+                }
+                body:not(.active-tab-barkod) #table-page-2 th.col-code,
+                body:not(.active-tab-barkod) #table-page-2 td.col-code {
+                    font-size: ${p2.codeSize} !important;
+                }
+                body:not(.active-tab-barkod) #table-page-2 tr.row-total td {
+                    font-size: ${p2.totalFont} !important;
+                    padding-top: ${p2.totalPad} !important;
+                    padding-bottom: ${p2.totalPad} !important;
+                }
+                #print-page-date-2 {
+                    font-size: ${p2.dateFont} !important;
+                }
+            }
+        `;
+        styleEl.textContent = css;
+    }
+
+    function getSiparisPageRule() {
+        return '@page { size: A4 portrait; margin: 5mm 6mm; }';
     }
 
     function applyPrintPageSize(tab) {
@@ -5295,10 +5384,14 @@
             const otherItems = allItems.slice(0, splitIdx).filter(matchesQuery);
             const bekoItems = allItems.slice(splitIdx).filter(matchesQuery);
 
-            const lines1 = calcEffectiveLines(otherItems, !!page1Note, otherItems.length > 0);
+            const p1 = computeScaleParams(otherItems, !!page1Note);
+            const p2 = computeScaleParams(bekoItems, false);
+            applyDynamicPrintScale(p1, p2);
+
+            const lines1 = calcEffectiveLines(otherItems) + (page1Note ? 1.5 : 0) + (otherItems.length > 0 ? 1.5 : 0);
             applyDensity(table1, block1, lines1);
 
-            const lines2 = calcEffectiveLines(bekoItems, false, bekoItems.length > 0);
+            const lines2 = calcEffectiveLines(bekoItems) + (bekoItems.length > 0 ? 1.5 : 0);
             applyDensity(table2, block2, lines2);
 
             if (otherItems.length === 0 && bekoItems.length === 0 && !page1Note) {
@@ -5338,7 +5431,10 @@
 
             items = items.filter(matchesQuery);
 
-            const linesBrand = calcEffectiveLines(items, false, items.length > 0);
+            const pBrand = computeScaleParams(items, false);
+            applyDynamicPrintScale(pBrand, pBrand);
+
+            const linesBrand = calcEffectiveLines(items) + (items.length > 0 ? 1.5 : 0);
             applyDensity(table1, block1, linesBrand);
 
             if (items.length === 0) {
