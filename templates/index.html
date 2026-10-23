@@ -5153,8 +5153,9 @@
         let extra = 0;
         for (let i = 0; i < items.length; i++) {
             const nameLen = (items[i].name || '').length;
-            if (nameLen > 85) extra += 2.0;
-            else if (nameLen > 48) extra += 1.0;
+            if (nameLen > 210) extra += 3.0;
+            else if (nameLen > 140) extra += 2.0;
+            else if (nameLen > 75) extra += 1.0;
         }
         return extra;
     }
@@ -5163,59 +5164,54 @@
         const count = items ? items.length : 0;
         if (count === 0) {
             return {
-                rowHPx: '28px',
-                headerHPx: '22px',
-                totalHPx: '22px',
-                noteHPx: '20px',
-                fontSize: '9.0pt',
-                codeSize: '8.5pt',
-                padY: '5.0px',
-                lineH: '1.20',
-                totalFont: '9.0pt',
-                totalPad: '5.0px',
+                rowHPx: '24px',
+                headerHPx: '20px',
+                totalHPx: '20px',
+                noteHPx: '18px',
+                fontSize: '8.8pt',
+                codeSize: '8.2pt',
+                padY: '3.5px',
+                lineH: '1.14',
+                totalFont: '8.8pt',
+                totalPad: '2.5px',
                 dateFont: '8.5pt'
             };
         }
         // Mobil Safari AirPrint ve Masaüstü tam uyumlu güvenli A4 yazdırma bütçesi (piksel):
-        // AirPrint marjinleri (12.7mm) + Safari başlık/altlıkları (~20mm) düşüldüğünde
-        // sayfa gövdesinde net ~235mm (yaklaşık 888px) güvenli alan kalır.
-        // Tarih (14px) + Thead (18px) + Toplam (18px) + Not (16px) = ~66px.
-        // Satırlar için kalan net maksimum güvenli alan: ~760px - 830px.
-        let baseAvailHPx;
-        if (count <= 35) {
-            baseAvailHPx = hasNote ? 850.0 : 880.0;
-        } else if (count <= 55) {
-            baseAvailHPx = hasNote ? 800.0 : 830.0;
-        } else {
-            baseAvailHPx = hasNote ? 760.0 : 790.0;
-        }
+        // AirPrint marjinleri (~12.7mm) + Safari başlık/altlıkları (~15mm) düşüldüğünde
+        // sayfa gövdesinde net ~230-235mm (yaklaşık 870-890px) güvenli alan kalır.
+        // Tarih (15px) + Thead (20px) + Toplam (20px) + Not (~18px) + Tablo kenarlıkları (~25-40px) = ~80-115px.
+        // Satırlara (ve sarmalama paylarına) kalan net güvenli alan: 675px - 705px.
+        let baseAvailHPx = hasNote ? 675.0 : 705.0;
         
-        // Uzun ürün adlarından kaynaklanan sarmalama payı
+        // Uzun ürün adlarından (örn. Lenovo IdeaPad laptoplar) kaynaklanan sarmalama payı
+        // Her fazladan sarmalanan satır ortalama 13.0px dikey alan kaplar
         const extraLines = calcEffectiveLines(items);
-        const extraLinePx = extraLines * 7.5;
+        const extraLinePx = extraLines * 13.0;
         
-        // Satırlara düşen toplam alan (asla 8.8px satır yüksekliğinin altına düşmez)
-        const availForRows = Math.max(count * 8.8, baseAvailHPx - extraLinePx);
+        // Satırlara düşen toplam alan (asla 8.5px satır yüksekliğinin altına düşmez)
+        const availForRows = Math.max(count * 8.5, baseAvailHPx - extraLinePx);
         const targetRowH = availForRows / count;
         
-        // Satır yüksekliğini 8.8px (90+ satır) ile 30.0px (<= 25 satır) aralığında dinamik ayarla
-        const minRowH = 8.8;
-        const maxRowH = 30.0;
+        // Satır yüksekliğini 8.5px (90+ satır) ile 23.5px (<= 25 satır) aralığında dinamik ayarla
+        const minRowH = 8.5;
+        const maxRowH = 23.5;
         const rowHPx = Math.min(maxRowH, Math.max(minRowH, targetRowH));
         const ratio = (rowHPx - minRowH) / (maxRowH - minRowH); // 0.0 (en sıkışık) ile 1.0 (en ferah)
 
-        const fontSize = (5.2 + ratio * (9.0 - 5.2)).toFixed(1);
-        const codeSize = (4.8 + ratio * (8.5 - 4.8)).toFixed(1);
-        const padY = Math.max(0.1, (rowHPx - (parseFloat(fontSize) * 1.25)) / 2.0).toFixed(1);
-        const lineH = (1.00 + ratio * 0.18).toFixed(2);
+        const fontSize = (5.2 + ratio * (8.8 - 5.2)).toFixed(1);
+        const codeSize = (4.8 + ratio * (8.2 - 4.8)).toFixed(1);
+        // Dikey dolgu (padY) satırların şişerek sayfayı taşırmasını önlemek için max 3.5px ile sınırlandırılır
+        const padY = Math.max(0.2, Math.min(3.5, (rowHPx - (parseFloat(fontSize) * 1.25)) / 2.0)).toFixed(1);
+        const lineH = (1.02 + ratio * 0.12).toFixed(2);
         
-        const totalFont = (6.0 + ratio * (9.0 - 6.0)).toFixed(1);
-        const totalPad = Math.max(0.5, rowHPx * 0.15).toFixed(1);
+        const totalFont = (6.0 + ratio * (8.8 - 6.0)).toFixed(1);
+        const totalPad = Math.max(0.5, Math.min(2.5, rowHPx * 0.10)).toFixed(1);
         const dateFont = (6.8 + ratio * (8.5 - 6.8)).toFixed(1);
         
-        const headerHPx = Math.max(16, Math.min(24, rowHPx * 1.12)).toFixed(1);
-        const totalHPx = Math.max(16, Math.min(24, rowHPx * 1.12)).toFixed(1);
-        const noteHPx = Math.max(14, Math.min(22, rowHPx * 1.08)).toFixed(1);
+        const headerHPx = Math.max(16, Math.min(22, rowHPx * 1.05)).toFixed(1);
+        const totalHPx = Math.max(16, Math.min(22, rowHPx * 1.05)).toFixed(1);
+        const noteHPx = Math.max(14, Math.min(20, rowHPx * 1.02)).toFixed(1);
 
         return {
             rowHPx: rowHPx.toFixed(1) + 'px',
@@ -5277,8 +5273,8 @@
                     font-size: ${p1.fontSize} !important;
                     color: #ffffff !important;
                     text-align: center !important;
-                    padding-top: ${p1.padY} !important;
-                    padding-bottom: ${p1.padY} !important;
+                    padding-top: 2.5px !important;
+                    padding-bottom: 2.5px !important;
                     padding-left: 3px !important;
                     padding-right: 3px !important;
                     vertical-align: middle !important;
@@ -5402,8 +5398,8 @@
                     font-size: ${p2.fontSize} !important;
                     color: #ffffff !important;
                     text-align: center !important;
-                    padding-top: ${p2.padY} !important;
-                    padding-bottom: ${p2.padY} !important;
+                    padding-top: 2.5px !important;
+                    padding-bottom: 2.5px !important;
                     padding-left: 3px !important;
                     padding-right: 3px !important;
                     vertical-align: middle !important;
@@ -5532,13 +5528,11 @@
             : (cls.indexOf('active-tab-oliz') !== -1 ? 'oliz'
             : (cls.indexOf('active-tab-arsiv') !== -1 ? 'arsiv' : 'siparis'));
 
-        // Sipariş yazdırma öncesinde tüm listeyi ve aramayı garantiye al
+        // Sipariş yazdırma öncesinde tüm listeyi, dinamik ölçeklemeyi ve aramayı garantiye al
         if (tab === 'siparis' && currentResultData && currentResultData.grouped_items && currentResultData.grouped_items.length > 0) {
-            let needReRender = false;
             const searchInput = document.getElementById('table-search');
             if (searchInput && searchInput.value) {
                 searchInput.value = '';
-                needReRender = true;
             }
             if (activeTabKey !== 'all') {
                 activeTabKey = 'all';
@@ -5547,11 +5541,8 @@
                     document.querySelectorAll('#brand-tabs .tab-btn').forEach(b => b.classList.remove('active'));
                     allTabBtn.classList.add('active');
                 }
-                needReRender = true;
             }
-            if (needReRender) {
-                renderTableRows();
-            }
+            renderTableRows();
         }
         applyPrintPageSize(tab);
     });
