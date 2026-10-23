@@ -375,3 +375,15 @@ Statik + canlı denetimde tespit edilen **19 doğrulanmış hata** bulunmuş, ta
   - Sayfa 2 (`#table-page-2`: Beko, Grundig, Lenovo & Sony) ise uzun laptop ve donanım açıklamalarını rahatça karşılamak adına standart tam genişliğini (`width: 100% !important;`) korur.
   - Mobilde (`<= 768px`) dikey çizgilerin kaymaması için Rule 13'teki `table-layout: fixed !important` kuralları korunmuştur.
 
+---
+
+## 19. Tablo Başlıkları Renk ve Ortalama Standardı (Ürün Adı ve Stok Kodu)
+
+* **Kural:**
+  - Tablo başlık satırında (`<thead>`), koyu `#1E293B` arka plan üzerinde tüm başlık metinleri net ve okunaklı beyaz (`#ffffff !important`) olarak konumlandırılmıştır.
+  - **`Miktar` (`th.col-qty`):** Beyaz (`#ffffff !important`), kalın font (`font-weight: 700`) ve sütunda ortalıdır.
+  - **`Ürün Adı` (`th.col-name`):** Beyaz (`#ffffff !important`), kalın font ve sütun içinde **tam ortalı (`text-align: center !important;`)** olarak konumlandırılmıştır. (Gövdedeki `td.col-name` ürün listesi ise depo personeli için sola dayalı `text-align: left` standardını korur).
+  - **`Stok Kodu` (`th.col-code`):** Beyaz (`#ffffff !important`), kalın font ve sütunda ortalıdır (`text-align: center !important`).
+  - Bu standart masaüstü ekranda, mobilde ve tüm A4 baskı çıktılarında (`@media print` ve `applyDynamicPrintScale`) Sayfa 1, Sayfa 2 ve tekil marka sekmelerinin tamamında eksiksiz uygulanır.
+
+

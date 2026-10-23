@@ -632,6 +632,7 @@
             padding: 14px 16px;
             color: #ffffff;
             font-weight: 700;
+            text-align: center;
             letter-spacing: 0.02em;
             border-bottom: 1px solid var(--border-subtle);
         }
@@ -942,13 +943,28 @@
             transform: scale(1.05);
         }
 
-        th.col-name, td.col-name {
+        th.col-name {
+            width: auto;
+            text-align: center;
+            color: #ffffff;
+            padding: 12px 16px;
+        }
+
+        td.col-name {
             width: auto;
             text-align: left;
             padding: 12px 16px;
         }
 
-        th.col-code, td.col-code {
+        th.col-code {
+            width: 140px;
+            white-space: nowrap;
+            text-align: center;
+            color: #ffffff;
+            padding: 12px 20px;
+        }
+
+        td.col-code {
             width: 140px;
             white-space: nowrap;
             text-align: center;
@@ -1508,8 +1524,13 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            th:nth-child(2), th.col-name {
-                text-align: left !important;
+            th.col-name {
+                text-align: center !important;
+                color: #ffffff !important;
+            }
+            th.col-code {
+                text-align: center !important;
+                color: #ffffff !important;
             }
             tr {
                 break-inside: avoid !important;
@@ -1558,14 +1579,29 @@
                 text-align: center !important;
                 vertical-align: middle !important;
             }
-            th.col-name, td.col-name {
+            th.col-name {
+                width: auto !important;
+                text-align: center !important;
+                color: #ffffff !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+            }
+            td.col-name {
                 width: auto !important;
                 text-align: left !important;
                 color: #000000 !important;
                 word-break: normal !important;
                 overflow-wrap: break-word !important;
             }
-            th.col-code, td.col-code {
+            th.col-code {
+                width: 1% !important;
+                white-space: nowrap !important;
+                text-align: center !important;
+                font-family: inherit !important;
+                font-weight: 700 !important;
+                color: #ffffff !important;
+            }
+            td.col-code {
                 width: 1% !important;
                 white-space: nowrap !important;
                 text-align: center !important;
@@ -2837,7 +2873,15 @@
             }
 
             /* 3. SÜTUN: ÜRÜN ADI (Kalan genişliğin tamamı, okunaklı, esnek sarma) */
-            table.data-table th.col-name, 
+            table.data-table th.col-name {
+                width: auto !important;
+                padding: 6px 5px !important;
+                font-size: 11.5px !important;
+                line-height: 1.30 !important;
+                text-align: center !important;
+                color: #ffffff !important;
+                vertical-align: middle;
+            }
             table.data-table td.col-name {
                 width: auto !important;
                 padding: 6px 5px !important;
@@ -2850,7 +2894,17 @@
             }
 
             /* 4. SÜTUN: STOK KODU (Kompakt 82px, tek parça ve okunaklı monospace) */
-            table.data-table th.col-code, 
+            table.data-table th.col-code {
+                width: 82px !important;
+                max-width: 86px !important;
+                min-width: 76px !important;
+                padding: 6px 2px !important;
+                font-size: 10px !important;
+                font-weight: 700 !important;
+                text-align: center !important;
+                color: #ffffff !important;
+                vertical-align: middle;
+            }
             table.data-table td.col-code {
                 width: 82px !important;
                 max-width: 86px !important;
@@ -3129,7 +3183,13 @@
                 print-color-adjust: exact !important;
             }
 
-            body:not(.active-tab-barkod) table.data-table th.col-name,
+            body:not(.active-tab-barkod) table.data-table th.col-name {
+                width: auto !important;
+                padding-left: 5px !important;
+                padding-right: 5px !important;
+                text-align: center !important;
+                color: #ffffff !important;
+            }
             body:not(.active-tab-barkod) table.data-table td.col-name {
                 width: auto !important;
                 padding-left: 5px !important;
@@ -3137,9 +3197,21 @@
                 text-align: left !important;
                 word-break: normal !important;
                 overflow-wrap: break-word !important;
+                color: #000000 !important;
             }
 
-            body:not(.active-tab-barkod) table.data-table th.col-code,
+            body:not(.active-tab-barkod) table.data-table th.col-code {
+                width: 80px !important;
+                min-width: 72px !important;
+                max-width: 90px !important;
+                padding-left: 2px !important;
+                padding-right: 2px !important;
+                text-align: center !important;
+                white-space: nowrap !important;
+                color: #ffffff !important;
+                font-size: inherit !important;
+                font-weight: 700 !important;
+            }
             body:not(.active-tab-barkod) table.data-table td.col-code {
                 width: 80px !important;
                 min-width: 72px !important;
@@ -3150,6 +3222,7 @@
                 white-space: nowrap !important;
                 font-family: 'JetBrains Mono', monospace !important;
                 font-size: inherit !important;
+                color: #000000 !important;
             }
 
             /* Badge padding ve min-width sıfırlama (baskıda satırı şişirmesin) */
@@ -5202,6 +5275,8 @@
                 body:not(.active-tab-barkod) #table-page-1 thead tr th.col-code {
                     height: ${p1.headerHPx} !important;
                     font-size: ${p1.fontSize} !important;
+                    color: #ffffff !important;
+                    text-align: center !important;
                     padding-top: ${p1.padY} !important;
                     padding-bottom: ${p1.padY} !important;
                     padding-left: 3px !important;
@@ -5212,7 +5287,15 @@
                 body:not(.active-tab-barkod) #table-page-1 col.col-check { width: 24px !important; }
                 body:not(.active-tab-barkod) #table-page-1 col.col-name { width: auto !important; }
                 body:not(.active-tab-barkod) #table-page-1 col.col-code { width: 80px !important; }
-                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-code,
+                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-code {
+                    font-size: ${p1.codeSize} !important;
+                    width: 80px !important;
+                    min-width: 72px !important;
+                    max-width: 90px !important;
+                    white-space: nowrap !important;
+                    text-align: center !important;
+                    color: #ffffff !important;
+                }
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-code {
                     font-size: ${p1.codeSize} !important;
                     width: 80px !important;
@@ -5227,6 +5310,7 @@
                     max-width: 52px !important;
                     white-space: nowrap !important;
                     text-align: center !important;
+                    color: #ffffff !important;
                 }
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-qty {
                     width: 24px !important;
@@ -5243,7 +5327,11 @@
                     text-align: center !important;
                     vertical-align: middle !important;
                 }
-                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-name,
+                body:not(.active-tab-barkod) #table-page-1 thead tr th.col-name {
+                    width: auto !important;
+                    text-align: center !important;
+                    color: #ffffff !important;
+                }
                 body:not(.active-tab-barkod) #table-page-1 tbody tr td.col-name {
                     width: auto !important;
                     text-align: left !important;
@@ -5312,6 +5400,8 @@
                 body:not(.active-tab-barkod) #table-page-2 thead tr th.col-code {
                     height: ${p2.headerHPx} !important;
                     font-size: ${p2.fontSize} !important;
+                    color: #ffffff !important;
+                    text-align: center !important;
                     padding-top: ${p2.padY} !important;
                     padding-bottom: ${p2.padY} !important;
                     padding-left: 3px !important;
@@ -5322,7 +5412,15 @@
                 body:not(.active-tab-barkod) #table-page-2 col.col-check { width: 24px !important; }
                 body:not(.active-tab-barkod) #table-page-2 col.col-name { width: auto !important; }
                 body:not(.active-tab-barkod) #table-page-2 col.col-code { width: 80px !important; }
-                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-code,
+                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-code {
+                    font-size: ${p2.codeSize} !important;
+                    width: 80px !important;
+                    min-width: 72px !important;
+                    max-width: 90px !important;
+                    white-space: nowrap !important;
+                    text-align: center !important;
+                    color: #ffffff !important;
+                }
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-code {
                     font-size: ${p2.codeSize} !important;
                     width: 80px !important;
@@ -5337,6 +5435,7 @@
                     max-width: 52px !important;
                     white-space: nowrap !important;
                     text-align: center !important;
+                    color: #ffffff !important;
                 }
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-qty {
                     width: 24px !important;
@@ -5353,7 +5452,11 @@
                     text-align: center !important;
                     vertical-align: middle !important;
                 }
-                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-name,
+                body:not(.active-tab-barkod) #table-page-2 thead tr th.col-name {
+                    width: auto !important;
+                    text-align: center !important;
+                    color: #ffffff !important;
+                }
                 body:not(.active-tab-barkod) #table-page-2 tbody tr td.col-name {
                     width: auto !important;
                     text-align: left !important;
