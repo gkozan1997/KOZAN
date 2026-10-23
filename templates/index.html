@@ -616,6 +616,14 @@
             text-align: left;
         }
 
+        @media screen and (min-width: 769px) {
+            #table-page-1 {
+                width: max-content;
+                min-width: 0;
+                max-width: 100%;
+            }
+        }
+
         thead {
             background: #1e293b;
         }
@@ -1477,6 +1485,11 @@
                 font-size: 8pt !important;
                 line-height: 1.15 !important;
                 margin: 0 !important;
+            }
+            #table-page-1 {
+                width: max-content !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
             }
             thead {
                 display: table-header-group !important;
@@ -3025,6 +3038,11 @@
                 table-layout: auto !important;
                 border-collapse: collapse !important;
                 margin: 0 !important;
+            }
+            body:not(.active-tab-barkod) #table-page-1 {
+                width: max-content !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
             }
 
             body:not(.active-tab-barkod) table.data-table tr,
@@ -5169,7 +5187,8 @@
                 }
 
                 body:not(.active-tab-barkod) #table-page-1 {
-                    width: 100% !important;
+                    width: max-content !important;
+                    min-width: 0 !important;
                     max-width: 100% !important;
                     table-layout: auto !important;
                     border-collapse: collapse !important;

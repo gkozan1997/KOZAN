@@ -361,3 +361,17 @@ Statik + canlı denetimde tespit edilen **19 doğrulanmış hata** bulunmuş, ta
 * **Toast ve Excel Entegrasyonu:**
   - Ürün çıkarıldığında ekranda beliren bildirimde (toast) doğrudan `[↩️ Geri Al]` aksiyon butonu yer alır.
   - Ürün çıkarılmış haldeyken Excel İndirildiğinde (`/api/export-filtered-excel`) veya açıldığında, Excel dosyası da seçilen hariç tutmaları tanıyarak yalnızca aktif ürünlerle üretilir (`build_filtered_workbook`).
+
+---
+
+## 18. Sayfa 1 Ürün Adı ve Stok Kodu Sütun Yakınlaşma Standardı (Max-Content Fit)
+
+* **Problem & Amaç:**
+  - Sayfa 1'de (Diğer Markalar: Tefal, Babyliss, Philips, Braun, Karcher, WMF vb.) ürün isimleri Sayfa 2'deki uzun dizüstü bilgisayar (Lenovo IdeaPad serisi) veya Beko cihaz isimlerine göre daha kısa ve kompakttır.
+  - Tablonun tamamı `width: 100%` genişliğe zorlandığında, `col.col-name` (Ürün Adı) sütunu gereksiz yere sağa doğru aşırı genişlemekte ve ürün adı ile Stok Kodu sütunu arasında geniş bir boşluk oluşmaktaydı.
+* **Uygulanan Standart:**
+  - Sayfa 1 tablosu (`#table-page-1`), hem A4 dikey baskı motorunda (`applyDynamicPrintScale` ve `@media print`), hem de masaüstü ekranda (`@media screen and (min-width: 769px)`) `width: max-content !important; min-width: 0 !important; max-width: 100% !important;` kuralıyla doğrudan içerik genişliğine göre boyutlandırılmıştır.
+  - Bu sayede Ürün Adı sütununda en uzun ürün yazısı bittikten hemen sonra sağ taraftaki Stok Kodu sütunu tabloya yaklaşır ve aradaki gereksiz boşluk tamamen ortadan kalkar.
+  - Sayfa 2 (`#table-page-2`: Beko, Grundig, Lenovo & Sony) ise uzun laptop ve donanım açıklamalarını rahatça karşılamak adına standart tam genişliğini (`width: 100% !important;`) korur.
+  - Mobilde (`<= 768px`) dikey çizgilerin kaymaması için Rule 13'teki `table-layout: fixed !important` kuralları korunmuştur.
+
