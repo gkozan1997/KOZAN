@@ -9,7 +9,7 @@ Bu doküman, projenin mimari yapısını, pazaryeri sipariş formatlarını, iş
 * **Web Arayüzü & Sunucu:** `app.py` (Flask tabanlı, 127.0.0.1:5000 portunda çalışır).
 * **Çekirdek Motor:** `core_engine.py` (Tüm Excel okuma, temizleme, marka tespiti, Beko ayrıştırma ve A4 oluşturma mantığını barındırır).
 * **Konsol / CLI:** `process_orders.py` ve `order_processor.py`.
-* **Canlı Bulut Yayını (7/24 Aktif):** [kozan-rtki.vercel.app](https://kozan-rtki.vercel.app) (Vercel + GitHub `gkozan1997/KOZAN` entegrasyonu ile cep telefonu ve her yerden erişilebilir).
+* **Canlı Bulut Yayını (7/24 Aktif):** [kozan-sibl.vercel.app](https://kozan-sibl.vercel.app) (Vercel + GitHub `gkozan1997/KOZAN` entegrasyonu ile cep telefonu ve her yerden erişilebilir).
 * **Başlatıcılar:**
   * Proje içindeki `baslat.bat`.
   * Masaüstündeki `Siparis_Toplama_Programi.bat`.
@@ -156,7 +156,7 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
 ## 8. Otomatik GitHub & Vercel Senkronizasyonu Standardı
 
 * **Zorunlu Güncelleme Kuralı:** Projede yapılan her yenilik, kural güncellemesi, özellik eklemesi veya hata düzeltmesi sonrasında proje MUTLAKA GitHub'a commit ve push (`git push origin main`) edilir.
-* **Canlı Sistem Senkronizasyonu:** Bu sayede [kozan-rtki.vercel.app](https://kozan-rtki.vercel.app) üzerindeki canlı bulut yayını masaüstü sistemiyle daima %100 senkronize ve güncel kalır.
+* **Canlı Sistem Senkronizasyonu:** Bu sayede [kozan-sibl.vercel.app](https://kozan-sibl.vercel.app) üzerindeki canlı bulut yayını masaüstü sistemiyle daima %100 senkronize ve güncel kalır.
 
 ---
 
