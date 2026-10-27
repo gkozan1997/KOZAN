@@ -7,6 +7,7 @@ echo ===================================================================
 echo.
 echo Program baslatiliyor, lutfen bekleyin...
 echo Tarayiciniz otomatik olarak acilacaktir: http://127.0.0.1:5000
+echo Farkli agdan / mobilden erisim (7/24 Bulut): https://kozan-sibl.vercel.app
 echo.
 
 echo Port 5000 kontrol ediliyor...

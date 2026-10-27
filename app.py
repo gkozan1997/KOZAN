@@ -2,6 +2,7 @@ import os
 import sys
 import io
 import time
+import socket
 import secrets
 import threading
 import traceback
@@ -1184,10 +1185,23 @@ def open_browser():
 
 
 if __name__ == '__main__':
+    local_ip = '127.0.0.1'
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        local_ip = s.getsockname()[0]
+        s.close()
+    except Exception:
+        pass
+
     threading.Timer(0.8, open_browser).start()
     print("=" * 66)
     print("  DEPO PANELİ | SİPARİŞ & ÜRÜN TOPLAMA SİSTEMİ")
-    print(f"  Mod    : {'BULUT' if IS_CLOUD else 'MASAÜSTÜ'}")
-    print("  Adres  : http://127.0.0.1:5000")
+    print(f"  Mod          : {'BULUT' if IS_CLOUD else 'MASAÜSTÜ'}")
+    print("  Yerel (Bu PC): http://127.0.0.1:5000")
+    if local_ip != '127.0.0.1':
+        print(f"  Aynı Wi-Fi   : http://{local_ip}:5000")
+    print("  Canlı Bulut  : https://kozan-sibl.vercel.app")
     print("=" * 66)
-    app.run(host='127.0.0.1', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=False)
+
