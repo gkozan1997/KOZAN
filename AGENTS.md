@@ -56,27 +56,28 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
   * Ürün adı veya ilk kelimesi `BEKO` içeriyorsa,
   * Mağaza adı `beko` içeriyorsa (`Bingöl Ticaret - Beko`),
   * Veya ürün adı doğrudan Beko model kodlarıyla başlıyorsa (`KMX`, `7053MB`, `CM `, `CMX`, `B 600`, `B 710`, `BKK`, `BK RHC`, `BFC`, `BDE`, `TKM`, `BEU`, `KMB`, `9704`, `9705`, `31825`, `74826`, `FR 8374`, `FRA ` vb.) ya da net Beko model regex kalıbı taşıyorsa otomatik olarak **BEKO** markası olarak tanımlanır. (Not: Metin içindeki santimetre "CM" veya renk kodu "BK" gibi kısaltmalar ya da diğer markalar asla Beko ile karıştırılmaz).
-* **Beko, Grundig, Lenovo ve Sony Listeleme Davranışı (2. Sayfa ve 2. Sekme Standardı):**
-  * **IdeaPad ve PlayStation Tanıma Kriteri:**
+* **Beko, Grundig, Lenovo, Sony ve Leisure Listeleme Davranışı (2. Sayfa ve 2. Sekme Standardı):**
+  * **IdeaPad, PlayStation ve Leisure Tanıma Kriteri:**
     - Ürün adında veya marka sütununda `IdeaPad` geçen veya `IdeaPad` ile başlayan tüm ürünler (başında Lenovo yazmasa dahi, örn: 'IdeaPad Slim 3...') otomatik olarak **LENOVO** markası olarak tanımlanır ve doğrudan **2. Sayfaya** basılır.
     - Ürün adında veya markasında `Sony`, `PlayStation`, `PS5`, `PS4` geçen ürünler otomatik olarak **SONY** markası olarak tanımlanır ve doğrudan **2. Sayfaya** basılır.
+    - Ürün adında, markasında, mağazasında veya stok kodunda `Leisure` geçen ürünler otomatik olarak **LEISURE** markası olarak tanımlanır ve doğrudan **2. Sayfaya** basılır.
   * **Genel Liste (1. Sekme - `Ürün Toplama Listesi`):**
-    - İlk olarak diğer tüm markalar (Delonghi, Thor, Tefal, Babyliss, Philips, Braun, Teka, Bissell vb.) listelenir.
-    - Diğer markaların bittiği satıra dikey sayfa sonu (`Break(id=other_items_count + 1)`) eklenir; böylece **BEKO, GRUNDIG, LENOVO (IdeaPad dahil) ve SONY (PlayStation dahil) markalı ürünler doğrudan 2. Sayfaya** basılır.
+    - İlk olarak diğer tüm markalar (Delonghi, Thor, Dipbi, Tefal, Babyliss, Philips, Braun, Teka, Bissell vb.) listelenir.
+    - Diğer markaların bittiği satıra dikey sayfa sonu (`Break(id=other_items_count + 1)`) eklenir; böylece **BEKO, GRUNDIG, LENOVO (IdeaPad dahil), SONY (PlayStation dahil) ve LEISURE markalı ürünler doğrudan 2. Sayfaya** basılır.
     - 2. sayfada da `Miktar`, `Ürün Adı`, `Stok Kodu` başlıklarının en üstte tekrarlanması için `ws.print_title_rows = '1:1'` ve `fitToHeight = 2` kullanılır.
   * **Excel Çalışma Kitabı Sekmeleri:**
-    - 1. Sekme: `Ürün Toplama Listesi` (Sayfa 1: Diğer Markalar, Sayfa 2: Beko, Grundig, Lenovo & Sony).
-    - 2. Sekme: Özel **`BEKO, GRUNDIG, LENOVO & SONY`** sekmesi (tüm Beko, Grundig, Lenovo ve Sony siparişleri burada toplanır).
-    - 3+ Sekmeler: Diğer markaların alfabetik/adet sıralı özel sekmeleri (`TEFAL`, `BABYLISS`, `DELONGHI`, `THOR`, `PHILIPS` vb.).
+    - 1. Sekme: `Ürün Toplama Listesi` (Sayfa 1: Diğer Markalar, Sayfa 2: Beko, Grundig, Lenovo, Sony & Leisure).
+    - 2. Sekme: Özel **`BEKO, GRUNDIG, LENOVO & SONY`** sekmesi (tüm Beko, Grundig, Lenovo, Sony ve Leisure siparişleri burada toplanır).
+    - 3+ Sekmeler: Diğer markaların alfabetik/adet sıralı özel sekmeleri (`DIPBI`, `TEFAL`, `BABYLISS`, `DELONGHI`, `THOR`, `PHILIPS` vb.).
   * **Web Arayüzü Sekmeleri:**
     - 1. Sekme: `Tümü (Ana Liste)`
-    - 2. Sekme: `🛡️ BEKO, GRUNDIG, LENOVO & SONY (X Adet)`
-    - 3+ Sekmeler: `DELONGHI`, `THOR`, `TEFAL`, `BABYLISS`, vb.
-  * **Bağımsız Dosya:** `Beko_Urun_Toplama_Listesi_A4.xlsx` eş zamanlı olarak tüm Beko, Grundig, Lenovo & Sony siparişlerini bağımsız A4 listesi olarak üretir.
-  * **Seçenekli Ayrıştırma (`filter_beko=True`):** Kullanıcı arayüzdeki "Beko, Grundig, Lenovo & Sony siparişlerini ana listeden ayır" onay kutusunu işaretlerse, bu ürünler ana listeden çıkarılır ve yalnızca bağımsız listede yer alır.
+    - 2. Sekme: `🛡️ BEKO, GRUNDIG, LENOVO, SONY & LEISURE (X Adet)`
+    - 3+ Sekmeler: `DIPBI`, `DELONGHI`, `THOR`, `TEFAL`, `BABYLISS`, vb.
+  * **Bağımsız Dosya:** `Beko_Urun_Toplama_Listesi_A4.xlsx` eş zamanlı olarak tüm Beko, Grundig, Lenovo, Sony & Leisure siparişlerini bağımsız A4 listesi olarak üretir.
+  * **Seçenekli Ayrıştırma (`filter_beko=True`):** Kullanıcı arayüzdeki "Beko, Grundig, Lenovo, Sony & Leisure siparişlerini ana listeden ayır" onay kutusunu işaretlerse, bu ürünler ana listeden çıkarılır ve yalnızca bağımsız listede yer alır.
 * **Diğer Markalar (1. Sayfa Standardı):**
-  * `DELONGHI`, `THOR`, `TEFAL`, `BABYLISS`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ`, `NESPRESSO`, `KRUPS`, `MELITTA`, `SAGE`, `SIMFER`, `KUMTEL`, `LUXELL`, `SINBO`, `KARCHER`, `ROWENTA` vb.
-  * Delonghi, Thor ve benzeri tüm markalar doğrudan **1. Sayfaya** basılır. Asla 2. Sayfaya (Beko, Grundig, Lenovo & Sony) kaymaz.
+  * `DIPBI`, `DELONGHI`, `THOR`, `TEFAL`, `BABYLISS`, `BISSELL`, `PHILIPS`, `BRAUN`, `WMF`, `KENWOOD`, `ARIETE`, `LAURASTAR`, `TEKA`, `IPHONE/APPLE`, `FAKIR`, `ARZUM`, `KARACA`, `KORKMAZ`, `NESPRESSO`, `KRUPS`, `MELITTA`, `SAGE`, `SIMFER`, `KUMTEL`, `LUXELL`, `SINBO`, `KARCHER`, `ROWENTA` vb.
+  * Dipbi, Delonghi, Thor ve benzeri tüm markalar doğrudan **1. Sayfaya** basılır. Asla 2. Sayfaya kaymaz.
   * Her marka için Excel çalışma kitabında otomatik olarak özel A4 sekmesi oluşturulur.
 * **Büyük Beyaz Eşya, Ankastre, TV ve Garanti Filtrelemesi (`is_major_appliance_or_warranty` + `is_conditional_appliance`):**
   * Gerçek filtreleme `consolidate_and_build` (`core_engine.py`) içindeki `is_item_excluded()` ile yapılır; `is_major_appliance_or_warranty` her satır için doğrudan uygulanır; `is_conditional_appliance` ise **Beko Ocaklar**, **Beko ADP 61420 Davlumbaz serisi** ve **Beko Ankastre Mikrodalgalar** (BMC, BMGB, BMM serisi) için uygulanır.

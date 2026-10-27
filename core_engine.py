@@ -69,7 +69,8 @@ KNOWN_BRANDS = [
     'BERGHOFF', 'ZWILLING', 'PASABAHCE', 'LAV', 'BORCAM', 'SINFONIA', 
     'SMEG', 'BERETTA', 'FERROLI', 'DEMIRDOKUM', 'ECA', 'BAYMAK', 
     'VAILLANT', 'VIESSMANN', 'BUDERUS', 'DAIKIN', 'MITSUBISHI',
-    'HITACHI', 'SHARP', 'PIONEER', 'HOMEND', 'COSMED', 'AWOX'
+    'HITACHI', 'SHARP', 'PIONEER', 'HOMEND', 'COSMED', 'AWOX',
+    'LEISURE', 'DIPBI'
 ]
 
 BRAND_ALIASES = {
@@ -85,6 +86,9 @@ BRAND_ALIASES = {
     "PLAYSTATION": "SONY",
     "PLAYSTATION 5": "SONY",
     "PLAYSTATION 4": "SONY",
+    "LEISURE": "LEISURE",
+    "DIPBI": "DIPBI",
+    "DIP BI": "DIPBI",
 }
 
 BEKO_START_MODELS = [
@@ -342,7 +346,7 @@ def is_excluded_product(name, brand='', stok=''):
     if brand and brand != 'BEKO' and 'BEKO' not in canonical_key(name):
         return False
     u_name = canonical_key(name)
-    if any(kb in u_name for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY')):
+    if any(kb in u_name for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE')):
         return False
     return is_major_appliance_or_warranty(name, stok=stok)
 
@@ -400,8 +404,19 @@ def detect_brand(full_name, store='', brand_col='', stok=''):
             return 'KARCHER'
         if 'LENOVO' in stok_upper or 'IDEAPAD' in stok_upper:
             return 'LENOVO'
+        if 'LEISURE' in stok_upper:
+            return 'LEISURE'
+        if 'DIPBI' in stok_upper or 'DIP BI' in stok_upper:
+            return 'DIPBI'
         if 'BEKO' in stok_upper:
             return 'BEKO'
+
+    if store:
+        s_canon = canonical_key(store)
+        if 'LEISURE' in s_canon:
+            return 'LEISURE'
+        if 'DIPBI' in s_canon or 'DIP BI' in s_canon:
+            return 'DIPBI'
 
     if brand_col:
         m = canonical_key(brand_col)
@@ -409,6 +424,10 @@ def detect_brand(full_name, store='', brand_col='', stok=''):
             m_norm = BRAND_ALIASES.get(m, m)
             if 'IDEAPAD' in m_norm or 'LENOVO' in m_norm:
                 return 'LENOVO'
+            if 'LEISURE' in m_norm:
+                return 'LEISURE'
+            if 'DIPBI' in m_norm or 'DIP BI' in m_norm:
+                return 'DIPBI'
             for kb in sorted(KNOWN_BRANDS, key=len, reverse=True):
                 if kb == m_norm or f" {kb} " in f" {m_norm} ":
                     return BRAND_ALIASES.get(kb, kb)
@@ -427,15 +446,23 @@ def detect_brand(full_name, store='', brand_col='', stok=''):
     if 'PLAYSTATION' in u_upper or 'PLAYSTATION' in first_word or re.search(r'\bPS[45]\b', u_upper):
         return 'SONY'
 
-    # 0.2 Kärcher model kodları (SC 1-5, WV 1-6, WD 1-6, SE 3-6, K 2-7, FC 3-7, VC 2-7 vb.)
+    # 0.2 Leisure kontrolü (Leisure marka siparişler 2. sayfaya gider)
+    if 'LEISURE' in u_upper or 'LEISURE' in first_word:
+        return 'LEISURE'
+
+    # 0.3 Dipbi kontrolü (Dipbi marka siparişler 1. sayfaya gider)
+    if 'DIPBI' in u_upper or 'DIPBI' in first_word or 'DIP BI' in u_upper:
+        return 'DIPBI'
+
+    # 0.4 Kärcher model kodları (SC 1-5, WV 1-6, WD 1-6, SE 3-6, K 2-7, FC 3-7, VC 2-7 vb.)
     if re.search(r'\b(SC\s*[1-5]|WV\s*[1-6]|WD\s*[1-6]|SE\s*[3-6]|K\s*[2-7]|FC\s*[3-7]|VC\s*[2-7])\b', u_upper) and any(kw in u_upper for kw in ['EASYFIX', 'BUHARLI', 'YIKAMA', 'SUPURGE', 'TEMIZLEME', 'BASINCLI']):
         return 'KARCHER'
 
-    # 0.3 Babyliss model kodları (MS750, C1600, AS773, AS774, AS970, AS6550, W2447, C112, C260, C325, T881, 5910E vb.)
+    # 0.5 Babyliss model kodları (MS750, C1600, AS773, AS774, AS970, AS6550, W2447, C112, C260, C325, T881, 5910E vb.)
     if re.search(r'\b(MS750|C1600|AS773|AS774|AS970|AS6550|W2447|C112|C260|C325|T881|5910E|D572|ST395|ST492|C319|C338|C454|MS22)\b', u_upper):
         return 'BABYLISS'
 
-    # 0.4 Tefal Blendeo
+    # 0.6 Tefal Blendeo
     if 'BLENDEO' in u_upper or 'BLENDEO' in first_word:
         return 'TEFAL'
 
@@ -1101,10 +1128,10 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
 
     for item in all_raw_rows:
         i_brand = item.get('brand', '')
-        if i_brand in KNOWN_BRANDS and i_brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'):
+        if i_brand in KNOWN_BRANDS and i_brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'):
             is_beko = False
         else:
-            is_beko = (i_brand == 'BEKO' or (('BEKO' in canonical_key(item['name']) or is_beko_7723_minibar(item['name']) or is_beko_7723_minibar(item.get('stok', ''))) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'))))
+            is_beko = (i_brand == 'BEKO' or (('BEKO' in canonical_key(item['name']) or is_beko_7723_minibar(item['name']) or is_beko_7723_minibar(item.get('stok', ''))) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'))))
         if is_beko:
             ord_no = item.get('order_no', '')
             cust_key = canonical_key(item.get('customer', ''))
@@ -1131,9 +1158,9 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
 
     def is_item_excluded(item):
         i_brand = item.get('brand', '')
-        if i_brand in KNOWN_BRANDS and i_brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'):
+        if i_brand in KNOWN_BRANDS and i_brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'):
             return False
-        is_beko = (i_brand == 'BEKO' or (('BEKO' in canonical_key(item['name']) or is_beko_7723_minibar(item['name']) or is_beko_7723_minibar(item.get('stok', ''))) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'))))
+        is_beko = (i_brand == 'BEKO' or (('BEKO' in canonical_key(item['name']) or is_beko_7723_minibar(item['name']) or is_beko_7723_minibar(item.get('stok', ''))) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'))))
         # Sadece BEKO markasına uygulanır, diğer markalar asla elenmez
         if not is_beko:
             return False
@@ -1194,10 +1221,10 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         if brand in ('DİĞER', 'DIGER', 'OTHER', 'UNKNOWN') or not brand:
             brand = detect_brand(item['name'], item.get('magaza', ''), item.get('brand', ''), stok=stok)
 
-        if brand in KNOWN_BRANDS and brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'):
+        if brand in KNOWN_BRANDS and brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'):
             is_beko = False
         else:
-            is_beko = (brand == 'BEKO' or ('BEKO' in canonical_key(item['name']) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY'))))
+            is_beko = (brand == 'BEKO' or ('BEKO' in canonical_key(item['name']) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'))))
         if is_beko:
             brand = 'BEKO'
 
@@ -1208,6 +1235,14 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         is_sony = (brand == 'SONY' or 'SONY' in canonical_key(item['name']) or 'PLAYSTATION' in canonical_key(item['name']))
         if is_sony:
             brand = 'SONY'
+
+        is_leisure = (brand == 'LEISURE' or 'LEISURE' in canonical_key(item['name']))
+        if is_leisure:
+            brand = 'LEISURE'
+
+        is_dipbi = (brand == 'DIPBI' or 'DIPBI' in canonical_key(item['name']) or 'DIP BI' in canonical_key(item['name']))
+        if is_dipbi:
+            brand = 'DIPBI'
 
         ord_no = item.get('order_no', '')
         cust_raw = item.get('customer', '')
@@ -1228,7 +1263,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         else:
             merge_key = ('NAME_MAJOR' if is_with_major else 'NAME', brand, canonical_key(clean_name))
 
-        is_special_brand = (is_beko or brand in ('GRUNDIG', 'LENOVO', 'SONY'))
+        is_special_brand = (is_beko or brand in ('GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'))
         target_dict = beko_consolidated if (filter_beko and is_special_brand) else brand_consolidated[brand]
 
         if merge_key not in target_dict:
@@ -1265,7 +1300,8 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
     grundig_list = list(brand_orders.get('GRUNDIG', []))
     lenovo_list = list(brand_orders.get('LENOVO', []))
     sony_list = list(brand_orders.get('SONY', []))
-    beko_grundig_orders = beko_list + grundig_list + lenovo_list + sony_list
+    leisure_list = list(brand_orders.get('LEISURE', []))
+    beko_grundig_orders = beko_list + grundig_list + lenovo_list + sony_list + leisure_list
 
     if filter_beko:
         processed_beko = []
@@ -1285,19 +1321,21 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         b_grundig = [x for x in processed_beko if x['brand'] == 'GRUNDIG']
         b_lenovo = [x for x in processed_beko if x['brand'] == 'LENOVO']
         b_sony = [x for x in processed_beko if x['brand'] == 'SONY']
-        b_other = [x for x in processed_beko if x['brand'] not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY')]
+        b_leisure = [x for x in processed_beko if x['brand'] == 'LEISURE']
+        b_other = [x for x in processed_beko if x['brand'] not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE')]
         beko_orders = (
             sort_items_by_family_and_color(b_beko) +
             sort_items_by_family_and_color(b_grundig) +
             sort_items_by_family_and_color(b_lenovo) +
             sort_items_by_family_and_color(b_sony) +
+            sort_items_by_family_and_color(b_leisure) +
             sort_items_by_family_and_color(b_other)
         )
         beko_grundig_orders = beko_orders
     else:
         beko_orders = beko_grundig_orders
 
-    other_brand_keys = [b for b in brand_orders.keys() if b not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY')]
+    other_brand_keys = [b for b in brand_orders.keys() if b not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE')]
     sorted_other_keys = sorted(other_brand_keys, key=lambda b: sum(x['qty'] for x in brand_orders[b]), reverse=True)
 
     grouped_items = []
