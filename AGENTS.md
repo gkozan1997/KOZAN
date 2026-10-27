@@ -90,6 +90,7 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Minibar / BEKO 7723 Ms Siyah 33 Litre Minibar (ve tüm Beko minibar modelleri: doğrudan listeden hariç tutulur, siparişleri toplama listesine eklenmez)
     - Ankastre Fırın, Mini Fırın, Solo Fırın, Buhar Destekli Fırın, Ocaklı Fırın
     - Çamaşır Makinesi
+    - Beyaz Eşya Paketleri ve Setleri (Beko 2 li Çamaşır ve Bulaşık Paketi, Çamaşır ve Kurutma Paketi, Bulaşık ve Buzdolabı Paketi, 3 lü Çeyiz Paketi, Beyaz Eşya Paketi, Ankastre Setler - Stok kodu CMSRBLSKPKT, BYZESY vb. olan tüm büyük eşya paketleri ve kombinasyonları doğrudan listeden elenir)
     - Ek Garanti, Garanti Uzatma Paketleri (Beko vb. ek garantiler - Lenovo Garanti hariç)
     - TV / Televizyon (QLED, OLED, Smart LED vb.)
     - Derin Dondurucu (Çekmeceli, Sandık tipi vb.)

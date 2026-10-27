@@ -138,6 +138,7 @@ EXCLUDE_PRODUCT_KEYWORDS = [
     'camasir makinesi',
     'bulasik makinesi',
     'buzdolabi',
+    'buz dolabi',
     'minibar',
     'ankastre firin',
     'mini firin',
@@ -159,6 +160,33 @@ EXCLUDE_PRODUCT_KEYWORDS = [
     'boyler',
     'ani su isitici',
     'ani su isiticisi',
+    'camasir ve bulasik',
+    'bulasik ve camasir',
+    'camasir ve kurutma',
+    'kurutma ve camasir',
+    'camasir ve buzdolabi',
+    'buzdolabi ve camasir',
+    'bulasik ve buzdolabi',
+    'buzdolabi ve bulasik',
+    'camasir paketi',
+    'camasir seti',
+    'bulasik paketi',
+    'bulasik seti',
+    'buzdolabi paketi',
+    'buzdolabi seti',
+    'kurutma paketi',
+    'kurutma seti',
+    'beyaz esya paketi',
+    'beyaz esya seti',
+    'beyaz esya',
+    'ceyiz paketi',
+    'ceyiz seti',
+    'dugun paketi',
+    'dugun seti',
+    'ankastre set',
+    'ankastre seti',
+    'ankastre paket',
+    'ankastre paketi',
 ]
 
 def is_beko_adp61420(name):
@@ -214,9 +242,10 @@ def is_conditional_appliance(name, stok=''):
     # 3. Beko Ankastre Mikrodalgalarda müşteri tek başına aldıysa listeye ekle, yanında büyük ürün varsa ekleme.
     return is_beko_ocak(name) or is_beko_adp61420(name) or is_beko_ankastre_mikrodalga(name, stok)
 
-def is_major_appliance_or_warranty(name):
+def is_major_appliance_or_warranty(name, stok=''):
     norm = normalize_tr(name)
-    if not norm:
+    norm_stok = normalize_tr(stok) if stok else ''
+    if not norm and not norm_stok:
         return False
 
     # 1. KESİNLİKLE KORUNACAKLAR (İstisnalar)
@@ -225,63 +254,97 @@ def is_major_appliance_or_warranty(name):
     if 'sac kurutma' in norm:
         return False
     # Mikrodalga kontrolü: Solo mikrodalgalar küçük ev aletidir ve korunur; ankastre mikrodalgalar ise koşullu üründür (tek başına alınınca korunur, büyük ürünle elenir)
-    if 'mikrodalga' in norm or is_beko_ankastre_mikrodalga(norm):
+    if 'mikrodalga' in norm or is_beko_ankastre_mikrodalga(norm, stok):
         return False
     # Beko ADP 61420 davlumbaz ve renkleri koşullu üründür (tek başına alınınca korunur, büyük ürünle elenir)
     if is_beko_adp61420(norm):
         return False
+    # Ütü ve kumaş bakım cihazları küçük ev aletidir ve korunur
+    if 'utu' in norm or 'iron' in norm or 'tiftik' in norm:
+        return False
 
-    # 2. TV / Televizyon kontrolü
+    # 2. Stok Kodu Kontrolü (Büyük beyaz eşya paket/bundle stok kodları: CMSRBLSKPKT36, CMSRKURT vb.)
+    if norm_stok:
+        if re.search(r'(cmsr.*blsk|blsk.*cmsr|cmsr.*kurt|kurt.*cmsr|bzdlb.*cmsr|cmsr.*bzdlb)', norm_stok):
+            return True
+        if re.search(r'\b(cmsr|blsk|bzdlb|kurt|byzesy|ceyiz|dugun).*(pkt|set)\b', norm_stok):
+            return True
+
+    # 3. TV / Televizyon kontrolü
     if 'televizyon' in norm:
         return True
-    cleaned_words = norm.replace('"', ' ').replace("'", ' ').replace('-', ' ').replace(',', ' ').replace('.', ' ').split()
+    cleaned_words = re.sub(r'[^a-z0-9]', ' ', norm).split()
     if 'tv' in cleaned_words or 'qled' in cleaned_words or 'oled' in cleaned_words:
         return True
 
-    # 3. Kurutma makinesi (çamaşır / büyük)
-    if 'kurutma makinesi' in norm:
+    # 4. Kurutma makinesi & kurutma paketleri
+    if 'kurutma makinesi' in norm or 'kurutma paketi' in norm or 'kurutma seti' in norm:
+        return True
+    if 'kurutma' in norm and not any(w in norm for w in ['sac kurutma', 'meyve', 'sebze', 'gida']):
         return True
 
-    # 4. Fırınlar (Mikrodalga yukarıda istisna yapıldığı için diğer ankastre/mini fırınlar elenir)
+    # 5. Bulaşık ve Çamaşır (Bulaşık her zaman büyük eşyadır; çamaşır da ütü hariç çamaşır makinesi/paketidir)
+    if 'bulasik' in norm:
+        return True
+    if 'camasir' in norm:
+        return True
+
+    # 6. Beyaz Eşya Paketleri, Çeyiz/Düğün Paketleri & Ankastre Setler
+    if any(kw in norm for kw in [
+        'beyaz esya', 'ceyiz paketi', 'ceyiz seti', 'dugun paketi', 'dugun seti',
+        'ankastre set', 'ankastre seti', 'ankastre paket', 'ankastre paketi'
+    ]):
+        return True
+
+    # 7. Paket / Set kelimesi + Büyük Eşya kelimesi
+    has_package = any(pw in norm for pw in ['paket', 'seti', ' set ', 'kombin', '2 li', '2\'li', '3 lu', '3\'lu', '4 lu', '4\'lu', '5 li', '5\'li']) or norm.endswith(' set')
+    if has_package and any(mw in norm for mw in ['buzdolabi', 'buz dolabi', 'dondurucu', 'firin', 'ocak', 'davlumbaz']):
+        return True
+
+    # 8. Fırınlar (Mikrodalga yukarıda istisna yapıldığı için diğer ankastre/mini fırınlar elenir)
     if 'ankastre firin' in norm or 'mini firin' in norm or 'buhar destekli firin' in norm or 'solo firin' in norm or ' firin' in norm or norm.endswith('firin'):
         return True
 
-    # 5. Davlumbaz ve Aspiratör (Büyük Eşyalar - Doğrudan hariç tutulur; Ocak ve ADP 61420 tek başına alınınca listeye eklenir)
+    # 9. Davlumbaz ve Aspiratör (Büyük Eşyalar - Doğrudan hariç tutulur; Ocak ve ADP 61420 tek başına alınınca listeye eklenir)
     if 'davlumbaz' in norm or 'aspirator' in norm:
         return True
     if re.search(r'\b(adp\s*\d+[a-z0-9]*|bde\s*\d+[a-z0-9]*|ade\s*\d+[a-z0-9]*|hde\s*\d+[a-z0-9]*|cde\s*\d+[a-z0-9]*|p\s*38|p\s*41|p\s*27)\b', norm):
         return True
 
-    # 6. Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS vb.)
+    # 10. Yazarkasa / POS Cihazları (Beko X30 TR Yazarkasa POS vb.)
     if 'yazarkasa' in norm or 'yazar kasa' in norm or 'pos cihazi' in norm or 'odeme kaydedici' in norm or 'okc' in cleaned_words:
         return True
     if 'pos' in cleaned_words and ('yazar' in norm or 'kasa' in norm or 'x30' in norm or '300 tr' in norm or '220' in norm or '400' in norm or 'mobil' in norm or 'cihaz' in norm or 'eft' in norm):
         return True
 
-    # 7. Termosifon, şofben, kombi, boyler ve ani su ısıtıcıları (Büyük su ısıtma ve ısıtma cihazları)
+    # 11. Termosifon, şofben, kombi, boyler ve ani su ısıtıcıları (Büyük su ısıtma ve ısıtma cihazları)
     if 'termosifon' in norm or 'sofben' in norm or 'boyler' in norm or 'ani su isitici' in norm or 'ani su isiticisi' in norm:
         return True
     if re.search(r'\bkombi\b', norm):
         return True
 
-    # 7.1 Minibar kontrolü: Beko 7723 MS Siyah 33 Litre Minibar
-    if is_beko_7723_minibar(norm):
+    # 12. Dondurucu (derin dondurucu, sandık tipi vb. - dondurma hariç)
+    if 'dondurucu' in norm and 'dondurma' not in norm:
         return True
 
-    # 8. Diğer beyaz eşya & garanti listesi
+    # 13. Buzdolabı & Minibar
+    if 'buzdolabi' in norm or 'buz dolabi' in norm or is_beko_7723_minibar(norm) or is_beko_7723_minibar(stok):
+        return True
+
+    # 14. Diğer beyaz eşya & garanti listesi
     for kw in EXCLUDE_PRODUCT_KEYWORDS:
         if kw in norm:
             return True
 
     return False
 
-def is_excluded_product(name, brand=''):
+def is_excluded_product(name, brand='', stok=''):
     if brand and brand != 'BEKO' and 'BEKO' not in canonical_key(name):
         return False
     u_name = canonical_key(name)
     if any(kb in u_name for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY')):
         return False
-    return is_major_appliance_or_warranty(name)
+    return is_major_appliance_or_warranty(name, stok=stok)
 
 def safe_sheet_title(title, used_titles=None):
     """
@@ -1049,7 +1112,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
             ph = re.sub(r'\D', '', str(item.get('phone', '')))
             is_valid_phone = len(ph) >= 10
 
-            if is_major_appliance_or_warranty(item['name']) or is_beko_7723_minibar(item.get('stok', '')):
+            if is_major_appliance_or_warranty(item['name'], item.get('stok', '')) or is_beko_7723_minibar(item.get('stok', '')):
                 if ord_no: orders_with_beko_major.add(ord_no)
                 if is_valid_cust: customers_with_beko_major.add(cust_key)
                 if is_valid_phone: customers_with_beko_major.add(ph[-10:])
@@ -1078,7 +1141,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         name = item['name']
         stok = (item.get('stok') or '').strip()
         # 1. Büyük beyaz eşyalar (buzdolabı, çamaşır, bulaşık, kurutma, minibar, fırın, klima, tv, ADE/BDE davlumbaz vb.) ve garantiler KESİNLİKLE elenir
-        if is_major_appliance_or_warranty(name) or is_beko_7723_minibar(stok):
+        if is_major_appliance_or_warranty(name, stok) or is_beko_7723_minibar(stok):
             return True
 
         ord_no = item.get('order_no', '')
