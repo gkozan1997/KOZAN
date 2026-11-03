@@ -212,17 +212,19 @@ def is_beko_ankastre_mikrodalga(name, stok=''):
         return True
     return False
 
-def is_beko_ocak(name):
+def is_beko_ocak(name, stok=''):
     norm = normalize_tr(name)
-    if not norm:
+    norm_stok = normalize_tr(stok) if stok else ''
+    combined = f"{norm} {norm_stok}".strip()
+    if not combined:
         return False
-    if 'mikrodalga' in norm or 'sac kurutma' in norm:
+    if 'mikrodalga' in combined or 'sac kurutma' in combined:
         return False
-    if 'ankastre firin' in norm or 'mini firin' in norm or 'solo firin' in norm or ' firin' in norm or norm.endswith('firin'):
+    if 'ankastre firin' in combined or 'mini firin' in combined or 'solo firin' in combined or ' firin' in combined or combined.endswith('firin'):
         return False
-    if 'ocak' in norm or 'ocaklar' in norm:
+    if re.search(r'\b(ocak|ocaklar)\b', combined):
         return True
-    if re.search(r'\b(bocd\s*[a-z0-9]*|bomd\s*[a-z0-9]*|bsomd\s*[a-z0-9]*|boi\s*\d+[a-z0-9]*|hocd\s*[a-z0-9]*)\b', norm):
+    if re.search(r'\b(bocd\s*[a-z0-9]*|bomd\s*[a-z0-9]*|bsomd\s*[a-z0-9]*|boi\s*\d+[a-z0-9]*|hocd\s*[a-z0-9]*)\b', combined):
         return True
     return False
 
@@ -263,7 +265,7 @@ def is_conditional_appliance(name, stok=''):
     # 2. Beko ADP61420S duvar tipi davlumbaz ve diğer renklerinde müşteri tek başına aldıysa listeye ekle, yanında büyük ürün varsa ekleme.
     # 3. Beko Ankastre Mikrodalgalarda müşteri tek başına aldıysa listeye ekle, yanında büyük ürün varsa ekleme.
     # 4. Beko Aspiratörlerde (P 38, P 41 vb.) müşteri tek başına aldıysa listeye ekle, yanında büyük ürün varsa ekleme.
-    return is_beko_ocak(name) or is_beko_adp61420(name) or is_beko_ankastre_mikrodalga(name, stok) or is_beko_aspirator(name, stok)
+    return is_beko_ocak(name, stok) or is_beko_adp61420(name) or is_beko_ankastre_mikrodalga(name, stok) or is_beko_aspirator(name, stok)
 
 def is_major_appliance_or_warranty(name, stok=''):
     norm = normalize_tr(name)
@@ -1167,7 +1169,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
                 if ord_no: orders_with_beko_major.add(ord_no)
                 if is_valid_cust: customers_with_beko_major.add(cust_key)
                 if is_valid_phone: customers_with_beko_major.add(ph[-10:])
-            if is_beko_ocak(item['name']):
+            if is_beko_ocak(item['name'], item.get('stok', '')):
                 if ord_no: orders_with_beko_ocak.add(ord_no)
                 if is_valid_cust: customers_with_beko_ocak.add(cust_key)
                 if is_valid_phone: customers_with_beko_ocak.add(ph[-10:])
@@ -1212,7 +1214,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         # 2. Kullanıcı kuralı: Beko Ocaklar, ADP 61420 Davlumbaz serisi, Ankastre Mikrodalgalar ve Aspiratörler (P 38, P 41 vb.)
         # - Tek başına ise -> LİSTELE (return False)
         # - Büyüğün yanında ise veya AYNI MÜŞTERİ AYRI SİPARİŞLERİNDE BÜYÜK ÜRÜN VARSA -> LİSTELEME (return True)!
-        is_ocak = is_beko_ocak(name)
+        is_ocak = is_beko_ocak(name, stok)
         is_adp = is_beko_adp61420(name)
         is_amd = is_beko_ankastre_mikrodalga(name, stok)
         is_asp = is_beko_aspirator(name, stok)
