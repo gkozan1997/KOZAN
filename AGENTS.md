@@ -88,7 +88,7 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Çamaşır Kurutma Makinesi, Kurutma Makinesi
     - Bulaşık Makinesi
     - Buzdolabı (Mini Buzdolabı dahil)
-    - Minibar / BEKO 7723 Ms Siyah 33 Litre Minibar (ve tüm Beko minibar modelleri: doğrudan listeden hariç tutulur, siparişleri toplama listesine eklenmez)
+    - Minibar / BEKO 7723 Ms Siyah 33 Litre Minibar, BEKO 7726 MC Minibar (ve tüm Beko minibar modelleri: doğrudan listeden hariç tutulur, siparişleri toplama listesine eklenmez)
     - Ankastre Fırın, Mini Fırın, Solo Fırın, Buhar Destekli Fırın, Ocaklı Fırın
     - Çamaşır Makinesi
     - Beyaz Eşya Paketleri ve Setleri (Beko 2 li Çamaşır ve Bulaşık Paketi, Çamaşır ve Kurutma Paketi, Bulaşık ve Buzdolabı Paketi, 3 lü Çeyiz Paketi, Beyaz Eşya Paketi, Ankastre Setler - Stok kodu CMSRBLSKPKT, BYZESY vb. olan tüm büyük eşya paketleri ve kombinasyonları doğrudan listeden elenir)
