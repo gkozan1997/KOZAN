@@ -95,11 +95,12 @@ BEKO_START_MODELS = [
     'KMX', '7053', 'CM ', 'CMX', 'B 600', 'B 710', 'B600', 'B710',
     'BKK', 'BK RHC', 'BK ', 'BFC', 'BDE', 'TKM', 'BEU', 'KMB', 
     '9704', '9705', '31825', '74826', 'FR 8374', 'FRA ', 'FRA', 
-    'RHB', 'CFM', 'FK 81', 'FK81', 'ADP', 'ADE', 'BOCD', '7723'
+    'RHB', 'CFM', 'FK 81', 'FK81', 'ADP', 'ADE', 'BOCD', '7723',
+    'OTB'
 ]
 
 BEKO_INLINE_REGEX = re.compile(
-    r'\b(7723\s*MS|7723|7053MB|BKK\s*\d+|TKM\s*\d+|BEU\s*\d+|BFC\s*\d+|BDE\s*\d+[A-Z0-9]*|ADP\s*\d+[A-Z0-9]*|ADE\s*\d+[A-Z0-9]*|BOCD\s*[A-Z0-9]+|KMX\s*\d+|CMX\s*\d+|FRA\s*\d+|RHB\s*\d+|CFM\s*\d+|CM\s*\d{3,4}|BK\s*(?:RHC|\d{3,4}))\b',
+    r'\b(7723\s*MS|7723|7053MB|BKK\s*\d+|TKM\s*\d+|BEU\s*\d+|BFC\s*\d+|BDE\s*\d+[A-Z0-9]*|ADP\s*\d+[A-Z0-9]*|ADE\s*\d+[A-Z0-9]*|BOCD\s*[A-Z0-9]+|OTB\s*\d+[A-Z0-9]*|KMX\s*\d+|CMX\s*\d+|FRA\s*\d+|RHB\s*\d+|CFM\s*\d+|CM\s*\d{3,4}|BK\s*(?:RHC|\d{3,4}))\b',
     re.IGNORECASE
 )
 
@@ -240,6 +241,38 @@ def is_beko_7723_minibar(name):
             return True
     return False
 
+def is_beko_otb_car_fridge(name, stok=''):
+    """
+    Kullanıcı talebi: OTB 51223 M Araç Buzdolabı (ve benzeri taşınabilir araç buzdolapları)
+    büyük ev tipi buzdolabı olarak elenmez; küçük/özel taşınabilir cihaz olarak
+    BEKO markası altında sipariş toplama listesine eklenir ve 2. Sayfada listelenir.
+    """
+    norm = normalize_tr(name)
+    norm_stok = normalize_tr(stok) if stok else ''
+    combined = f"{norm} {norm_stok}".strip()
+    if not combined:
+        return False
+
+    # 1. OTB ve 51223 kombinasyonu (OTB 51223 M, OTB51223M vb.)
+    if 'otb' in combined and '51223' in combined:
+        return True
+    if re.search(r'\botb\s*51223', combined):
+        return True
+
+    # 2. Araç / oto tipi buzdolabı ve (OTB veya 51223 veya Beko)
+    is_car_fridge = (
+        any(w in combined for w in [
+            'arac buzdolab', 'oto buzdolab', 'tasinabilir buzdolab',
+            'arac ici buzdolab', 'aractipi buzdolab', 'arac tipi buzdolab'
+        ])
+        or (('arac' in combined or 'oto' in combined) and 'buzdolab' in combined)
+    )
+    if is_car_fridge:
+        if 'otb' in combined or '51223' in combined or 'beko' in combined:
+            return True
+
+    return False
+
 def is_beko_aspirator(name, stok=''):
     norm = normalize_tr(name)
     norm_stok = normalize_tr(stok) if stok else ''
@@ -277,6 +310,9 @@ def is_major_appliance_or_warranty(name, stok=''):
     if ('lenovo' in norm or 'ideapad' in norm) and 'garanti' in norm:
         return False
     if 'sac kurutma' in norm:
+        return False
+    # Araç buzdolabı istisnası: Beko OTB 51223 M Araç Buzdolabı küçük oto tipi cihazdır, siparişleri toplanır ve listelenir
+    if is_beko_otb_car_fridge(norm, stok):
         return False
     # Mikrodalga kontrolü: Solo mikrodalgalar küçük ev aletidir ve korunur; ankastre mikrodalgalar ise koşullu üründür (tek başına alınınca korunur, büyük ürünle elenir)
     if 'mikrodalga' in norm or is_beko_ankastre_mikrodalga(norm, stok):
@@ -489,6 +525,10 @@ def detect_brand(full_name, store='', brand_col='', stok=''):
     # 0.6 Tefal Blendeo
     if 'BLENDEO' in u_upper or 'BLENDEO' in first_word:
         return 'TEFAL'
+
+    # 0.7 Beko Araç Buzdolabı (OTB 51223 M vb. doğrudan BEKO markasına atanır)
+    if is_beko_otb_car_fridge(full_name, stok):
+        return 'BEKO'
 
     # 1. Başlangıç veya ilk kelime bilinen marka mı? (Delonghi, Thor, Philips, Tefal, vb.)
     for kb in sorted(KNOWN_BRANDS, key=len, reverse=True):
@@ -1157,7 +1197,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         if i_brand in KNOWN_BRANDS and i_brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'):
             is_beko = False
         else:
-            is_beko = (i_brand == 'BEKO' or (('BEKO' in canonical_key(item['name']) or is_beko_7723_minibar(item['name']) or is_beko_7723_minibar(item.get('stok', ''))) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'))))
+            is_beko = (i_brand == 'BEKO' or (('BEKO' in canonical_key(item['name']) or is_beko_otb_car_fridge(item['name'], item.get('stok', '')) or is_beko_7723_minibar(item['name']) or is_beko_7723_minibar(item.get('stok', ''))) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'))))
         if is_beko:
             ord_no = item.get('order_no', '')
             cust_key = canonical_key(item.get('customer', ''))
@@ -1190,7 +1230,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         i_brand = item.get('brand', '')
         if i_brand in KNOWN_BRANDS and i_brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'):
             return False
-        is_beko = (i_brand == 'BEKO' or (('BEKO' in canonical_key(item['name']) or is_beko_7723_minibar(item['name']) or is_beko_7723_minibar(item.get('stok', ''))) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'))))
+        is_beko = (i_brand == 'BEKO' or (('BEKO' in canonical_key(item['name']) or is_beko_otb_car_fridge(item['name'], item.get('stok', '')) or is_beko_7723_minibar(item['name']) or is_beko_7723_minibar(item.get('stok', ''))) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'))))
         # Sadece BEKO markasına uygulanır, diğer markalar asla elenmez
         if not is_beko:
             return False
@@ -1258,7 +1298,7 @@ def consolidate_and_build(all_raw_rows, source_filenames, filter_beko=False, cus
         if brand in KNOWN_BRANDS and brand not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'):
             is_beko = False
         else:
-            is_beko = (brand == 'BEKO' or ('BEKO' in canonical_key(item['name']) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'))))
+            is_beko = (brand == 'BEKO' or is_beko_otb_car_fridge(item['name'], stok) or ('BEKO' in canonical_key(item['name']) and not any(kb in canonical_key(item['name']) for kb in KNOWN_BRANDS if kb not in ('BEKO', 'GRUNDIG', 'LENOVO', 'SONY', 'LEISURE'))))
         if is_beko:
             brand = 'BEKO'
 

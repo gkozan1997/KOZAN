@@ -108,6 +108,7 @@ Pazaryeri ve entegrasyon dosyalarında başlıklar değişkenlik gösterebilir:
     - Solo Mikrodalga Fırın (Beko BMD 200, BMD 240 vb. tezgah üstü solo mikrodalgalar küçük ev aletidir, toplanmaya devam eder)
     - Su Isıtıcı / Su Isıtıcısı (Kettle - Mutfak tipi tezgah üstü kettle cihazları küçük ev aletidir, listede toplanmaya devam eder)
     - Saç Kurutma Makinesi (BaByliss, Grundig vb.)
+    - Beko OTB 51223 M Araç Buzdolabı (Taşınabilir araç ve oto tipi buzdolapları küçük/özel sınıftır; ev tipi buzdolapları gibi elenmez, BEKO markası altında toplanır ve 2. Sayfada listelenir)
     - Tüm Küçük Ev Aletleri (Kahve/Çay Makinesi, Blender, Ütü, Fritöz, Süpürge, Tost Makinesi vb.), Telefon ve Bilgisayarlar.
 
 ---
